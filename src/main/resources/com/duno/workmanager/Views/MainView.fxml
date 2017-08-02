@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane minHeight="800.0" minWidth="1280.0" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.duno.workmanager.Controllers.MainViewController">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu mnemonicParsing="false" text="Soubor">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Nový">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+                  <MenuItem mnemonicParsing="false" text="Uložit soubor">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem mnemonicParsing="false" text="Uložit jako..." />
+                  <MenuItem mnemonicParsing="false" text="Otevřít...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Export">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="XLSX Tabulka">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Ostatní">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Autor..." />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <bottom>
+        <ButtonBar maxHeight="40.0" minHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <buttons>
+                <ChoiceBox fx:id="choiceBox" maxWidth="85.0" minWidth="85.0" ButtonBar.buttonData="RIGHT" />
+            </buttons>
+            <padding>
+                <Insets left="17.0" right="17.0" />
+            </padding>
+        </ButtonBar>
+    </bottom>
+    <center>
+        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <Tab closable="false" disable="false" text="Leden">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Únor">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Březen">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Duben">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Květen">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Červen">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Červenec">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Srpen">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Září">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Říjen">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Listopad">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+            <Tab closable="false" disable="false" text="Prosinec">
+                <fx:include source="MonthView.fxml" />
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>
