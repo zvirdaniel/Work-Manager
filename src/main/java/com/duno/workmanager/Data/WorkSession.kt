@@ -31,6 +31,19 @@ class WorkSession {
     val duration get() = Duration.between(beginDate.toInstant(), endDate.toInstant())
     val profit get() = duration.toMinutes().toDouble() * (hourlyWage.toDouble() / 60.0)
 
+    val czechBeginDate: String
+        get() {
+            val formatter = SimpleDateFormat("dd. MM. yyyy")
+            return formatter.format(beginDate)
+        }
+
+
+    val beginTime: String
+        get() {
+            val formatter = SimpleDateFormat("HH:mm")
+            return formatter.format(beginDate)
+        }
+
     /**
      * @param beginDate Date when the session started, implicitly set to Instant.now()
      * @param endDate Date when the session ended
@@ -81,34 +94,6 @@ class WorkSession {
      */
     constructor(raw: WorkSessionRaw) : this(raw.beginDate, raw.endDate,
             raw.hourlyWage, raw.description)
-
-
-    // Generated code
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-
-        other as WorkSession
-
-        if (beginDate != other.beginDate) return false
-        if (endDate != other.endDate) return false
-        if (hourlyWage != other.hourlyWage) return false
-        if (description != other.description) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = beginDate.hashCode()
-        result = 31 * result + endDate.hashCode()
-        result = 31 * result + hourlyWage
-        result = 31 * result + description.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "WorkSession(beginDate=$beginDate, endDate=$endDate, hourlyWage=$hourlyWage, description='$description')"
-    }
 }
 
 /**

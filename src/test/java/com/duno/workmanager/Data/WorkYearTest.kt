@@ -2,14 +2,13 @@ package com.duno.workmanager.Data
 
 import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
-import java.io.File
 
 /**
  * Package: com.duno.workmanager.Data
  * Created by Daniel Zvir on 14.5.17.
  */
 class WorkYearTest {
-    val workYear = WorkYear(2017)
+    val workYear = WorkYear()
 
     init {
         val data = mutableListOf<WorkSession>(
@@ -22,27 +21,6 @@ class WorkYearTest {
                 WorkSession(dateParse("16-05-2017 11:00"), 8.0, 100, "Úpravy HTML_Workflow pro Pavla, řešení chyb, plánování a přípravy dat pro Poptávky do e-shopu")
         )
         workYear.addAllToMonth(5, data)
-    }
-
-    @Test
-    fun testWriteToXlsx() {
-        val saveFile = File("/home/zvird/result.xlsx")
-        workYear.writeYearInXlsx(saveFile, 5)
-    }
-
-    @Test
-    fun testSerializeToString() {
-        val stringJson = workYear.getYearInJson()
-        val newYear = WorkYear(2017, stringJson)
-        assertEquals(newYear, workYear)
-    }
-
-    @Test
-    fun testSerializeToFile() {
-        val file = File.createTempFile("testingFile", "json")
-        workYear.writeYearInJson(file)
-        val newYear = WorkYear(2017, file)
-        assertEquals(newYear, workYear)
     }
 
     @Test

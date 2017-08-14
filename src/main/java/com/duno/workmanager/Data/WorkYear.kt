@@ -10,7 +10,7 @@ import java.util.*
  * Package: com.duno.workmanager.Data
  * Created by Daniel Zvir on 16.5.17.
  */
-class WorkYear(val yearNumber: Int) {
+class WorkYear() {
     private val mapper = jacksonObjectMapper()
     private val months = hashMapOf<Int, MutableList<WorkSession>>()
 
@@ -18,7 +18,7 @@ class WorkYear(val yearNumber: Int) {
         for (i in 1..12) this.months[i] = mutableListOf<WorkSession>()
     }
 
-    constructor(yearNumber: Int, yearInJson: String) : this(yearNumber) {
+    constructor(yearInJson: String) : this() {
         val rawData: HashMap<Int, MutableList<WorkSessionRaw>> = mapper.readValue(yearInJson)
         for (i in 1..12) {
             rawData[i]?.forEach {
@@ -27,7 +27,7 @@ class WorkYear(val yearNumber: Int) {
         }
     }
 
-    constructor(yearNumber: Int, saveFile: File) : this(yearNumber) {
+    constructor(saveFile: File) : this() {
         val rawData: HashMap<Int, MutableList<WorkSessionRaw>> = mapper.readValue(saveFile)
         for (i in 1..12) {
             rawData[i]?.forEach {
@@ -117,30 +117,5 @@ class WorkYear(val yearNumber: Int) {
         var result = 0.0
         months.forEach { result += (getMonthTotalHours(it.key)) }
         return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-
-        other as WorkYear
-
-        if (yearNumber != other.yearNumber) return false
-        if (months != other.months) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = yearNumber
-        result = 31 * result + months.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "WorkYear(" +
-                "yearNumber=$yearNumber," +
-                "months=$months" +
-                ")"
     }
 }

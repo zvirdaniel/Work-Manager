@@ -36,13 +36,6 @@ class WorkSessionTest {
     }
 
     @Test
-    fun testRawDataParsing() {
-        val raw = twoHourSession.rawData
-        val newObject = WorkSession(raw)
-        assertEquals(twoHourSession, newObject)
-    }
-
-    @Test
     fun testRawDataChange() {
         val temporaryWork = thirtyMinSession
         temporaryWork.endDate = twoHourSession.endDate
