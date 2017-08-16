@@ -14,7 +14,6 @@ import java.util.*
  */
 
 // TODO: Async loading
-
 class MonthController : Initializable {
     @FXML var table = TableView<ObservableSession>()
     @FXML var date = TableColumn<ObservableSession, String>()
@@ -28,7 +27,6 @@ class MonthController : Initializable {
         duration.cellValueFactory = PropertyValueFactory<ObservableSession, String>("duration")
         description.cellValueFactory = PropertyValueFactory<ObservableSession, String>("description")
 
-        table.items.clear()
-        table.items.addAll(DataManagement.sessionList)
+        DataManagement.addTab(this)
     }
 }

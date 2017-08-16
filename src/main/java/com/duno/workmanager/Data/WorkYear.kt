@@ -3,7 +3,6 @@ package com.duno.workmanager.Data
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
-import java.util.*
 
 
 /**
@@ -12,7 +11,7 @@ import java.util.*
  */
 class WorkYear() {
     private val mapper = jacksonObjectMapper()
-    private val months = hashMapOf<Int, MutableList<WorkSession>>()
+    val months = hashMapOf<Int, MutableList<WorkSession>>()
 
     init {
         for (i in 1..12) this.months[i] = mutableListOf<WorkSession>()
@@ -79,7 +78,7 @@ class WorkYear() {
     }
 
     /**
-     * Clears all data for all months
+     * Clears all data for all observableMonths
      */
     fun clearYear() {
         for (month in months) {
@@ -95,7 +94,7 @@ class WorkYear() {
         months[month]?.forEach {
             result += it.profit
         }
-        return result;
+        return result
     }
 
     fun getMonthTotalHours(month: Int): Double {
@@ -104,7 +103,7 @@ class WorkYear() {
         months[month]?.forEach {
             result += it.duration.toMinutes().toDouble() / 60.0
         }
-        return result;
+        return result
     }
 
     fun getYearProfit(): Double {
