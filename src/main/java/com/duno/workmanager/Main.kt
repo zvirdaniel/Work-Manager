@@ -6,6 +6,8 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
 
+
+
 // TODO: Limit GUI description input to 90 characters
 
 class Main : Application() {

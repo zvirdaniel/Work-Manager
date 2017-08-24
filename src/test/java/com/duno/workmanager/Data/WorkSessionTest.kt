@@ -19,8 +19,8 @@ class WorkSessionTest {
 
     @Test
     fun testGetTimeElapsed() {
-        assertEquals(thirtyMinSession.duration?.toMinutes()?.toInt(), 30)
-        assertEquals(twoHourSession.duration?.toHours()?.toInt(), 2)
+        assertEquals(thirtyMinSession.duration.toMinutes().toInt(), 30)
+        assertEquals(twoHourSession.duration.toHours().toInt(), 2)
     }
 
     @Test

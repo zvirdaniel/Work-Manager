@@ -1,30 +1,29 @@
 package com.duno.workmanager.Models
 
 import com.duno.workmanager.Data.WorkSession
-import javafx.beans.property.SimpleStringProperty
+import java.time.Duration
 
 /**
- * Created by Daniel Zvir on 26.7.17.
+ * Created by Daniel Zvir on 16.08.2017.
  */
-class ObservableSession(workSession: WorkSession) {
-    private val beginDateProperty = SimpleStringProperty(workSession.czechBeginDate)
-    private val beginTimeProperty = SimpleStringProperty(workSession.beginTime)
-    private val durationProperty = SimpleStringProperty(workSession.duration.toHours().toString())
-    private val descriptionProperty = SimpleStringProperty(workSession.description)
+class ObservableSession(session: WorkSession) : WorkSession(session) {
+    var beginDateProperty: String = czechBeginDate
+        set(value) {
+            czechBeginDate = value
+        }
 
-    var beginDate: String
-        get() = beginDateProperty.get()
-        set(value) = beginDateProperty.set(value)
+    var beginTimeProperty: String = beginTime
+        set(value) {
+            beginTime = value
+        }
 
-    var beginTime: String
-        get() = beginTimeProperty.get()
-        set(value) = beginTimeProperty.set(value)
+    var durationProperty: String = duration.toHours().toString()
+        set(value) {
+            duration = Duration.ofHours(value.toLong())
+        }
 
-    var duration: String
-        get() = durationProperty.get()
-        set(value) = durationProperty.set(value)
-
-    var description: String
-        get() = descriptionProperty.get()
-        set(value) = descriptionProperty.set(value)
+    var descriptionProperty: String = description
+        set(value) {
+            description = value
+        }
 }

@@ -21,28 +21,42 @@ import java.util.concurrent.TimeUnit
 data class WorkSessionRaw(var beginDate: Date, var endDate: Date,
                           var hourlyWage: Int, var description: String)
 
-class WorkSession {
+open class WorkSession {
     var beginDate: Date
     var endDate: Date
     var hourlyWage: Int
     var description: String
 
     val rawData get() = WorkSessionRaw(beginDate, endDate, hourlyWage, description)
-    val duration get() = Duration.between(beginDate.toInstant(), endDate.toInstant())
     val profit get() = duration.toMinutes().toDouble() * (hourlyWage.toDouble() / 60.0)
 
-    val czechBeginDate: String
-        get() {
-            val formatter = SimpleDateFormat("dd. MM. yyyy")
-            return formatter.format(beginDate)
+    /**
+     * @return Duration between beginDate and endDate
+     */
+    var duration: Duration
+        get() = Duration.between(beginDate.toInstant(), endDate.toInstant())
+        set(value) {
+            endDate = Date(beginDate.time + TimeUnit.MINUTES.toMillis((value.toHours() * 60)))
         }
 
-
-    val beginTime: String
-        get() {
-            val formatter = SimpleDateFormat("HH:mm")
-            return formatter.format(beginDate)
+    /**
+     * @return String with the following format: dd. MM. yyyy
+     */
+    var czechBeginDate: String
+        get() = SimpleDateFormat("dd. MM. yyyy").format(beginDate)
+        set(dateText) {
+            beginDate = SimpleDateFormat("dd. MM. yyyy").parse(dateText)
         }
+
+    /**
+     * @return String with the following format: HH:mm
+     */
+    var beginTime: String
+        get() = SimpleDateFormat("HH:mm").format(beginDate)
+        set(timeText) {
+            beginDate = SimpleDateFormat("dd. MM. yyyy HH:mm").parse(czechBeginDate + " " + timeText)
+        }
+
 
     /**
      * @param beginDate Date when the session started, implicitly set to Instant.now()
@@ -94,6 +108,11 @@ class WorkSession {
      */
     constructor(raw: WorkSessionRaw) : this(raw.beginDate, raw.endDate,
             raw.hourlyWage, raw.description)
+
+    /**
+     * @param workSession Creates new WorkSession using its raw data
+     */
+    constructor(workSession: WorkSession) : this(workSession.rawData)
 }
 
 /**

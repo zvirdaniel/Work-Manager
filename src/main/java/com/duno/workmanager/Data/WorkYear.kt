@@ -52,7 +52,15 @@ class WorkYear() {
     /**
      * @param saveFile File to save all the data into, example: "result.json"
      */
-    fun writeYearInJson(saveFile: File) = mapper.writeValue(saveFile, getMapOfRawWorkSessions())
+    fun writeYearInJson(saveFile: File): Boolean {
+        try {
+            mapper.writeValue(saveFile, getMapOfRawWorkSessions())
+        } catch (e: Exception) {
+            return false
+        }
+
+        return true
+    }
 
     fun addToMonth(month: Int, session: WorkSession) {
         checkMonthNumber(month)
@@ -107,7 +115,7 @@ class WorkYear() {
     }
 
     fun getYearProfit(): Double {
-        var result: Double = 0.0
+        var result = 0.0
         months.forEach { result += getMonthProfit(it.key) }
         return result
     }
