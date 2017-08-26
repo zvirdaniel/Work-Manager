@@ -1,7 +1,6 @@
 package com.duno.workmanager.Data
 
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -28,35 +27,6 @@ open class WorkSession {
     var description: String
 
     val rawData get() = WorkSessionRaw(beginDate, endDate, hourlyWage, description)
-    val profit get() = duration.toMinutes().toDouble() * (hourlyWage.toDouble() / 60.0)
-
-    /**
-     * @return Duration between beginDate and endDate
-     */
-    var duration: Duration
-        get() = Duration.between(beginDate.toInstant(), endDate.toInstant())
-        set(value) {
-            endDate = Date(beginDate.time + TimeUnit.MINUTES.toMillis((value.toHours() * 60)))
-        }
-
-    /**
-     * @return String with the following format: dd. MM. yyyy
-     */
-    var czechBeginDate: String
-        get() = SimpleDateFormat("dd. MM. yyyy").format(beginDate)
-        set(dateText) {
-            beginDate = SimpleDateFormat("dd. MM. yyyy").parse(dateText)
-        }
-
-    /**
-     * @return String with the following format: HH:mm
-     */
-    var beginTime: String
-        get() = SimpleDateFormat("HH:mm").format(beginDate)
-        set(timeText) {
-            beginDate = SimpleDateFormat("dd. MM. yyyy HH:mm").parse(czechBeginDate + " " + timeText)
-        }
-
 
     /**
      * @param beginDate Date when the session started, implicitly set to Instant.now()

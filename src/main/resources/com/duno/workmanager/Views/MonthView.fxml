@@ -7,9 +7,9 @@
         <center>
             <TableView fx:id="table" editable="true">
                 <columns>
-                    <TableColumn fx:id="date" maxWidth="110.0" minWidth="90.0" text="Datum" />
-                    <TableColumn fx:id="time" maxWidth="110.0" minWidth="90.0" text="Začátek práce" />
-                    <TableColumn fx:id="duration" maxWidth="110.0" minWidth="90.0" text="Celkový čas" />
+                    <TableColumn fx:id="date" maxWidth="130.0" minWidth="110.0" text="Datum" />
+                    <TableColumn fx:id="time" maxWidth="120.0" minWidth="90.0" text="Začátek práce" />
+                    <TableColumn fx:id="duration" maxWidth="100.0" minWidth="90.0" text="Celkový čas" />
                     <TableColumn fx:id="description" prefWidth="100.0" sortable="false" text="Popis práce" />
                 </columns>
                 <columnResizePolicy>

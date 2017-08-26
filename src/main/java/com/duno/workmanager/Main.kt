@@ -6,10 +6,6 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
 
-
-
-// TODO: Limit GUI description input to 90 characters
-
 class Main : Application() {
     lateinit var primaryStage: Stage
 
@@ -18,10 +14,14 @@ class Main : Application() {
         val root = loader.load<Parent>()
 
         primaryStage = stage
-        primaryStage.title = "Work Manager"
+        primaryStage.title = "WorkManager"
         primaryStage.scene = Scene(root, 1280.0, 800.0)
         primaryStage.minWidth = 1280.0
         primaryStage.minHeight = 800.0
         primaryStage.show()
     }
+}
+
+fun main(args: Array<String>) {
+    Application.launch(Main::class.java, *args)
 }

@@ -6,6 +6,7 @@ import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.Priority
+import org.controlsfx.control.Notifications
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -47,4 +48,12 @@ fun errorDialog(message: String) {
     alert.headerText = "Look! An error"
     alert.contentText = message
     alert.showAndWait()
+}
+
+fun errorNotification(message: String) {
+    Notifications.create()
+            .title("WorkManager")
+            .text(message)
+            .hideAfter(javafx.util.Duration(4000.0))
+            .showError()
 }
