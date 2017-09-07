@@ -2,6 +2,7 @@ package com.duno.workmanager.Models
 
 import com.duno.workmanager.Data.WorkSession
 import com.duno.workmanager.Other.errorNotification
+import com.duno.workmanager.Other.isOnSameDay
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import java.text.DateFormat
@@ -10,9 +11,8 @@ import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-/**
- * Created by Daniel Zvir on 16.08.2017.
- */
+// TODO: Redraw table if incorrect value was set
+
 class ObservableSession(session: WorkSession) : WorkSession(session) {
     // Date with the following format: dd. MM. yyyy
     val beginDateProperty: StringProperty
@@ -21,7 +21,7 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
     var beginDateString: String
         get() = SimpleDateFormat("dd. MM. yyyy").format(beginDate)
         set(date) {
-            var parsedDate: Date? = null
+            val parsedDate: Date?
 
             try {
                 parsedDate = SimpleDateFormat("dd. MM. yyyy").parse(date)
@@ -49,7 +49,7 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
                 return
             }
 
-            var parsedDate: Date? = null
+            val parsedDate: Date?
 
             try {
                 parsedDate = SimpleDateFormat("dd. MM. yyyy HH:mm").parse(beginDateString + " " + time)
@@ -59,8 +59,12 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
             }
 
             if (parsedDate != null) {
-                beginDate = parsedDate
-                println("Begin date - ${DateFormat.getInstance().format(beginDate)} was set.")
+                if (isOnSameDay(parsedDate, beginDate)) {
+                    beginDate = parsedDate
+                    println("Begin date - ${DateFormat.getInstance().format(beginDate)} was set.")
+                } else {
+                    errorNotification("$time is not within 00:01 - 23:59")
+                }
             }
         }
 
@@ -72,8 +76,9 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
     var descriptionString: String
         get() = description
         set(value) {
-            if (value.length > 90) {
-                val overflow = value.length - 90
+            val MAX_LENGTH = 150
+            if (value.length > MAX_LENGTH) {
+                val overflow = value.length - MAX_LENGTH
                 errorNotification("Description length owerflow by $overflow characters.")
             } else {
                 description = value
@@ -97,10 +102,29 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
         get() = SimpleStringProperty(durationString)
 
     var durationString: String
-        get() = Duration.between(beginDate.toInstant(), endDate.toInstant()).toHours().toString()
+        get() {
+            val duration = Duration.between(beginDate.toInstant(), endDate.toInstant())
+            val hours = duration.toMinutes() / 60
+            return hours.toString()
+        }
         set(text) {
-            val duration = Duration.ofHours(text.toLong()).toHours()
-            endDate = Date(beginDate.time + TimeUnit.MINUTES.toMillis(duration * 60))
-            println("End date - ${DateFormat.getInstance().format(endDate)} was set.")
+            val durationInMinutes: Long?
+
+            try {
+                val minutes = text.toDouble() * 60
+                durationInMinutes = Duration.ofMinutes(minutes.toLong()).toMinutes()
+            } catch (e: Exception) {
+                errorNotification("Error while parsing $text.")
+                return
+            }
+
+            if (durationInMinutes < 0) {
+                errorNotification("You can't work less than 0 hours!")
+            } else if (durationInMinutes > 18 * 60) {
+                errorNotification("You are not a chinese worker! You can't work more than 18 hours!")
+            } else {
+                endDate = Date(beginDate.time + TimeUnit.MINUTES.toMillis(durationInMinutes))
+                println("End date - ${DateFormat.getInstance().format(endDate)} was set.")
+            }
         }
 }

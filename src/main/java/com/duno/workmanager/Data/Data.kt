@@ -2,7 +2,8 @@ package com.duno.workmanager.Data
 
 import com.duno.workmanager.Controllers.MonthController
 import com.duno.workmanager.Models.ObservableSession
-import com.duno.workmanager.Other.exceptionDialog
+import com.duno.workmanager.Other.errorDialog
+import com.duno.workmanager.PrimaryStage
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import java.io.File
@@ -57,18 +58,19 @@ object CurrentFile {
      * @return true if file was set properly, false if file was not valid
      */
     fun set(file: File, showError: Boolean = false): Boolean {
-        val result: Boolean
+        val correctlySet: Boolean
 
         if (isValid(file, showError)) {
             currentFile = file
             Preferences.userNodeForPackage(CurrentFile::class.java).put(LAST_USED_FILE, file.absolutePath)
-            result = true
+            PrimaryStage.get().title = "WorkManager - ${file.name}"
+            correctlySet = true
         } else {
-            result = false
+            correctlySet = false
         }
 
         VisibleData.reloadCurrentFile()
-        return result
+        return correctlySet
     }
 
     /**
@@ -108,7 +110,7 @@ object CurrentFile {
         try {
             WorkYear(file)
         } catch (e: Exception) {
-            if (showError) exceptionDialog(e, "This file is not valid!")
+            if (showError) errorDialog("This file is not valid!")
             return false
         }
 

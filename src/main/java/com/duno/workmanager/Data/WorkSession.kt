@@ -1,6 +1,5 @@
 package com.duno.workmanager.Data
 
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -83,13 +82,4 @@ open class WorkSession {
      * @param workSession Creates new WorkSession using its raw data
      */
     constructor(workSession: WorkSession) : this(workSession.rawData)
-}
-
-/**
- * @param daysMonthsYears Parsing format is "dd-MM-yyyy HH:mm", example: "05-05-2017 15:30"
- */
-fun dateParse(daysMonthsYears: String): Date {
-    val parser = SimpleDateFormat("dd-MM-yyyy HH:mm")
-    val date = parser.parse(daysMonthsYears)
-    return date
 }

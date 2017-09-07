@@ -2,7 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.input.*?>
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane minHeight="800.0" minWidth="1280.0" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.duno.workmanager.Controllers.MainController">
     <top>
@@ -23,7 +23,10 @@
                         <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                     </accelerator>
                 </MenuItem>
-                <MenuItem fx:id="saveAsFileMenu" mnemonicParsing="false" text="Uložit jako..." />
+                <MenuItem fx:id="saveAsFileMenu" mnemonicParsing="false" text="Uložit jako...">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+               </accelerator></MenuItem>
             </Menu>
             <Menu mnemonicParsing="false" text="Export">
                 <MenuItem mnemonicParsing="false" text="XLSX Tabulka">
