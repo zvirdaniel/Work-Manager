@@ -10,7 +10,7 @@
             <Menu mnemonicParsing="false" text="Soubor">
                 <MenuItem fx:id="newFileMenu" mnemonicParsing="false" text="Nový">
                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                        <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
                     </accelerator>
                 </MenuItem>
                 <MenuItem fx:id="openFileMenu" mnemonicParsing="false" text="Otevřít...">
@@ -31,12 +31,12 @@
             <Menu mnemonicParsing="false" text="Export">
                 <MenuItem mnemonicParsing="false" text="XLSX Tabulka">
                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                        <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                     </accelerator>
                 </MenuItem>
             </Menu>
             <Menu mnemonicParsing="false" text="Ostatní">
-                <MenuItem mnemonicParsing="false" text="Autor..." />
+                <MenuItem fx:id="aboutMenu" mnemonicParsing="false" text="Autor..." />
             </Menu>
         </MenuBar>
     </top>
@@ -85,6 +85,10 @@
             <padding>
                 <Insets left="17.0" right="17.0" />
             </padding>
+         <buttons>
+            <Button fx:id="newRowButton" mnemonicParsing="false" text="Nový řádek" />
+            <Button fx:id="deleteButton" mnemonicParsing="false" text="Odstranit" />
+         </buttons>
         </ButtonBar>
    </bottom>
 </BorderPane>

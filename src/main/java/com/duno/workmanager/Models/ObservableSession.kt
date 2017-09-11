@@ -14,7 +14,9 @@ import java.util.concurrent.TimeUnit
 // TODO: Redraw table if incorrect value was set
 
 class ObservableSession(session: WorkSession) : WorkSession(session) {
-    // Date with the following format: dd. MM. yyyy
+    /**
+     * @return date with the following format: dd. MM. yyyy
+     */
     val beginDateProperty: StringProperty
         get() = SimpleStringProperty(beginDateString)
 
@@ -26,7 +28,7 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
             try {
                 parsedDate = SimpleDateFormat("dd. MM. yyyy").parse(date)
             } catch (e: Exception) {
-                errorNotification("Error while parsing $date")
+                errorNotification("Chyba při parsování $date")
                 return
             }
 
@@ -37,7 +39,9 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
         }
 
 
-    // Time with the following format: HH:mm
+    /**
+     * @return time with the following format: HH:mm
+     */
     val beginTimeProperty: StringProperty
         get() = SimpleStringProperty(beginTimeString)
 
@@ -45,7 +49,7 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
         get() = SimpleDateFormat("HH:mm").format(beginDate)
         set(time) {
             if (time == "00:00" || time == "24:00") {
-                errorNotification("Time can't be set to midnight!")
+                errorNotification("Čas nelze nastavit na půlnoc!")
                 return
             }
 
@@ -54,7 +58,7 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
             try {
                 parsedDate = SimpleDateFormat("dd. MM. yyyy HH:mm").parse(beginDateString + " " + time)
             } catch (e: Exception) {
-                errorNotification("Error while parsing $time.")
+                errorNotification("Chyba při parsování $time.")
                 return
             }
 
@@ -63,13 +67,15 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
                     beginDate = parsedDate
                     println("Begin date - ${DateFormat.getInstance().format(beginDate)} was set.")
                 } else {
-                    errorNotification("$time is not within 00:01 - 23:59")
+                    errorNotification("$time není mezi 00:01 - 23:59")
                 }
             }
         }
 
 
-    // Description
+    /**
+     * @return description
+     */
     val descriptionProperty: StringProperty
         get() = SimpleStringProperty(descriptionString)
 
@@ -79,32 +85,35 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
             val MAX_LENGTH = 150
             if (value.length > MAX_LENGTH) {
                 val overflow = value.length - MAX_LENGTH
-                errorNotification("Description length owerflow by $overflow characters.")
+                errorNotification("Popis překročil limit o $overflow znaků.")
             } else {
                 description = value
             }
         }
 
 
-    // Profit without currency
+    /**
+     * @return profit without currency
+     */
     val profitProperty: StringProperty
         get() = SimpleStringProperty(profitString)
 
     val profitString: String
         get() {
-            val duration = Duration.between(beginDate.toInstant(), endDate.toInstant()).toMinutes()
-            return (duration.toDouble() * (hourlyWage.toDouble() / 60.0)).toString()
+            return (durationInMinutes * (hourlyWage.toDouble() / 60.0)).toString()
         }
 
 
-    // Duration in hours
+    /**
+     * @return duration in hours
+     */
     val durationProperty: StringProperty
         get() = SimpleStringProperty(durationString)
 
     var durationString: String
         get() {
             val duration = Duration.between(beginDate.toInstant(), endDate.toInstant())
-            val hours = duration.toMinutes() / 60
+            val hours = duration.toMinutes() / 60.0
             return hours.toString()
         }
         set(text) {
@@ -114,14 +123,14 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
                 val minutes = text.toDouble() * 60
                 durationInMinutes = Duration.ofMinutes(minutes.toLong()).toMinutes()
             } catch (e: Exception) {
-                errorNotification("Error while parsing $text.")
+                errorNotification("Chyba při parsování $text.")
                 return
             }
 
             if (durationInMinutes < 0) {
-                errorNotification("You can't work less than 0 hours!")
+                errorNotification("Nelze pracovat méně než 0 hodin!")
             } else if (durationInMinutes > 18 * 60) {
-                errorNotification("You are not a chinese worker! You can't work more than 18 hours!")
+                errorNotification("Nejsi číňan, nelze pracovat více než 18 hodin!")
             } else {
                 endDate = Date(beginDate.time + TimeUnit.MINUTES.toMillis(durationInMinutes))
                 println("End date - ${DateFormat.getInstance().format(endDate)} was set.")

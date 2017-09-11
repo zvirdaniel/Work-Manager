@@ -10,7 +10,7 @@ import java.io.File
 import java.util.prefs.Preferences
 
 /**
- * Manages data in tabs (visible to user)
+ * Manages data in memory (visible to user)
  */
 object VisibleData {
     val observableMonths = hashMapOf<Int, ObservableList<ObservableSession>>()
@@ -21,12 +21,19 @@ object VisibleData {
         reloadCurrentFile()
     }
 
+    /**
+     * Remaps data from the current file into observableMonths
+     */
     fun reloadCurrentFile() {
         val file = CurrentFile.get()
         val workYear = WorkYear(file)
         setAndShowCurrentWorkYear(workYear)
     }
 
+    /**
+     * @param workYear used as data source for import, it's mapped into observableMonths
+     * Imports data from workYear into observableMonths, which are visible to user
+     */
     private fun setAndShowCurrentWorkYear(workYear: WorkYear) {
         for ((key, value) in workYear.months) {
             observableMonths[key]?.clear()
@@ -34,7 +41,17 @@ object VisibleData {
         }
     }
 
-    fun addTab(controller: MonthController) {
+    /**
+     * @return MonthController instance for a given month
+     */
+    fun getTabController(index: Int): MonthController {
+        return monthControllers[index]
+    }
+
+    /**
+     * @param controller instance to be added into the list, can be retrieved later
+     */
+    fun addTabController(controller: MonthController) {
         monthControllers.add(controller)
 
         if (monthControllers.count() == 12) {
@@ -100,12 +117,20 @@ object CurrentFile {
         return get()
     }
 
+    /**
+     * Creates a temporary file in the filesystem and sets it as current
+     */
     private fun createAndSetTempFile() {
         val file = File.createTempFile("TemporaryWorkYear", ".json")
         WorkYear().writeYearInJson(file)
         set(file)
     }
 
+    /**
+     * @return true if file was parsed as a WorkYear, false if exception was thrown
+     * @param file to open
+     * @param showError if error dialog is to be shown
+     */
     private fun isValid(file: File, showError: Boolean = false): Boolean {
         try {
             WorkYear(file)
@@ -156,6 +181,10 @@ object FileManagement {
         return writeWorkYear(currentFile)
     }
 
+    /**
+     * @param file to write the data into, it will be overwritten
+     * @return false if exception is thrown, true otherwise
+     */
     private fun writeWorkYear(file: File): Boolean {
         val workYear = WorkYear()
         for (month in VisibleData.observableMonths) {

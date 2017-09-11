@@ -100,13 +100,13 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
             for (dataRowNumber in month!!.indices) {
                 val row = sheet.getRow(dataRowNumber + 2)
                 val session = WorkSession(month[dataRowNumber])
-                val localDate = session.beginDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                val localDate = session.beginDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
                 // Begin date
                 row.getCell(0).setCellValue(localDate.format(DateTimeFormatter.ofPattern("dd. L. u")))
                 // Begin hours
                 row.getCell(1).setCellValue(SimpleDateFormat("HH:mm").format(session.beginDate))
                 // Duration in hours
-                val bigDecimal = BigDecimal((session.duration.toMinutes() / 60.0)).setScale(1, RoundingMode.HALF_UP)
+                val bigDecimal = BigDecimal((session.durationInMinutes / 60.0)).setScale(1, RoundingMode.HALF_UP)
                 row.getCell(2).setCellValue(bigDecimal.toDouble())
                 // Description
                 row.getCell(3).setCellValue(session.description)

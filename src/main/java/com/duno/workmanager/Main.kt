@@ -1,5 +1,7 @@
 package com.duno.workmanager
 
+import com.duno.workmanager.Other.exportDialog
+import com.duno.workmanager.Other.services
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -7,20 +9,30 @@ import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 
+// TODO: progress bar, use MaskerPane
+// TODO: Dialog owner
+// TODO: Notify the user that temporary file was created
+// TODO: Complete documentation
+
 class Main : Application() {
     override fun start(stage: Stage) {
         PrimaryStage.set(stage)
 
         loadIcons()
+        services = hostServices
 
         val loader = FXMLLoader(javaClass.getResource("Views/MainView.fxml"))
         val root = loader.load<Parent>()
+        val css = Main::class.java.getResource("Views/Main.css").toExternalForm()
+        root.stylesheets.add(css)
 
         PrimaryStage.get().title = "WorkManager"
         PrimaryStage.get().scene = Scene(root, 1280.0, 800.0)
         PrimaryStage.get().minWidth = 1280.0
         PrimaryStage.get().minHeight = 800.0
         PrimaryStage.get().show()
+
+        exportDialog()
     }
 
     private fun loadIcons() {

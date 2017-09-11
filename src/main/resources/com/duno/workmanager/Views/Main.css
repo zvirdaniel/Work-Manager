@@ -1,0 +1,4 @@
+.table-view .cell {
+    -fx-cell-size: 35;
+    -fx-alignment: center-left;
+}

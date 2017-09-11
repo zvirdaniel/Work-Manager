@@ -1,5 +1,6 @@
 package com.duno.workmanager.Data
 
+import java.time.Duration
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -26,6 +27,11 @@ open class WorkSession {
     var description: String
 
     val rawData get() = WorkSessionRaw(beginDate, endDate, hourlyWage, description)
+
+    /**
+     * Calculates duration and converts it to minutes (double)
+     */
+    val durationInMinutes get() = Duration.between(beginDate.toInstant(), endDate.toInstant()).toMinutes().toDouble()
 
     /**
      * @param beginDate Date when the session started, implicitly set to Instant.now()

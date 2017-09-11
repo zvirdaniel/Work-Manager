@@ -35,6 +35,9 @@ class WorkYear() {
         }
     }
 
+    /**
+     * @return Map of raw data containing WorkSessions
+     */
     fun getMapOfRawWorkSessions(): HashMap<Int, MutableList<WorkSessionRaw>> {
         val monthsRaw = hashMapOf<Int, MutableList<WorkSessionRaw>>()
         for (i in 1..12) {
@@ -51,6 +54,7 @@ class WorkYear() {
 
     /**
      * @param saveFile File to save all the data into, example: "result.json"
+     * @return false if exception is thrown, true otherwise
      */
     fun writeYearInJson(saveFile: File): Boolean {
         try {
@@ -62,16 +66,27 @@ class WorkYear() {
         return true
     }
 
+    /**
+     * @param month index
+     * @param session WorkSession to be added to a given month
+     */
     fun addToMonth(month: Int, session: WorkSession) {
         checkMonthNumber(month)
         months[month]?.add(session)
     }
 
+    /**
+     * @param sessions Collection of WorkSessions to be added to a given month
+     * @param month index
+     */
     fun addAllToMonth(month: Int, sessions: Collection<WorkSession>) {
         checkMonthNumber(month)
         months[month]?.addAll(sessions)
     }
 
+    /**
+     * @return List of WorkSessions for a given month, month index is checked
+     */
     fun getMonth(month: Int): MutableList<WorkSession> {
         checkMonthNumber(month)
         return months[month] ?: mutableListOf<WorkSession>()
@@ -94,32 +109,50 @@ class WorkYear() {
         }
     }
 
+    /**
+     * @throws IllegalArgumentException if given month is not between 1 and 12
+     */
     private fun checkMonthNumber(month: Int) = if (month !in 1..12) throw IllegalArgumentException("Months must be between 1 and 12!") else null
 
+    /**
+     * @return Total profit for a given month, without currency
+     */
     fun getMonthProfit(month: Int): Double {
         checkMonthNumber(month)
-        var result = 0.0
+        var sum = 0.0
         months[month]?.forEach {
-            result += it.profit
+            val profit = it.durationInMinutes * (it.hourlyWage.toDouble() / 60.0)
+            sum += profit
         }
-        return result
+
+        return sum
     }
 
+    /**
+     * @return Total amount of hours in a given month
+     */
     fun getMonthTotalHours(month: Int): Double {
         checkMonthNumber(month)
         var result = 0.0
         months[month]?.forEach {
-            result += it.duration.toMinutes().toDouble() / 60.0
+            result += it.durationInMinutes / 60.0
         }
+
         return result
     }
 
+    /**
+     * @return Total profit for a given year, without currency
+     */
     fun getYearProfit(): Double {
         var result = 0.0
         months.forEach { result += getMonthProfit(it.key) }
         return result
     }
 
+    /**
+     * @return Total amount of hours in a year
+     */
     fun getYearTotalHours(): Double {
         var result = 0.0
         months.forEach { result += (getMonthTotalHours(it.key)) }

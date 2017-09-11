@@ -2,10 +2,14 @@ package com.duno.workmanager.Controllers
 
 import com.duno.workmanager.Data.CurrentFile
 import com.duno.workmanager.Data.FileManagement
+import com.duno.workmanager.Data.VisibleData
+import com.duno.workmanager.Other.aboutDialog
 import com.duno.workmanager.Other.errorDialog
+import com.duno.workmanager.Other.saveChooser
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TabPane
 import javafx.stage.FileChooser
@@ -27,6 +31,9 @@ class MainController : Initializable {
     @FXML lateinit var saveFileMenu: MenuItem
     @FXML lateinit var saveAsFileMenu: MenuItem
     @FXML lateinit var newFileMenu: MenuItem
+    @FXML lateinit var aboutMenu: MenuItem
+    @FXML lateinit var deleteButton: Button
+    @FXML lateinit var newRowButton: Button
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         // EventHandlers
@@ -34,17 +41,33 @@ class MainController : Initializable {
         openFileMenu.onAction = EventHandler { openFile() }
         saveFileMenu.onAction = EventHandler { saveFile() }
         saveAsFileMenu.onAction = EventHandler { saveFileAs() }
+        deleteButton.onAction = EventHandler { deleteRow() }
+        newRowButton.onAction = EventHandler { newRow() }
+        aboutMenu.onAction = EventHandler { aboutDialog() }
 
         // Select current month
         tabPane.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
     }
 
+
+    private fun newRow() {
+        val currentTabIndex = tabPane.selectionModel.selectedIndex
+        val currentTab = VisibleData.getTabController(currentTabIndex)
+        currentTab.newRow()
+    }
+
+    private fun deleteRow() {
+        val currentTabIndex = tabPane.selectionModel.selectedIndex
+        val currentTab = VisibleData.getTabController(currentTabIndex)
+        val currentRow = currentTab.table.selectionModel.selectedItem
+        if (currentRow != null) {
+            currentTab.deleteRow(currentRow)
+        }
+    }
+
     private fun newFile() {
-        val chooser = FileChooser()
-        chooser.title = "Create new file"
-        chooser.initialDirectory = File(System.getProperty("user.home"))
-        chooser.extensionFilters.addAll(ExtensionFilter("JSON", "*.json"))
-        var file = chooser.showSaveDialog(null)
+        var file = saveChooser("Vytvořit nový soubor",
+                filters = listOf(ExtensionFilter("JSON", "*.json")))
 
         if (file != null) {
             if (!file.name.endsWith(".json")) {
@@ -55,7 +78,7 @@ class MainController : Initializable {
             try {
                 file.createNewFile()
             } catch (e: Exception) {
-                errorDialog("Can't create file there!")
+                errorDialog("Zde nelze zapsat soubor!")
                 return
             }
 
@@ -67,7 +90,7 @@ class MainController : Initializable {
         if (FileManagement.save()) {
             Notifications.create()
                     .title("WorkManager")
-                    .text("File was saved as ${CurrentFile.get().name}")
+                    .text("Soubor uložen jako ${CurrentFile.get().name}")
                     .hideAfter(Duration(4000.0))
                     .showInformation()
         }
@@ -75,12 +98,13 @@ class MainController : Initializable {
 
     private fun saveFileAs() {
         val originalFile = CurrentFile.get()
-        val chooser = FileChooser()
-        chooser.title = "Save file as"
-        chooser.initialFileName = originalFile.nameWithoutExtension + " copy"
-        chooser.initialDirectory = File(originalFile.parent)
-        chooser.extensionFilters.addAll(ExtensionFilter("JSON", "*.json"))
-        var file = chooser.showSaveDialog(null)
+
+        var file = saveChooser(title = "Uložit soubor jako...",
+                filters = listOf(ExtensionFilter("JSON", "*.json")),
+                initialDir = File(originalFile.parent),
+                initialFileName = originalFile.nameWithoutExtension + " kopie"
+        )
+
 
         if (file != null) {
             if (!file.name.endsWith(".json")) {
@@ -91,14 +115,14 @@ class MainController : Initializable {
             try {
                 file.createNewFile()
             } catch (e: Exception) {
-                errorDialog("Can't create file there!")
+                errorDialog("Zde nelze zapsat soubor!")
                 return
             }
 
             if (FileManagement.saveAs(file)) {
                 Notifications.create()
                         .title("WorkManager")
-                        .text("File was saved as ${file.name}")
+                        .text("Soubor byl uložen jako ${file.name}")
                         .hideAfter(Duration(4000.0))
                         .showInformation()
             }
@@ -107,7 +131,7 @@ class MainController : Initializable {
 
     private fun openFile() {
         val chooser = FileChooser()
-        chooser.title = "Open a file"
+        chooser.title = "Otevřít soubor"
         chooser.initialDirectory = File(System.getProperty("user.home"))
         chooser.getExtensionFilters().addAll(ExtensionFilter("JSON", "*.json"))
         val file = chooser.showOpenDialog(null)
