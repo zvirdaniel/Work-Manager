@@ -2,7 +2,6 @@ package com.duno.workmanager.Data
 
 import com.duno.workmanager.Controllers.MonthController
 import com.duno.workmanager.Models.ObservableSession
-import com.duno.workmanager.Other.errorDialog
 import com.duno.workmanager.PrimaryStage
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -71,23 +70,22 @@ object CurrentFile {
     private var currentFile: File? = null
 
     /**
-     * @param showError shows exception dialog if set to true and file is not valid
      * @return true if file was set properly, false if file was not valid
      */
-    fun set(file: File, showError: Boolean = false): Boolean {
-        val correctlySet: Boolean
+    fun set(file: File): Boolean {
+        val status: Boolean
 
-        if (isValid(file, showError)) {
+        if (isValid(file)) {
             currentFile = file
             Preferences.userNodeForPackage(CurrentFile::class.java).put(LAST_USED_FILE, file.absolutePath)
             PrimaryStage.get().title = "WorkManager - ${file.name}"
-            correctlySet = true
+            status = true
         } else {
-            correctlySet = false
+            status = false
         }
 
         VisibleData.reloadCurrentFile()
-        return correctlySet
+        return status
     }
 
     /**
@@ -129,13 +127,11 @@ object CurrentFile {
     /**
      * @return true if file was parsed as a WorkYear, false if exception was thrown
      * @param file to open
-     * @param showError if error dialog is to be shown
      */
-    private fun isValid(file: File, showError: Boolean = false): Boolean {
+    private fun isValid(file: File): Boolean {
         try {
             WorkYear(file)
         } catch (e: Exception) {
-            if (showError) errorDialog("This file is not valid!")
             return false
         }
 
@@ -149,26 +145,42 @@ object CurrentFile {
 object FileManagement {
     /**
      * @param file selected from GUI
+     * @return true if file successfully written, false otherwise
+     * Creates a new file and writes blank WorkYear into it
      */
-    fun new(file: File) {
+    fun new(file: File): Boolean {
+        try {
+            file.createNewFile()
+        } catch (e: Exception) {
+            return false
+        }
+
         val workYear = WorkYear()
-        workYear.writeYearInJson(file)
+        val writeStatus = workYear.writeYearInJson(file)
         CurrentFile.set(file)
+        return writeStatus
     }
 
     /**
      * @param file selected from GUI
-     * Shows exception dialog if file is not valid
+     * @return true if file is valid and was set, false otherwise
      */
-    fun open(file: File) {
-        CurrentFile.set(file, true)
+    fun open(file: File): Boolean {
+        return CurrentFile.set(file)
     }
 
     /**
      * @return true if file was successfully written; false otherwise
+     * @param file selected from GUI
      */
     fun saveAs(file: File): Boolean {
-        val writeStatus = writeWorkYear(file)
+        try {
+            file.createNewFile()
+        } catch (e: Exception) {
+            return false
+        }
+
+        val writeStatus = writeCurrentWorkYear(file)
         CurrentFile.set(file)
         return writeStatus
     }
@@ -178,14 +190,15 @@ object FileManagement {
      */
     fun save(): Boolean {
         val currentFile = CurrentFile.get()
-        return writeWorkYear(currentFile)
+        return writeCurrentWorkYear(currentFile)
     }
 
     /**
      * @param file to write the data into, it will be overwritten
      * @return false if exception is thrown, true otherwise
+     * Saves the data in memory into into a given file as a WorkYear
      */
-    private fun writeWorkYear(file: File): Boolean {
+    private fun writeCurrentWorkYear(file: File): Boolean {
         val workYear = WorkYear()
         for (month in VisibleData.observableMonths) {
             workYear.addAllToMonth(month.key, month.value)

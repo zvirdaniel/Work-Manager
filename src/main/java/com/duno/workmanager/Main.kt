@@ -18,8 +18,9 @@ class Main : Application() {
     override fun start(stage: Stage) {
         PrimaryStage.set(stage)
 
-        loadIcons()
         services = hostServices
+
+        loadIcons()
 
         val loader = FXMLLoader(javaClass.getResource("Views/MainView.fxml"))
         val root = loader.load<Parent>()

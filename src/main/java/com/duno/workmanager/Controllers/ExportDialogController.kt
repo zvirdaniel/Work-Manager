@@ -1,5 +1,6 @@
 package com.duno.workmanager.Controllers
 
+import com.duno.workmanager.Other.saveChooser
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -8,9 +9,11 @@ import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
+import javafx.scene.control.Hyperlink
 import javafx.scene.layout.AnchorPane
 import javafx.stage.FileChooser
 import org.controlsfx.control.RangeSlider
+import java.io.File
 import java.net.URL
 import java.time.ZoneId
 import java.util.*
@@ -22,17 +25,10 @@ class ExportDialogController : Initializable {
     @FXML lateinit var filePane: AnchorPane
     @FXML lateinit var onlyOneMonthCheckbox: CheckBox
 
+    var selectedFile: File? = null
+
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        val button = Button("Vyberte soubor")
-
-        button.onAction = EventHandler {
-            val chooser = FileChooser()
-            chooser.title = "Vyber soubor"
-            chooser.initialFileName = "K2 Práce"
-            chooser.extensionFilters.addAll(FileChooser.ExtensionFilter("Excel Tabulka", "*.xlsx"))
-        }
-
-        filePane.children.setAll(button)
+        generateAndSetButton()
 
         setAndShowChoiceBox()
 
@@ -41,6 +37,49 @@ class ExportDialogController : Initializable {
                 true -> setAndShowChoiceBox()
                 false -> setAndShowSlider()
             }
+        }
+    }
+
+    private fun generateAndSetButton() {
+        val button = Button("Vyberte soubor")
+
+        button.onAction = EventHandler {
+            selectAndSetFile()
+
+            if (selectedFile != null) {
+                generateAndSetLink()
+            }
+        }
+
+        setTopBottomAnchors(button, 0.0)
+        filePane.children.setAll(button)
+    }
+
+    private fun generateAndSetLink() {
+        val link = Hyperlink(selectedFile?.name)
+
+        link.onAction = EventHandler {
+            selectAndSetFile()
+
+            if (selectedFile != null) {
+                generateAndSetLink()
+            }
+        }
+
+        setTopBottomAnchors(link, 0.0)
+        filePane.children.setAll(link)
+    }
+
+    private fun selectAndSetFile() {
+        val file = saveChooser(
+                title = "Vyber soubor",
+                initialFileName = "K2 Práce",
+                filters = listOf(FileChooser.ExtensionFilter("Excel Tabulka", "*.xlsx")),
+                extension = ".xlsx"
+        )
+
+        if (file != null) {
+            selectedFile = file
         }
     }
 
@@ -58,13 +97,6 @@ class ExportDialogController : Initializable {
         monthPane.children.setAll(slider)
     }
 
-    private fun setAllAnchors(node: Node, value: Double) {
-        AnchorPane.setTopAnchor(node, value)
-        AnchorPane.setBottomAnchor(node, value)
-        AnchorPane.setRightAnchor(node, value)
-        AnchorPane.setLeftAnchor(node, value)
-    }
-
     private fun setAndShowChoiceBox() {
         val choices = FXCollections.observableArrayList<String>(
                 "Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec",
@@ -74,9 +106,20 @@ class ExportDialogController : Initializable {
         val choiceBox = ChoiceBox<String>(choices)
         choiceBox.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
 
-        AnchorPane.setTopAnchor(choiceBox, 20.0)
-        AnchorPane.setBottomAnchor(choiceBox, 20.0)
+        setTopBottomAnchors(choiceBox, 20.0)
 
         monthPane.children.setAll(choiceBox)
+    }
+
+    private fun setAllAnchors(node: Node, value: Double) {
+        AnchorPane.setTopAnchor(node, value)
+        AnchorPane.setBottomAnchor(node, value)
+        AnchorPane.setRightAnchor(node, value)
+        AnchorPane.setLeftAnchor(node, value)
+    }
+
+    private fun setTopBottomAnchors(node: Node, value: Double) {
+        AnchorPane.setTopAnchor(node, value)
+        AnchorPane.setBottomAnchor(node, value)
     }
 }

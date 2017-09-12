@@ -3,16 +3,13 @@ package com.duno.workmanager.Controllers
 import com.duno.workmanager.Data.CurrentFile
 import com.duno.workmanager.Data.FileManagement
 import com.duno.workmanager.Data.VisibleData
-import com.duno.workmanager.Other.aboutDialog
-import com.duno.workmanager.Other.errorDialog
-import com.duno.workmanager.Other.saveChooser
+import com.duno.workmanager.Other.*
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TabPane
-import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.util.Duration
 import org.controlsfx.control.Notifications
@@ -23,7 +20,7 @@ import java.util.*
 
 
 /**
- * Created by Daniel Zvir on 13.08.2017.
+ * Controller for the main GUI, not containing TableView
  */
 class MainController : Initializable {
     @FXML lateinit var tabPane: TabPane
@@ -49,95 +46,95 @@ class MainController : Initializable {
         tabPane.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
     }
 
-
+    /**
+     * Creates a new row in currently opened tab by calling it's controller
+     */
     private fun newRow() {
         val currentTabIndex = tabPane.selectionModel.selectedIndex
         val currentTab = VisibleData.getTabController(currentTabIndex)
-        currentTab.newRow()
+        currentTab.createNewRow()
     }
 
+    /**
+     * Deletes a row by calling the controller for currently opened tab
+     */
     private fun deleteRow() {
         val currentTabIndex = tabPane.selectionModel.selectedIndex
         val currentTab = VisibleData.getTabController(currentTabIndex)
         val currentRow = currentTab.table.selectionModel.selectedItem
         if (currentRow != null) {
-            currentTab.deleteRow(currentRow)
+            currentTab.removeRow(currentRow)
         }
     }
 
+    /**
+     * Opens a file selector and calls the backend function
+     */
     private fun newFile() {
-        var file = saveChooser("Vytvořit nový soubor",
-                filters = listOf(ExtensionFilter("JSON", "*.json")))
+        val file = saveChooser("Vytvořit nový soubor",
+                filters = listOf(ExtensionFilter("JSON", "*.json")),
+                extension = ".json")
 
         if (file != null) {
-            if (!file.name.endsWith(".json")) {
-                val newFile = File(file.path.plus(".json"))
-                file = newFile
+            if (FileManagement.new(file)) {
+                notifySavedAs(file.nameWithoutExtension)
+            } else {
+                notifyCantSave(file.nameWithoutExtension)
             }
-
-            try {
-                file.createNewFile()
-            } catch (e: Exception) {
-                errorDialog("Zde nelze zapsat soubor!")
-                return
-            }
-
-            FileManagement.new(file)
         }
     }
 
+    /**
+     * Calls backend's save function, creates a notification
+     */
     private fun saveFile() {
         if (FileManagement.save()) {
-            Notifications.create()
-                    .title("WorkManager")
-                    .text("Soubor uložen jako ${CurrentFile.get().name}")
-                    .hideAfter(Duration(4000.0))
-                    .showInformation()
+            notifySavedAs(CurrentFile.get().nameWithoutExtension)
+        } else {
+            notifyCantSave(CurrentFile.get().nameWithoutExtension)
         }
     }
 
+    /**
+     * Opens a file selector, and calls the backend function
+     */
     private fun saveFileAs() {
         val originalFile = CurrentFile.get()
 
-        var file = saveChooser(title = "Uložit soubor jako...",
+        val file = saveChooser(title = "Uložit soubor jako...",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
                 initialDir = File(originalFile.parent),
-                initialFileName = originalFile.nameWithoutExtension + " kopie"
+                initialFileName = originalFile.nameWithoutExtension + " kopie",
+                extension = ".json"
         )
 
 
         if (file != null) {
-            if (!file.name.endsWith(".json")) {
-                val newFile = File(file.path.plus(".json"))
-                file = newFile
-            }
-
-            try {
-                file.createNewFile()
-            } catch (e: Exception) {
-                errorDialog("Zde nelze zapsat soubor!")
-                return
-            }
-
             if (FileManagement.saveAs(file)) {
-                Notifications.create()
-                        .title("WorkManager")
-                        .text("Soubor byl uložen jako ${file.name}")
-                        .hideAfter(Duration(4000.0))
-                        .showInformation()
+                notifySavedAs(file.nameWithoutExtension)
+            } else {
+                notifyCantSave(file.nameWithoutExtension)
             }
         }
     }
 
+    /**
+     * Opens a file selector in home directory, calls backend for opening the file itself
+     */
     private fun openFile() {
-        val chooser = FileChooser()
-        chooser.title = "Otevřít soubor"
-        chooser.initialDirectory = File(System.getProperty("user.home"))
-        chooser.getExtensionFilters().addAll(ExtensionFilter("JSON", "*.json"))
-        val file = chooser.showOpenDialog(null)
+        val file = openChooser(
+                title = "Otevřít soubor",
+                filters = listOf(ExtensionFilter("JSON", "*.json"))
+        )
 
         if (file != null) {
-            FileManagement.open(file)
+            if (!FileManagement.open(file)) {
+                Notifications.create()
+                        .title("WorkManager")
+                        .text("Soubor nelze otevřít, nebo není validní.")
+                        .hideAfter(Duration(4000.0))
+                        .showInformation()
+            }
         }
     }
 }

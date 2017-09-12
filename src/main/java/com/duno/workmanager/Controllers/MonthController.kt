@@ -46,7 +46,7 @@ class MonthController : Initializable {
             val currentRow = table.selectionModel.selectedItem
             if (currentRow != null) {
                 if (it.code == KeyCode.DELETE) {
-                    deleteRow(currentRow)
+                    removeRow(currentRow)
                 }
             }
         }
@@ -87,11 +87,11 @@ class MonthController : Initializable {
         }
     }
 
-    fun deleteRow(row: ObservableSession) {
+    fun removeRow(row: ObservableSession) {
         table.items.remove(row)
     }
 
-    fun newRow() {
+    fun createNewRow() {
         val lastSession = table.items.lastOrNull() ?: WorkSession(addMinutes = 30, hourlyWage = 0, description = "Doplnit!")
         val session = WorkSession(addMinutes = 30, hourlyWage = lastSession.hourlyWage, description = lastSession.description)
         table.items.add(ObservableSession(session))
@@ -99,7 +99,7 @@ class MonthController : Initializable {
 
     private fun newRowHandler(row: TableRow<ObservableSession>) {
         if (row.item !is ObservableSession) {
-            newRow()
+            createNewRow()
         }
     }
 }

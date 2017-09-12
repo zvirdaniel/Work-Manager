@@ -17,6 +17,7 @@ import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 import javafx.stage.FileChooser
 import javafx.stage.Window
+import javafx.util.Duration
 import org.controlsfx.control.Notifications
 import java.io.File
 import java.time.ZoneId
@@ -29,6 +30,8 @@ var services: HostServices? = null
  */
 fun exportDialog(): Pair<IntRange, File> {
     // TODO: Open file chooser to select file
+    // TODO: Set file owners (modality)
+
     val loader = FXMLLoader(Main::class.java.getResource("Views/ExportDialog.fxml"))
     loader.setController(ExportDialogController())
     val content = loader.load<AnchorPane>()
@@ -55,7 +58,30 @@ fun exportDialog(): Pair<IntRange, File> {
     return Pair(1..1, CurrentFile.get())
 }
 
-// TODO: Set file owners
+/**
+ * @param title file chooser title
+ * @param filters file extension filters
+ * @param initialDir opened when chooser dialog opens
+ * @param ownerWindow given to file chooser itself as owner
+ * @return selected file
+ * Opens an open file dialog
+ */
+fun openChooser(
+        title: String,
+        filters: Collection<FileChooser.ExtensionFilter>? = null,
+        initialDir: File = File(System.getProperty("user.home")),
+        ownerWindow: Window? = null
+): File? {
+    val chooser = FileChooser()
+    chooser.title = title
+    chooser.initialDirectory = initialDir
+
+    if (filters != null) {
+        chooser.extensionFilters.addAll(filters)
+    }
+
+    return chooser.showOpenDialog(ownerWindow)
+}
 
 /**
  * @param title file chooser title
@@ -63,13 +89,17 @@ fun exportDialog(): Pair<IntRange, File> {
  * @param initialDir opened when chooser dialog opens
  * @param initialFileName used as suggested file name
  * @param ownerWindow given to file chooser itself as owner
+ * @param extension will be added to the file name, if not already there
+ * @return selected file
+ * Opens a save file dialog
  */
 fun saveChooser(
         title: String,
         filters: Collection<FileChooser.ExtensionFilter>? = null,
         initialDir: File = File(System.getProperty("user.home")),
         initialFileName: String? = null,
-        ownerWindow: Window? = null
+        ownerWindow: Window? = null,
+        extension: String = ""
 ): File? {
     val chooser = FileChooser()
     chooser.title = title
@@ -83,18 +113,39 @@ fun saveChooser(
         chooser.initialFileName = initialFileName
     }
 
-    return chooser.showSaveDialog(ownerWindow)
+    var file = chooser.showSaveDialog(ownerWindow)
+
+    if (extension.isNotEmpty()) {
+        if (!file.name.endsWith(extension)) {
+            file = File(file.path.plus(extension))
+        }
+    }
+
+    return file
 }
 
 /**
- * Shows error dialog with a given message
+ * @param fileName that will show up in the notification
+ * Creates a notification informing the user that the fileName cant be saved
  */
-fun errorDialog(message: String) {
-    val alert = Alert(AlertType.ERROR)
-    alert.title = "Chyba"
-    alert.headerText = "Hele, chyba!"
-    alert.contentText = message
-    alert.showAndWait()
+fun notifyCantSave(fileName: String) {
+    Notifications.create()
+            .title("WorkManager")
+            .text("Soubor nelze uložit jako $fileName.")
+            .hideAfter(Duration(4000.0))
+            .showError()
+}
+
+/**
+ * @param fileName that will show up in the notification
+ * Creates a notification informing the user about successful saving of the given file
+ */
+fun notifySavedAs(fileName: String) {
+    Notifications.create()
+            .title("WorkManager")
+            .text("Soubor uložen jako $fileName.")
+            .hideAfter(Duration(4000.0))
+            .showInformation()
 }
 
 /**
