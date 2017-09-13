@@ -6,12 +6,8 @@ import com.duno.workmanager.Main
 import javafx.application.HostServices
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
-import javafx.scene.control.Alert
+import javafx.scene.control.*
 import javafx.scene.control.Alert.AlertType
-import javafx.scene.control.ButtonBar.ButtonData
-import javafx.scene.control.ButtonType
-import javafx.scene.control.Dialog
-import javafx.scene.control.Hyperlink
 import javafx.scene.layout.AnchorPane
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
@@ -23,38 +19,39 @@ import java.io.File
 import java.time.ZoneId
 import java.util.*
 
-var services: HostServices? = null
+var services: HostServices? = null // Used in about dialog to open a link in a web browser
+
+// TODO: Set dialog modality
 
 /**
- * @return range of months to export, file to export data into
+ * @return range of months to export, .xlsx file to export data into
  */
 fun exportDialog(): Pair<IntRange, File> {
-    // TODO: Open file chooser to select file
-    // TODO: Set file owners (modality)
-
     val loader = FXMLLoader(Main::class.java.getResource("Views/ExportDialog.fxml"))
-    loader.setController(ExportDialogController())
+    val controller = ExportDialogController()
+    loader.setController(controller)
     val content = loader.load<AnchorPane>()
 
-    // Create the custom dialog
+    // Create a custom dialog
     val dialog = Dialog<IntRange>()
-    dialog.setTitle("Export dat do tabulky")
-    dialog.setHeaderText("Vyberte data k exportu do tabulky")
+    dialog.title = "Export dat do tabulky"
+    dialog.headerText = "Vyberte data k exportu do tabulky"
 
-    // Set the buttons
+    // Add buttons
+    val exportButtonType = ButtonType("Export", ButtonBar.ButtonData.OK_DONE)
     dialog.getDialogPane().getButtonTypes().
-            addAll(ButtonType("Export", ButtonData.OK_DONE), ButtonType.CANCEL)
+            addAll(exportButtonType, ButtonType.CANCEL)
 
-    // Do some validation (using the Java 8 lambda syntax)
-    // username.textProperty().addListener({ observable, oldValue, newValue -> exportButton.setDisable(newValue.trim().isEmpty()) })
+    // Pass export button to controller, button can be pressed only after a file has been selected
+    val exportButton = dialog.dialogPane.lookupButton(exportButtonType)
+    controller.exportButton = exportButton
+    exportButton.disableProperty().set(true)
 
+    // Set content from FXML
     dialog.dialogPane.content = content
     dialog.dialogPane.minWidth = 400.0
 
-    // Platform.runLater({ username.requestFocus() })
-
     val result: Optional<IntRange> = dialog.showAndWait()
-
     return Pair(1..1, CurrentFile.get())
 }
 
@@ -115,7 +112,7 @@ fun saveChooser(
 
     var file = chooser.showSaveDialog(ownerWindow)
 
-    if (extension.isNotEmpty()) {
+    if (file != null && extension.isNotEmpty()) {
         if (!file.name.endsWith(extension)) {
             file = File(file.path.plus(extension))
         }
