@@ -6,6 +6,7 @@ import org.apache.poi.ss.util.RegionUtil
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
+import java.io.IOException
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
@@ -36,8 +37,9 @@ fun WorkYear.writeYearInXlsx(saveFile: File, month: Int) {
  *
  * @param monthRange Range between 1 and 12, each month will be a separate sheet
  * @param saveFile File to save all data into, example: result.xlsx
+ * @return true if successfully written into a file, false if IOException was thrown
  */
-fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
+fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
     if (monthRange.start < 1 || monthRange.endInclusive > 12) {
         throw IllegalArgumentException("Month range is between 1 and 12!")
     }
@@ -150,7 +152,13 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
     }
 
     // Write the output to a file
-    wb.write(saveFile.outputStream())
+    try {
+        wb.write(saveFile.outputStream())
+    } catch (e: IOException) {
+        return false
+    }
+
+    return true
 }
 
 private fun createDescriptionStyle(wb: XSSFWorkbook): XSSFCellStyle {

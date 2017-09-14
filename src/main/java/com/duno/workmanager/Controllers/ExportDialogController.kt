@@ -19,16 +19,17 @@ import java.net.URL
 import java.time.ZoneId
 import java.util.*
 
-// TODO: App did not show opened file in title
-
 class ExportDialogController : Initializable {
     @FXML lateinit var monthPane: AnchorPane
     @FXML lateinit var filePane: AnchorPane
     @FXML lateinit var onlyOneMonthCheckbox: CheckBox
 
     lateinit var exportButton: Node
-    private var selectedFile: File? = null
+    var selectedFile: File? = null
 
+    /**
+     * Initializes a listener to a "single month?" checkbox and changes the UI respectively
+     */
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         setAndShowButton()
         setAndShowChoiceBox()
@@ -39,6 +40,23 @@ class ExportDialogController : Initializable {
                 false -> setAndShowSlider()
             }
         }
+    }
+
+    /**
+     * @return range of months and the file a user selected (can be null)
+     * Converts the UI elements into a Pair<IntRange, File?>
+     */
+    fun getResult(): Pair<IntRange, File?> {
+        val months: IntRange = if (onlyOneMonthCheckbox.isSelected) {
+            val choiceBox: ChoiceBox<*> = monthPane.children[0] as ChoiceBox<*>
+            val selectedMonth = choiceBox.selectionModel.selectedIndex - 1
+            selectedMonth..selectedMonth
+        } else {
+            val slider: RangeSlider = monthPane.children[0] as RangeSlider
+            slider.lowValue.toInt()..slider.highValue.toInt()
+        }
+
+        return Pair(months, selectedFile)
     }
 
     /**
@@ -57,7 +75,7 @@ class ExportDialogController : Initializable {
             }
         }
 
-        setTopBottomAnchors(button, 0.0)
+        setTopBottomAnchors(button, 20.0)
         filePane.children.setAll(button)
         Platform.runLater { filePane.children.first().requestFocus() }
     }

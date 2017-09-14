@@ -6,6 +6,7 @@ import com.duno.workmanager.Models.ObservableSession
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.scene.control.Label
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
@@ -28,6 +29,8 @@ class MonthController : Initializable {
     var description = TableColumn<ObservableSession, String>()
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
+        table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
+
         deleteKeyHandler()
 
         blankRowCallback()
@@ -95,6 +98,7 @@ class MonthController : Initializable {
         val lastSession = table.items.lastOrNull() ?: WorkSession(addMinutes = 30, hourlyWage = 0, description = "Doplnit!")
         val session = WorkSession(addMinutes = 30, hourlyWage = lastSession.hourlyWage, description = lastSession.description)
         table.items.add(ObservableSession(session))
+        table.selectionModel.selectLast()
     }
 
     private fun newRowHandler(row: TableRow<ObservableSession>) {

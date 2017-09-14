@@ -9,7 +9,7 @@ import java.io.File
 import java.util.prefs.Preferences
 
 /**
- * Manages data in memory (visible to user)
+ * Manages data in memory - in UI
  */
 object VisibleData {
     val observableMonths = hashMapOf<Int, ObservableList<ObservableSession>>()
@@ -31,7 +31,7 @@ object VisibleData {
 
     /**
      * @param workYear used as data source for import, it's mapped into observableMonths
-     * Imports data from workYear into observableMonths, which are visible to user
+     * Imports data from workYear into observableMonths - into UI
      */
     private fun setAndShowCurrentWorkYear(workYear: WorkYear) {
         for ((key, value) in workYear.months) {
@@ -78,7 +78,6 @@ object CurrentFile {
         if (isValid(file)) {
             currentFile = file
             Preferences.userNodeForPackage(CurrentFile::class.java).put(LAST_USED_FILE, file.absolutePath)
-            PrimaryStage.get().title = "WorkManager - ${file.name}"
             status = true
         } else {
             status = false
@@ -96,6 +95,7 @@ object CurrentFile {
 
         if (file != null) {
             println("File $file was returned")
+            PrimaryStage.get().title = "WorkManager - ${file.name}"
             return file
         }
 
@@ -171,6 +171,14 @@ object FileManagement {
 
     /**
      * @return true if file was successfully written; false otherwise
+     */
+    fun save(): Boolean {
+        val currentFile = CurrentFile.get()
+        return writeCurrentWorkYear(currentFile)
+    }
+
+    /**
+     * @return true if file was successfully written; false otherwise
      * @param file selected from GUI
      */
     fun saveAs(file: File): Boolean {
@@ -185,25 +193,37 @@ object FileManagement {
         return writeStatus
     }
 
-    /**
-     * @return true if file was successfully written; false otherwise
-     */
-    fun save(): Boolean {
-        val currentFile = CurrentFile.get()
-        return writeCurrentWorkYear(currentFile)
+    fun exportToSpreadsheet(monthRange: IntRange, file: File): Boolean {
+        try {
+            file.createNewFile()
+        } catch (e: Exception) {
+            return false
+        }
+
+        val workYear = generateWorkYearFromVisibleData()
+        return workYear.writeYearInXlsx(file, monthRange)
     }
 
     /**
      * @param file to write the data into, it will be overwritten
      * @return false if exception is thrown, true otherwise
-     * Saves the data in memory into into a given file as a WorkYear
+     * Saves the data in memory into a given file as a JSON
      */
     private fun writeCurrentWorkYear(file: File): Boolean {
+        val workYear = generateWorkYearFromVisibleData()
+        return workYear.writeYearInJson(file)
+    }
+
+    /**
+     * @return WorkYear containing the data from the UI
+     * Creates a WorkYear from the data contained in the UI
+     */
+    private fun generateWorkYearFromVisibleData(): WorkYear {
         val workYear = WorkYear()
-        for (month in VisibleData.observableMonths) {
-            workYear.addAllToMonth(month.key, month.value)
+        for ((key, value) in VisibleData.observableMonths) {
+            workYear.addAllToMonth(key, value)
         }
 
-        return workYear.writeYearInJson(file)
+        return workYear
     }
 }

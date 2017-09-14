@@ -1,7 +1,6 @@
 package com.duno.workmanager.Other
 
 import com.duno.workmanager.Controllers.ExportDialogController
-import com.duno.workmanager.Data.CurrentFile
 import com.duno.workmanager.Main
 import javafx.application.HostServices
 import javafx.event.EventHandler
@@ -12,7 +11,9 @@ import javafx.scene.layout.AnchorPane
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 import javafx.stage.FileChooser
+import javafx.stage.Modality
 import javafx.stage.Window
+import javafx.util.Callback
 import javafx.util.Duration
 import org.controlsfx.control.Notifications
 import java.io.File
@@ -21,26 +22,23 @@ import java.util.*
 
 var services: HostServices? = null // Used in about dialog to open a link in a web browser
 
-// TODO: Set dialog modality
-
 /**
  * @return range of months to export, .xlsx file to export data into
  */
-fun exportDialog(): Pair<IntRange, File> {
+fun exportDialog(parentWindow: Window): Pair<IntRange, File?> {
     val loader = FXMLLoader(Main::class.java.getResource("Views/ExportDialog.fxml"))
     val controller = ExportDialogController()
     loader.setController(controller)
     val content = loader.load<AnchorPane>()
 
     // Create a custom dialog
-    val dialog = Dialog<IntRange>()
+    val dialog = Dialog<Pair<IntRange, File?>>()
     dialog.title = "Export dat do tabulky"
     dialog.headerText = "Vyberte data k exportu do tabulky"
 
     // Add buttons
     val exportButtonType = ButtonType("Export", ButtonBar.ButtonData.OK_DONE)
-    dialog.getDialogPane().getButtonTypes().
-            addAll(exportButtonType, ButtonType.CANCEL)
+    dialog.dialogPane.buttonTypes.addAll(ButtonType.CANCEL, exportButtonType)
 
     // Pass export button to controller, button can be pressed only after a file has been selected
     val exportButton = dialog.dialogPane.lookupButton(exportButtonType)
@@ -50,9 +48,14 @@ fun exportDialog(): Pair<IntRange, File> {
     // Set content from FXML
     dialog.dialogPane.content = content
     dialog.dialogPane.minWidth = 400.0
+    dialog.initOwner(parentWindow)
+    dialog.initModality(Modality.WINDOW_MODAL)
 
-    val result: Optional<IntRange> = dialog.showAndWait()
-    return Pair(1..1, CurrentFile.get())
+    dialog.resultConverter = Callback {
+        controller.getResult()
+    }
+
+    return dialog.showAndWait().get()
 }
 
 /**
@@ -169,7 +172,7 @@ fun isOnSameDay(first: Date, second: Date): Boolean {
 /**
  * Shows about dialog with GitHub link
  */
-fun aboutDialog() {
+fun aboutDialog(parentWindow: Window) {
     val link = Hyperlink("GitHub")
     link.onAction = EventHandler {
         services?.showDocument("https://github.com/zvirdaniel/Work-Manager")
@@ -182,5 +185,8 @@ fun aboutDialog() {
     alert.headerText = "Daniel Zvir"
     alert.dialogPane.contentProperty().set(flow)
 
-    alert.showAndWait()
+    parentWindow.let { alert.initOwner(it) }
+    alert.initModality(Modality.WINDOW_MODAL)
+
+    alert.show()
 }

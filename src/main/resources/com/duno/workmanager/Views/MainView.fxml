@@ -28,7 +28,7 @@
                   <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
                </accelerator></MenuItem>
             </Menu>
-            <Menu mnemonicParsing="false" text="Export">
+            <Menu fx:id="exportMenu" mnemonicParsing="false" text="Export">
                 <MenuItem mnemonicParsing="false" text="XLSX Tabulka">
                     <accelerator>
                         <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP" />

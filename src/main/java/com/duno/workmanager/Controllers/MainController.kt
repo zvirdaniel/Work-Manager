@@ -4,6 +4,7 @@ import com.duno.workmanager.Data.CurrentFile
 import com.duno.workmanager.Data.FileManagement
 import com.duno.workmanager.Data.VisibleData
 import com.duno.workmanager.Other.*
+import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
@@ -11,6 +12,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TabPane
 import javafx.stage.FileChooser.ExtensionFilter
+import javafx.stage.Window
 import javafx.util.Duration
 import org.controlsfx.control.Notifications
 import java.io.File
@@ -29,8 +31,10 @@ class MainController : Initializable {
     @FXML lateinit var saveAsFileMenu: MenuItem
     @FXML lateinit var newFileMenu: MenuItem
     @FXML lateinit var aboutMenu: MenuItem
+    @FXML lateinit var exportMenu: MenuItem
     @FXML lateinit var deleteButton: Button
     @FXML lateinit var newRowButton: Button
+    private lateinit var window: Window
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         // EventHandlers
@@ -40,10 +44,23 @@ class MainController : Initializable {
         saveAsFileMenu.onAction = EventHandler { saveFileAs() }
         deleteButton.onAction = EventHandler { deleteRow() }
         newRowButton.onAction = EventHandler { newRow() }
-        aboutMenu.onAction = EventHandler { aboutDialog() }
+        aboutMenu.onAction = EventHandler { aboutDialog(window) }
+        exportMenu.onAction = EventHandler { exportData() }
 
         // Select current month
         tabPane.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
+
+        Platform.runLater { window = tabPane.scene.window }
+    }
+
+    private fun exportData() {
+        val pair = exportDialog(window)
+        val monthRange = pair.first
+        val file = pair.second
+
+        if (file != null) {
+            FileManagement.exportToSpreadsheet(monthRange, file)
+        }
     }
 
     /**
@@ -73,13 +90,14 @@ class MainController : Initializable {
     private fun newFile() {
         val file = saveChooser("Vytvořit nový soubor",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
-                extension = ".json")
+                extension = ".json",
+                ownerWindow = window)
 
         if (file != null) {
             if (FileManagement.new(file)) {
-                notifySavedAs(file.nameWithoutExtension)
+                notifySavedAs(file.name)
             } else {
-                notifyCantSave(file.nameWithoutExtension)
+                notifyCantSave(file.name)
             }
         }
     }
@@ -89,9 +107,9 @@ class MainController : Initializable {
      */
     private fun saveFile() {
         if (FileManagement.save()) {
-            notifySavedAs(CurrentFile.get().nameWithoutExtension)
+            notifySavedAs(CurrentFile.get().name)
         } else {
-            notifyCantSave(CurrentFile.get().nameWithoutExtension)
+            notifyCantSave(CurrentFile.get().name)
         }
     }
 
@@ -105,15 +123,16 @@ class MainController : Initializable {
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
                 initialDir = File(originalFile.parent),
                 initialFileName = originalFile.nameWithoutExtension + " kopie",
-                extension = ".json"
+                extension = ".json",
+                ownerWindow = window
         )
 
 
         if (file != null) {
             if (FileManagement.saveAs(file)) {
-                notifySavedAs(file.nameWithoutExtension)
+                notifySavedAs(file.name)
             } else {
-                notifyCantSave(file.nameWithoutExtension)
+                notifyCantSave(file.name)
             }
         }
     }
@@ -124,7 +143,8 @@ class MainController : Initializable {
     private fun openFile() {
         val file = openChooser(
                 title = "Otevřít soubor",
-                filters = listOf(ExtensionFilter("JSON", "*.json"))
+                filters = listOf(ExtensionFilter("JSON", "*.json")),
+                ownerWindow = window
         )
 
         if (file != null) {

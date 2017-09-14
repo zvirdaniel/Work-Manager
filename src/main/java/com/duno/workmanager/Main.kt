@@ -1,6 +1,5 @@
 package com.duno.workmanager
 
-import com.duno.workmanager.Other.exportDialog
 import com.duno.workmanager.Other.services
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
@@ -10,32 +9,29 @@ import javafx.scene.image.Image
 import javafx.stage.Stage
 
 // TODO: progress bar, use MaskerPane
-// TODO: Dialog owner
-// TODO: Notify the user that temporary file was created
-// TODO: Complete documentation
 
 class Main : Application() {
     override fun start(stage: Stage) {
         PrimaryStage.set(stage)
 
-        services = hostServices
+        services = hostServices // Used to open a hyperlink via the default browser in about dialog
 
         loadIcons()
 
         val loader = FXMLLoader(javaClass.getResource("Views/MainView.fxml"))
         val root = loader.load<Parent>()
-        val css = Main::class.java.getResource("Views/Main.css").toExternalForm()
+        val css = javaClass.getResource("Views/Main.css").toExternalForm()
         root.stylesheets.add(css)
 
-        PrimaryStage.get().title = "WorkManager"
         PrimaryStage.get().scene = Scene(root, 1280.0, 800.0)
         PrimaryStage.get().minWidth = 1280.0
         PrimaryStage.get().minHeight = 800.0
         PrimaryStage.get().show()
-
-        exportDialog()
     }
 
+    /**
+     * Loads icons of all sizes, JavaFX automatically selects the correct icon for the OS
+     */
     private fun loadIcons() {
         PrimaryStage.get().icons.addAll(
                 Image(javaClass.getResource("Icons/16x16.png").toURI().toString(), 16.0, 16.0, true, true),
@@ -51,6 +47,9 @@ class Main : Application() {
     }
 }
 
+/**
+ * Holds primary stage in a public static object
+ */
 object PrimaryStage {
     private var stage: Stage? = null
 
