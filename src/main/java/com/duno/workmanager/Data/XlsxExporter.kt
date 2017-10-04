@@ -153,7 +153,8 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
 
     // Write the output to a file
     try {
-        wb.write(saveFile.outputStream())
+        val outputStream = saveFile.outputStream()
+        wb.write(outputStream)
     } catch (e: IOException) {
         return false
     }

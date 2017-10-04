@@ -193,6 +193,11 @@ object FileManagement {
         return writeStatus
     }
 
+    /**
+     * @return true if file was successfully written; false otherwise
+     * @param monthRange of months to export into file
+     * @param file selected from GUI
+     */
     fun exportToSpreadsheet(monthRange: IntRange, file: File): Boolean {
         try {
             file.createNewFile()

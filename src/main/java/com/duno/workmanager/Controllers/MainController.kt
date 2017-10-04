@@ -5,20 +5,25 @@ import com.duno.workmanager.Data.FileManagement
 import com.duno.workmanager.Data.VisibleData
 import com.duno.workmanager.Other.*
 import javafx.application.Platform
+import javafx.concurrent.Task
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TabPane
+import javafx.scene.layout.StackPane
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Window
 import javafx.util.Duration
+import org.controlsfx.control.MaskerPane
 import org.controlsfx.control.Notifications
 import java.io.File
+import java.io.IOException
 import java.net.URL
 import java.time.ZoneId
 import java.util.*
+import kotlin.concurrent.thread
 
 
 /**
@@ -34,6 +39,8 @@ class MainController : Initializable {
     @FXML lateinit var exportMenu: MenuItem
     @FXML lateinit var deleteButton: Button
     @FXML lateinit var newRowButton: Button
+    @FXML lateinit var stackPane: StackPane
+    lateinit var maskerPane: MaskerPane
     private lateinit var window: Window
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
@@ -47,19 +54,55 @@ class MainController : Initializable {
         aboutMenu.onAction = EventHandler { aboutDialog(window) }
         exportMenu.onAction = EventHandler { exportData() }
 
+        // Add MaskerPane to the StackPane
+        maskerPane = MaskerPane()
+        maskerPane.visibleProperty().value = false
+        stackPane.children.add(maskerPane)
+
         // Select current month
         tabPane.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
 
         Platform.runLater { window = tabPane.scene.window }
     }
 
+    /**
+     * Opens an export dialog (file selector, and month range selector) and calls the backend function
+     */
     private fun exportData() {
         val pair = exportDialog(window)
         val monthRange = pair.first
         val file = pair.second
 
         if (file != null) {
-            FileManagement.exportToSpreadsheet(monthRange, file)
+            val task = object : Task<Void>() {
+                public override fun call(): Void? {
+                    updateMessage("Probíhá export dat")
+
+                    if (!FileManagement.exportToSpreadsheet(monthRange, file)) {
+                        throw IOException("Failed to save file ${file.path}")
+                    }
+
+                    updateMessage("Hotovo")
+                    updateProgress(100, 100)
+                    Thread.sleep(1000)
+
+                    return null
+                }
+
+                override fun succeeded() {
+                    notifySavedAs(file.name)
+                }
+
+                override fun failed() {
+                    notifyCantSave(file.name)
+                }
+            }
+
+            maskerPane.progressProperty().bind(task.progressProperty())
+            maskerPane.textProperty().bind(task.messageProperty())
+            maskerPane.visibleProperty().bind(task.runningProperty())
+
+            thread { task.run() }
         }
     }
 

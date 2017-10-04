@@ -8,7 +8,7 @@ import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 
-// TODO: progress bar, use MaskerPane
+// TODO: Ctrl + N does nothing
 
 class Main : Application() {
     override fun start(stage: Stage) {
@@ -69,4 +69,5 @@ object PrimaryStage {
 
 fun main(args: Array<String>) {
     Application.launch(Main::class.java, *args)
+
 }
