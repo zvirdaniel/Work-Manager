@@ -1,27 +1,61 @@
 package com.duno.workmanager.Data
 
-import com.duno.workmanager.Controllers.MonthController
+import com.duno.workmanager.Controllers.TableViewController
 import com.duno.workmanager.Models.ObservableSession
 import com.duno.workmanager.PrimaryStage
+import javafx.application.HostServices
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
+import org.controlsfx.control.MaskerPane
 import java.io.File
 import java.util.prefs.Preferences
+
+/**
+ * Holds static variables
+ */
+object Holder {
+    var services: HostServices? = null // Used in about dialog to open a link in a web browser
+    val maskerPane = MaskerPane()
+    private val tableViewControllers = mutableListOf<TableViewController>()
+
+    init {
+        maskerPane.visibleProperty().value = false
+    }
+
+    /**
+     * @return controller instance of a given month
+     */
+    fun getTableViewController(index: Int): TableViewController {
+        return tableViewControllers[index]
+    }
+
+    /**
+     * @param controller instance to be added into the list, can be retrieved later
+     */
+    fun addTableViewController(controller: TableViewController) {
+        tableViewControllers.add(controller)
+
+        if (tableViewControllers.count() == 12) {
+            tableViewControllers.forEachIndexed { i, c ->
+                c.table.items = VisibleData.visibleDataMap[i + 1]
+            }
+        }
+    }
+}
 
 /**
  * Manages data in memory - in UI
  */
 object VisibleData {
-    val observableMonths = hashMapOf<Int, ObservableList<ObservableSession>>()
-    private val monthControllers = mutableListOf<MonthController>()
+    val visibleDataMap = hashMapOf<Int, ObservableList<ObservableSession>>() // Holds the visible data of all months
 
     init {
-        for (i in 1..12) observableMonths[i] = FXCollections.observableArrayList<ObservableSession>()
+        for (i in 1..12) visibleDataMap[i] = FXCollections.observableArrayList<ObservableSession>()
         reloadCurrentFile()
     }
 
     /**
-     * Remaps data from the current file into observableMonths
+     * Remaps data from the current file into visibleDataMap
      */
     fun reloadCurrentFile() {
         val file = CurrentFile.get()
@@ -30,33 +64,26 @@ object VisibleData {
     }
 
     /**
-     * @param workYear used as data source for import, it's mapped into observableMonths
-     * Imports data from workYear into observableMonths - into UI
+     * @return WorkYear containing the data from the UI
+     * Creates a WorkYear from the data contained in the UI
+     */
+    fun generateWorkYearFromVisibleData(): WorkYear {
+        val workYear = WorkYear()
+        for ((key, value) in visibleDataMap) {
+            workYear.addAllToMonth(key, value)
+        }
+
+        return workYear
+    }
+
+    /**
+     * @param workYear used as data source for import, it's mapped into visibleDataMap
+     * Imports data from workYear into visibleDataMap - into UI
      */
     private fun setAndShowCurrentWorkYear(workYear: WorkYear) {
         for ((key, value) in workYear.months) {
-            observableMonths[key]?.clear()
-            observableMonths[key]?.addAll(value.map(::ObservableSession))
-        }
-    }
-
-    /**
-     * @return MonthController instance for a given month
-     */
-    fun getTabController(index: Int): MonthController {
-        return monthControllers[index]
-    }
-
-    /**
-     * @param controller instance to be added into the list, can be retrieved later
-     */
-    fun addTabController(controller: MonthController) {
-        monthControllers.add(controller)
-
-        if (monthControllers.count() == 12) {
-            monthControllers.forEachIndexed { i, c ->
-                c.table.items = observableMonths[i + 1]
-            }
+            visibleDataMap[key]?.clear()
+            visibleDataMap[key]?.addAll(value.map(::ObservableSession))
         }
     }
 }
@@ -194,30 +221,18 @@ object FileManagement {
     }
 
     /**
-     * @return WorkYear containing the data from the UI
-     * Creates a WorkYear from the data contained in the UI
-     */
-    fun generateWorkYearFromVisibleData(): WorkYear {
-        val workYear = WorkYear()
-        for ((key, value) in VisibleData.observableMonths) {
-            workYear.addAllToMonth(key, value)
-        }
-
-        return workYear
-    }
-
-    /**
      * @param file to write the data into, it will be overwritten
      * @return false if exception is thrown, true otherwise
      * Saves the data in memory into a given file as a JSON
      */
     private fun writeCurrentWorkYear(file: File): Boolean {
-        val workYear = generateWorkYearFromVisibleData()
+        val workYear = VisibleData.generateWorkYearFromVisibleData()
         return workYear.writeYearInJson(file)
     }
 }
 
 /**
+ * Exports the visible data into a file as a spreadsheet
  * This has to be out of FileManagement, because it can't be referenced to a function in an object
  * @return true if file was successfully written; false otherwise
  * @param monthRange of months to export into file
@@ -230,6 +245,6 @@ fun exportToSpreadsheet(monthRange: IntRange, file: File): Boolean {
         return false
     }
 
-    val workYear = FileManagement.generateWorkYearFromVisibleData()
+    val workYear = VisibleData.generateWorkYearFromVisibleData()
     return workYear.writeYearInXlsx(file, monthRange)
 }

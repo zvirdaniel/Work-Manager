@@ -1,6 +1,6 @@
 package com.duno.workmanager
 
-import com.duno.workmanager.Other.services
+import com.duno.workmanager.Data.Holder
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -12,7 +12,7 @@ class Main : Application() {
     override fun start(stage: Stage) {
         PrimaryStage.set(stage)
 
-        services = hostServices // Used to open a hyperlink via the default browser in about dialog
+        Holder.services = hostServices // Used to open a hyperlink via the default browser in about dialog
 
         loadIcons()
 
@@ -52,12 +52,7 @@ object PrimaryStage {
     private var stage: Stage? = null
 
     fun get(): Stage {
-        val s = stage
-        if (s != null) {
-            return s
-        } else {
-            throw Exception("Stage not initialized!")
-        }
+        return stage ?: throw Exception("Stage not initialized!")
     }
 
     fun set(s: Stage) {
@@ -67,5 +62,4 @@ object PrimaryStage {
 
 fun main(args: Array<String>) {
     Application.launch(Main::class.java, *args)
-
 }

@@ -23,10 +23,8 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
     var beginDateString: String
         get() = SimpleDateFormat("dd. MM. yyyy").format(beginDate)
         set(date) {
-            val parsedDate: Date?
-
-            try {
-                parsedDate = SimpleDateFormat("dd. MM. yyyy").parse(date)
+            val parsedDate: Date? = try {
+                SimpleDateFormat("dd. MM. yyyy").parse(date)
             } catch (e: Exception) {
                 errorNotification("Chyba při parsování $date")
                 return
@@ -53,10 +51,8 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
                 return
             }
 
-            val parsedDate: Date?
-
-            try {
-                parsedDate = SimpleDateFormat("dd. MM. yyyy HH:mm").parse(beginDateString + " " + time)
+            val parsedDate: Date? = try {
+                SimpleDateFormat("dd. MM. yyyy HH:mm").parse(beginDateString + " " + time)
             } catch (e: Exception) {
                 errorNotification("Chyba při parsování $time.")
                 return
@@ -119,21 +115,21 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
         set(text) {
             val durationInMinutes: Long?
 
-            try {
+            durationInMinutes = try {
                 val minutes = text.toDouble() * 60
-                durationInMinutes = Duration.ofMinutes(minutes.toLong()).toMinutes()
+                Duration.ofMinutes(minutes.toLong()).toMinutes()
             } catch (e: Exception) {
                 errorNotification("Chyba při parsování $text.")
                 return
             }
 
-            if (durationInMinutes < 0) {
-                errorNotification("Nelze pracovat méně než 0 hodin!")
-            } else if (durationInMinutes > 18 * 60) {
-                errorNotification("Nejsi číňan, nelze pracovat více než 18 hodin!")
-            } else {
-                endDate = Date(beginDate.time + TimeUnit.MINUTES.toMillis(durationInMinutes))
-                println("End date - ${DateFormat.getInstance().format(endDate)} was set.")
+            when {
+                durationInMinutes < 0 -> errorNotification("Nelze pracovat méně než 0 hodin!")
+                durationInMinutes > 18 * 60 -> errorNotification("Nejsi číňan, nelze pracovat více než 18 hodin!")
+                else -> {
+                    endDate = Date(beginDate.time + TimeUnit.MINUTES.toMillis(durationInMinutes))
+                    println("End date - ${DateFormat.getInstance().format(endDate)} was set.")
+                }
             }
         }
 }

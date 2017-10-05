@@ -61,10 +61,10 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
         sheet.horizontallyCenter = true
 
         val titleRow = sheet.createRow(0) // Row 0
-        titleRow.setHeightInPoints(45F)
+        titleRow.heightInPoints = 45F
         val titleCell = titleRow.createCell(0)
         titleCell.setCellValue(monthName) // Set month string to cell
-        titleCell.setCellStyle(createMonthNameStyle(wb)) // Set styling to cell
+        titleCell.cellStyle = createMonthNameStyle(wb) // Set styling to cell
 
         // Border
         val region = CellRangeAddress.valueOf("\$A$1:\$D$1")
@@ -82,11 +82,11 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
 
         // Header for every row
         val headerRow = sheet.createRow(1) // Row 1
-        headerRow.setHeightInPoints(40F)
+        headerRow.heightInPoints = 40F
         for (i in titles.indices) {
             val headerCell = headerRow.createCell(i)
             headerCell.setCellValue(titles[i]) // Set title string to cell
-            headerCell.setCellStyle(createHeaderStyle(wb)) // Set styling to cell
+            headerCell.cellStyle = createHeaderStyle(wb) // Set styling to cell
         }
 
         // Create cells with for data
@@ -125,7 +125,7 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
                     3 -> cellStyle = createDescriptionStyle(wb)
                     2 -> {
                         cellStyle = createDataStyle(wb)
-                        cellStyle.setDataFormat(wb.createDataFormat().getFormat("0.#"))
+                        cellStyle.dataFormat = wb.createDataFormat().getFormat("0.#")
                     }
                     else -> cellStyle = createDataStyle(wb)
                 }
@@ -143,7 +143,7 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
         cell = formulaRow.createCell(1)
         cell.cellFormula = "SUM(C3:C27)"
         cell.cellStyle = createDataStyle(wb)
-        cell.cellStyle.setDataFormat(wb.createDataFormat().getFormat("0.##"))
+        cell.cellStyle.dataFormat = wb.createDataFormat().getFormat("0.##")
         cell.cellStyle.font.italic = true
 
         //finally set column widths, the width is measured in units of 1/256th of a character width

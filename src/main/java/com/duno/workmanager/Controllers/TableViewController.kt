@@ -1,44 +1,40 @@
 package com.duno.workmanager.Controllers
 
-import com.duno.workmanager.Data.VisibleData
+import com.duno.workmanager.Data.Holder
 import com.duno.workmanager.Data.WorkSession
 import com.duno.workmanager.Models.ObservableSession
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.control.Label
-import javafx.scene.control.TableColumn
-import javafx.scene.control.TableRow
-import javafx.scene.control.TableView
+import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.input.KeyCode
 import javafx.util.Callback
 import java.net.URL
 import java.util.*
 
-class MonthController : Initializable {
-    @FXML
-    var table = TableView<ObservableSession>()
-    @FXML
-    var date = TableColumn<ObservableSession, String>()
-    @FXML
-    var time = TableColumn<ObservableSession, String>()
-    @FXML
-    var duration = TableColumn<ObservableSession, String>()
-    @FXML
-    var description = TableColumn<ObservableSession, String>()
+class TableViewController : Initializable {
+    @FXML lateinit var table: TableView<ObservableSession>
+    @FXML lateinit var date: TableColumn<ObservableSession, String>
+    @FXML lateinit var time: TableColumn<ObservableSession, String>
+    @FXML lateinit var duration: TableColumn<ObservableSession, String>
+    @FXML lateinit var description: TableColumn<ObservableSession, String>
+    @FXML lateinit var hourlyWageField: TextField
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
-        keyHandler()
+        keyHandlers()
         blankRowCallback()
         cellValueFactories()
         cellFactories()
         commitHandlers()
-        VisibleData.addTabController(this)
+        Holder.addTableViewController(this)
     }
 
-    private fun keyHandler() {
+    /**
+     * Ctrl-N and Delete key handlers
+     */
+    private fun keyHandlers() {
         table.onKeyPressed = EventHandler {
             if (it.isControlDown && it.code == KeyCode.N) {
                 createNewRow()

@@ -1,8 +1,8 @@
 package com.duno.workmanager.Other
 
 import com.duno.workmanager.Controllers.ExportDialogController
+import com.duno.workmanager.Data.Holder
 import com.duno.workmanager.Main
-import javafx.application.HostServices
 import javafx.concurrent.Task
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
@@ -21,12 +21,10 @@ import java.io.File
 import java.time.ZoneId
 import java.util.*
 
-var services: HostServices? = null // Used in about dialog to open a link in a web browser
-
 /**
  * @param body function reference
  */
-open class ProgressTask<T>(val body: () -> T) : Task<T>() {
+open class ProgressTask<T>(private val body: () -> T) : Task<T>() {
     override fun call(): T {
         updateMessage("Probíhá zpracování")
 
@@ -184,7 +182,7 @@ fun isOnSameDay(first: Date, second: Date): Boolean {
     val localFirst = first.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
     val localSecond = second.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 
-    return localFirst.equals(localSecond)
+    return localFirst == localSecond
 }
 
 /**
@@ -193,7 +191,7 @@ fun isOnSameDay(first: Date, second: Date): Boolean {
 fun aboutDialog(parentWindow: Window) {
     val link = Hyperlink("GitHub")
     link.onAction = EventHandler {
-        services?.showDocument("https://github.com/zvirdaniel/Work-Manager")
+        Holder.services?.showDocument("https://github.com/zvirdaniel/Work-Manager")
     }
 
     val flow = TextFlow(Text("Chyby pište na"), link)

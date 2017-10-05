@@ -5,9 +5,7 @@ import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-
 /**
- * Package: com.duno.workmanager.Data
  * Created by Daniel Zvir on 15.5.17.
  */
 

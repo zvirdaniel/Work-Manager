@@ -14,7 +14,7 @@ class WorkYear() {
     val months = hashMapOf<Int, MutableList<WorkSession>>()
 
     init {
-        for (i in 1..12) this.months[i] = mutableListOf<WorkSession>()
+        for (i in 1..12) this.months[i] = mutableListOf()
     }
 
     constructor(yearInJson: String) : this() {
@@ -50,7 +50,7 @@ class WorkYear() {
     /**
      * @return String containing JSON with a HashMap of WorkSessionRaw
      */
-    fun getYearInJson() = mapper.writeValueAsString(getMapOfRawWorkSessions())
+    fun getYearInJson(): String = mapper.writeValueAsString(getMapOfRawWorkSessions())
 
     /**
      * @param saveFile File to save all the data into, example: "result.json"
@@ -89,7 +89,7 @@ class WorkYear() {
      */
     fun getMonth(month: Int): MutableList<WorkSession> {
         checkMonthNumber(month)
-        return months[month] ?: mutableListOf<WorkSession>()
+        return months[month] ?: mutableListOf()
     }
 
     /**
@@ -101,7 +101,7 @@ class WorkYear() {
     }
 
     /**
-     * Clears all data for all observableMonths
+     * Clears all data for all visibleDataMap
      */
     fun clearYear() {
         for (month in months) {
