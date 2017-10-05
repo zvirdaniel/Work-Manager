@@ -194,19 +194,16 @@ object FileManagement {
     }
 
     /**
-     * @return true if file was successfully written; false otherwise
-     * @param monthRange of months to export into file
-     * @param file selected from GUI
+     * @return WorkYear containing the data from the UI
+     * Creates a WorkYear from the data contained in the UI
      */
-    fun exportToSpreadsheet(monthRange: IntRange, file: File): Boolean {
-        try {
-            file.createNewFile()
-        } catch (e: Exception) {
-            return false
+    fun generateWorkYearFromVisibleData(): WorkYear {
+        val workYear = WorkYear()
+        for ((key, value) in VisibleData.observableMonths) {
+            workYear.addAllToMonth(key, value)
         }
 
-        val workYear = generateWorkYearFromVisibleData()
-        return workYear.writeYearInXlsx(file, monthRange)
+        return workYear
     }
 
     /**
@@ -218,17 +215,21 @@ object FileManagement {
         val workYear = generateWorkYearFromVisibleData()
         return workYear.writeYearInJson(file)
     }
+}
 
-    /**
-     * @return WorkYear containing the data from the UI
-     * Creates a WorkYear from the data contained in the UI
-     */
-    private fun generateWorkYearFromVisibleData(): WorkYear {
-        val workYear = WorkYear()
-        for ((key, value) in VisibleData.observableMonths) {
-            workYear.addAllToMonth(key, value)
-        }
-
-        return workYear
+/**
+ * This has to be out of FileManagement, because it can't be referenced to a function in an object
+ * @return true if file was successfully written; false otherwise
+ * @param monthRange of months to export into file
+ * @param file selected from GUI
+ */
+fun exportToSpreadsheet(monthRange: IntRange, file: File): Boolean {
+    try {
+        file.createNewFile()
+    } catch (e: Exception) {
+        return false
     }
+
+    val workYear = FileManagement.generateWorkYearFromVisibleData()
+    return workYear.writeYearInXlsx(file, monthRange)
 }

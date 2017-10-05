@@ -3,6 +3,7 @@ package com.duno.workmanager.Other
 import com.duno.workmanager.Controllers.ExportDialogController
 import com.duno.workmanager.Main
 import javafx.application.HostServices
+import javafx.concurrent.Task
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.*
@@ -21,6 +22,23 @@ import java.time.ZoneId
 import java.util.*
 
 var services: HostServices? = null // Used in about dialog to open a link in a web browser
+
+/**
+ * @param body function reference
+ */
+open class ProgressTask<T>(val body: () -> T) : Task<T>() {
+    override fun call(): T {
+        updateMessage("Probíhá zpracování")
+
+        val result = body()
+
+        Thread.sleep(1000)
+        updateMessage("Zpracování dokončeno")
+        updateProgress(100, 100)
+
+        return result
+    }
+}
 
 /**
  * @return range of months to export, .xlsx file to export data into

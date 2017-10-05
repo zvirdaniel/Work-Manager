@@ -3,9 +3,9 @@ package com.duno.workmanager.Controllers
 import com.duno.workmanager.Data.CurrentFile
 import com.duno.workmanager.Data.FileManagement
 import com.duno.workmanager.Data.VisibleData
+import com.duno.workmanager.Data.exportToSpreadsheet
 import com.duno.workmanager.Other.*
 import javafx.application.Platform
-import javafx.concurrent.Task
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
@@ -19,12 +19,10 @@ import javafx.util.Duration
 import org.controlsfx.control.MaskerPane
 import org.controlsfx.control.Notifications
 import java.io.File
-import java.io.IOException
 import java.net.URL
 import java.time.ZoneId
 import java.util.*
 import kotlin.concurrent.thread
-
 
 /**
  * Controller for the main GUI, not containing TableView
@@ -59,8 +57,12 @@ class MainController : Initializable {
         maskerPane.visibleProperty().value = false
         stackPane.children.add(maskerPane)
 
-        // Select current month
+        // Select current month, focus table if tab is clicked
         tabPane.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
+        tabPane.selectionModel.selectedIndexProperty().addListener({ _, _, newValue ->
+            val tab = VisibleData.getTabController(newValue.toInt())
+            Platform.runLater { tab.table.requestFocus() }
+        })
 
         Platform.runLater { window = tabPane.scene.window }
     }
@@ -74,21 +76,7 @@ class MainController : Initializable {
         val file = pair.second
 
         if (file != null) {
-            val task = object : Task<Void>() {
-                public override fun call(): Void? {
-                    updateMessage("Probíhá export dat")
-
-                    if (!FileManagement.exportToSpreadsheet(monthRange, file)) {
-                        throw IOException("Failed to save file ${file.path}")
-                    }
-
-                    updateMessage("Hotovo")
-                    updateProgress(100, 100)
-                    Thread.sleep(1000)
-
-                    return null
-                }
-
+            val blockedTask = object : ProgressTask<Boolean>({ exportToSpreadsheet(monthRange, file) }) {
                 override fun succeeded() {
                     notifySavedAs(file.name)
                 }
@@ -98,11 +86,10 @@ class MainController : Initializable {
                 }
             }
 
-            maskerPane.progressProperty().bind(task.progressProperty())
-            maskerPane.textProperty().bind(task.messageProperty())
-            maskerPane.visibleProperty().bind(task.runningProperty())
-
-            thread { task.run() }
+            maskerPane.progressProperty().bind(blockedTask.progressProperty())
+            maskerPane.textProperty().bind(blockedTask.messageProperty())
+            maskerPane.visibleProperty().bind(blockedTask.runningProperty())
+            thread { blockedTask.run() }
         }
     }
 

@@ -8,8 +8,6 @@ import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 
-// TODO: Ctrl + N does nothing
-
 class Main : Application() {
     override fun start(stage: Stage) {
         PrimaryStage.set(stage)

@@ -30,26 +30,23 @@ class MonthController : Initializable {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
-
-        deleteKeyHandler()
-
+        keyHandler()
         blankRowCallback()
-
         cellValueFactories()
-
         cellFactories()
-
         commitHandlers()
-
         VisibleData.addTabController(this)
     }
 
-    private fun deleteKeyHandler() {
+    private fun keyHandler() {
         table.onKeyPressed = EventHandler {
-            val currentRow = table.selectionModel.selectedItem
-            if (currentRow != null) {
-                if (it.code == KeyCode.DELETE) {
-                    removeRow(currentRow)
+            if (it.isControlDown && it.code == KeyCode.N) {
+                createNewRow()
+            }
+
+            if (it.code == KeyCode.DELETE) {
+                if (table.selectionModel.selectedItem != null) {
+                    removeRow(table.selectionModel.selectedItem)
                 }
             }
         }
@@ -81,8 +78,8 @@ class MonthController : Initializable {
             val row = TableRow<ObservableSession>()
 
             row.onMouseClicked = EventHandler {
-                if (it.clickCount >= 2) {
-                    newRowHandler(row)
+                if (it.clickCount >= 2 && row.item !is ObservableSession) {
+                    createNewRow()
                 }
             }
 
@@ -99,11 +96,5 @@ class MonthController : Initializable {
         val session = WorkSession(addMinutes = 30, hourlyWage = lastSession.hourlyWage, description = lastSession.description)
         table.items.add(ObservableSession(session))
         table.selectionModel.selectLast()
-    }
-
-    private fun newRowHandler(row: TableRow<ObservableSession>) {
-        if (row.item !is ObservableSession) {
-            createNewRow()
-        }
     }
 }
