@@ -1,6 +1,5 @@
 package com.duno.workmanager.Models
 
-import com.duno.workmanager.Data.WorkSession
 import com.duno.workmanager.Other.errorNotification
 import com.duno.workmanager.Other.isOnSameDay
 import javafx.beans.property.SimpleStringProperty
@@ -10,8 +9,6 @@ import java.text.SimpleDateFormat
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
-
-// TODO: Redraw table if incorrect value was set
 
 class ObservableSession(session: WorkSession) : WorkSession(session) {
     /**
@@ -32,7 +29,7 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
 
             if (parsedDate != null) {
                 beginDate = parsedDate
-                println("Begin date - ${DateFormat.getInstance().format(beginDate)} was set.")
+                println("Begin date - ${DateFormat.getInstance().format(beginDate)} was setPrimaryStage.")
             }
         }
 
@@ -61,7 +58,7 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
             if (parsedDate != null) {
                 if (isOnSameDay(parsedDate, beginDate)) {
                     beginDate = parsedDate
-                    println("Begin date - ${DateFormat.getInstance().format(beginDate)} was set.")
+                    println("Begin date - ${DateFormat.getInstance().format(beginDate)} was setPrimaryStage.")
                 } else {
                     errorNotification("$time není mezi 00:01 - 23:59")
                 }
@@ -128,7 +125,7 @@ class ObservableSession(session: WorkSession) : WorkSession(session) {
                 durationInMinutes > 18 * 60 -> errorNotification("Nejsi číňan, nelze pracovat více než 18 hodin!")
                 else -> {
                     endDate = Date(beginDate.time + TimeUnit.MINUTES.toMillis(durationInMinutes))
-                    println("End date - ${DateFormat.getInstance().format(endDate)} was set.")
+                    println("End date - ${DateFormat.getInstance().format(endDate)} was setPrimaryStage.")
                 }
             }
         }

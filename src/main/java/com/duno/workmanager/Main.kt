@@ -1,6 +1,6 @@
 package com.duno.workmanager
 
-import com.duno.workmanager.Data.Holder
+import com.duno.workmanager.Data.DataHolder
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -10,9 +10,8 @@ import javafx.stage.Stage
 
 class Main : Application() {
     override fun start(stage: Stage) {
-        PrimaryStage.set(stage)
-
-        Holder.services = hostServices // Used to open a hyperlink via the default browser in about dialog
+        DataHolder.primaryStage = stage
+        DataHolder.services = hostServices // Used to open a hyperlink via the default browser in about dialog
 
         loadIcons()
 
@@ -21,17 +20,17 @@ class Main : Application() {
         val css = javaClass.getResource("Views/Main.css").toExternalForm()
         root.stylesheets.add(css)
 
-        PrimaryStage.get().scene = Scene(root, 1280.0, 800.0)
-        PrimaryStage.get().minWidth = 1280.0
-        PrimaryStage.get().minHeight = 800.0
-        PrimaryStage.get().show()
+        DataHolder.primaryStage.scene = Scene(root, 1280.0, 800.0)
+        DataHolder.primaryStage.minWidth = 1280.0
+        DataHolder.primaryStage.minHeight = 800.0
+        DataHolder.primaryStage.show()
     }
 
     /**
      * Loads icons of all sizes, JavaFX automatically selects the correct icon for the OS
      */
     private fun loadIcons() {
-        PrimaryStage.get().icons.addAll(
+        DataHolder.primaryStage.icons.addAll(
                 Image(javaClass.getResource("Icons/16x16.png").toURI().toString(), 16.0, 16.0, true, true),
                 Image(javaClass.getResource("Icons/20x20.png").toURI().toString(), 20.0, 20.0, true, true),
                 Image(javaClass.getResource("Icons/24x24.png").toURI().toString(), 24.0, 24.0, true, true),
@@ -42,21 +41,6 @@ class Main : Application() {
                 Image(javaClass.getResource("Icons/256x256.png").toURI().toString(), 256.0, 256.0, true, true),
                 Image(javaClass.getResource("Icons/512x512.png").toURI().toString(), 512.0, 512.0, true, true)
         )
-    }
-}
-
-/**
- * Holds primary stage in a public static object
- */
-object PrimaryStage {
-    private var stage: Stage? = null
-
-    fun get(): Stage {
-        return stage ?: throw Exception("Stage not initialized!")
-    }
-
-    fun set(s: Stage) {
-        stage = s
     }
 }
 

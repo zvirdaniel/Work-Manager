@@ -1,4 +1,4 @@
-package com.duno.workmanager.Data
+package com.duno.workmanager.Models
 
 import java.time.Duration
 import java.time.Instant
@@ -32,10 +32,10 @@ open class WorkSession {
     val durationInMinutes get() = Duration.between(beginDate.toInstant(), endDate.toInstant()).toMinutes().toDouble()
 
     /**
-     * @param beginDate Date when the session started, implicitly set to Instant.now()
+     * @param beginDate Date when the session started, implicitly setPrimaryStage to Instant.now()
      * @param endDate Date when the session ended
      * @param hourlyWage Without any currency
-     * @param description Preferred length is 90 characters or less, implicitly set to "Empty description"
+     * @param description Preferred length is 90 characters or less, implicitly setPrimaryStage to "Empty description"
      */
     constructor(beginDate: Date = Date.from(Instant.now()),
                 endDate: Date, hourlyWage: Int,
@@ -47,10 +47,10 @@ open class WorkSession {
     }
 
     /**
-     * @param beginDate Date when the session started, implicitly set to Instant.now()
+     * @param beginDate Date when the session started, implicitly setPrimaryStage to Instant.now()
      * @param addMinutes Creates an endDate (java.util.Date) from beginDate + minutes you specified
      * @param hourlyWage Without any currency
-     * @param description Preferred length is 90 characters or less, implicitly set to "Empty description"
+     * @param description Preferred length is 90 characters or less, implicitly setPrimaryStage to "Empty description"
      */
     constructor(beginDate: Date = Date.from(Instant.now()),
                 addMinutes: Long, hourlyWage: Int,
@@ -62,10 +62,10 @@ open class WorkSession {
     }
 
     /**
-     * @param beginDate Date when the session started, implicitly set to Instant.now()
+     * @param beginDate Date when the session started, implicitly setPrimaryStage to Instant.now()
      * @param addHours Creates an endDate (java.util.Date) from beginDate + hours you specified
      * @param hourlyWage Without any currency
-     * @param description Preferred length is 90 characters or less, implicitly set to "Empty description"
+     * @param description Preferred length is 90 characters or less, implicitly setPrimaryStage to "Empty description"
      */
     constructor(beginDate: Date = Date.from(Instant.now()),
                 addHours: Double, hourlyWage: Int,

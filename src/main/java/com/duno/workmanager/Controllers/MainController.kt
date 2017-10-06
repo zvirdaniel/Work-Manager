@@ -1,8 +1,8 @@
 package com.duno.workmanager.Controllers
 
 import com.duno.workmanager.Data.CurrentFile
+import com.duno.workmanager.Data.DataHolder
 import com.duno.workmanager.Data.FileManagement
-import com.duno.workmanager.Data.Holder
 import com.duno.workmanager.Data.exportToSpreadsheet
 import com.duno.workmanager.Other.*
 import javafx.application.Platform
@@ -53,12 +53,12 @@ class MainController : Initializable {
         exportMenu.onAction = EventHandler { exportData() }
 
         // MaskerPane is used to block the UI if needed
-        stackPane.children.add(Holder.maskerPane)
+        stackPane.children.add(DataHolder.maskerPane)
 
         // Select current month, focus table if tab is clicked
         tabPane.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
         tabPane.selectionModel.selectedIndexProperty().addListener({ _, _, newValue ->
-            val tab = Holder.getTableViewController(newValue.toInt())
+            val tab = DataHolder.getTableViewController(newValue.toInt())
             Platform.runLater { tab.table.requestFocus() }
         })
 
@@ -84,9 +84,9 @@ class MainController : Initializable {
                 }
             }
 
-            Holder.maskerPane.progressProperty().bind(blockedTask.progressProperty())
-            Holder.maskerPane.textProperty().bind(blockedTask.messageProperty())
-            Holder.maskerPane.visibleProperty().bind(blockedTask.runningProperty())
+            DataHolder.maskerPane.progressProperty().bind(blockedTask.progressProperty())
+            DataHolder.maskerPane.textProperty().bind(blockedTask.messageProperty())
+            DataHolder.maskerPane.visibleProperty().bind(blockedTask.runningProperty())
             thread { blockedTask.run() }
         }
     }
@@ -96,7 +96,7 @@ class MainController : Initializable {
      */
     private fun newRow() {
         val currentTabIndex = tabPane.selectionModel.selectedIndex
-        val currentTab = Holder.getTableViewController(currentTabIndex)
+        val currentTab = DataHolder.getTableViewController(currentTabIndex)
         currentTab.createNewRow()
     }
 
@@ -105,7 +105,7 @@ class MainController : Initializable {
      */
     private fun deleteRow() {
         val currentTabIndex = tabPane.selectionModel.selectedIndex
-        val currentTab = Holder.getTableViewController(currentTabIndex)
+        val currentTab = DataHolder.getTableViewController(currentTabIndex)
         val currentRow = currentTab.table.selectionModel.selectedItem
         if (currentRow != null) {
             currentTab.removeRow(currentRow)

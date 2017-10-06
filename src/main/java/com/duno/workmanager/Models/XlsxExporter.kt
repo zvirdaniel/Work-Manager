@@ -1,4 +1,4 @@
-package com.duno.workmanager.Data
+package com.duno.workmanager.Models
 
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddress
@@ -146,7 +146,7 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
         cell.cellStyle.dataFormat = wb.createDataFormat().getFormat("0.##")
         cell.cellStyle.font.italic = true
 
-        //finally set column widths, the width is measured in units of 1/256th of a character width
+        //finally setPrimaryStage column widths, the width is measured in units of 1/256th of a character width
         sheet.setColumnWidth(0, 30 * 256) //30 characters wide
         sheet.setColumnWidth(3, 90 * 256)
     }

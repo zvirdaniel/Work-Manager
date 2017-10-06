@@ -1,8 +1,8 @@
 package com.duno.workmanager.Controllers
 
-import com.duno.workmanager.Data.Holder
-import com.duno.workmanager.Data.WorkSession
+import com.duno.workmanager.Data.DataHolder
 import com.duno.workmanager.Models.ObservableSession
+import com.duno.workmanager.Models.WorkSession
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
@@ -28,7 +28,7 @@ class TableViewController : Initializable {
         cellValueFactories()
         cellFactories()
         commitHandlers()
-        Holder.addTableViewController(this)
+        DataHolder.addTableViewController(this)
     }
 
     /**
@@ -55,6 +55,9 @@ class TableViewController : Initializable {
         description.onEditCommit = EventHandler { it.rowValue.descriptionString = it.newValue }
     }
 
+    /**
+     * Responsible for rendering the data contained within each cell for a single column
+     */
     private fun cellFactories() {
         date.cellFactory = TextFieldTableCell.forTableColumn()
         time.cellFactory = TextFieldTableCell.forTableColumn()
@@ -62,7 +65,12 @@ class TableViewController : Initializable {
         description.cellFactory = TextFieldTableCell.forTableColumn()
     }
 
+    /**
+     * Responsible for populating the data for all cells within a single column
+     */
     private fun cellValueFactories() {
+
+
         date.setCellValueFactory { it.value.beginDateProperty }
         time.setCellValueFactory { it.value.beginTimeProperty }
         duration.setCellValueFactory { it.value.durationProperty }
