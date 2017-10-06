@@ -14,6 +14,8 @@ import java.net.URL
 import java.util.*
 
 // TODO: Connect hourly wage to the controller
+// TODO: Implement Time, Duration and Description cell value factories
+// TODO: Implement custom date cell factory
 
 class TableViewController : Initializable {
     @FXML lateinit var table: TableView<WorkSession>

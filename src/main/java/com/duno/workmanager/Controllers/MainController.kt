@@ -136,6 +136,7 @@ class MainController : Initializable {
      */
     private fun saveFileNotificator() {
         try {
+            saveFile()
             savedAsNotification(CurrentFile.get().name)
         } catch (e: Exception) {
             cantSaveNotification(CurrentFile.get().name)

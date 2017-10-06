@@ -13,7 +13,7 @@ import java.time.ZoneId
 object DataHolder {
     var services: HostServices? = null // Used in about dialog to openFile a link in a web browser
     val maskerPane = MaskerPane() // Used to block the UI
-    val zone = ZoneId.systemDefault() // This zone is used in all DateTime/Instant conversion
+    val zone: ZoneId = ZoneId.systemDefault() // This zone is used in all DateTime/Instant conversion
     lateinit var primaryStage: Stage
     private val tableViewControllers = mutableListOf<TableViewController>()
 

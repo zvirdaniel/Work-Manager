@@ -45,13 +45,13 @@ object CurrentFile {
         }
 
         val lastUsedFile = File(lastUsedPath)
-        try {
+        return try {
             validate(lastUsedFile)
             set(lastUsedFile)
-            return get()
+            get()
         } catch (e: Exception) {
             createAndSetTempFile()
-            return get()
+            get()
         }
     }
 

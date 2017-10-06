@@ -51,13 +51,13 @@ class LocalDateProperty(date: LocalDate) : SimpleObjectProperty<LocalDate>(date)
 
         try {
             val date: LocalDate
-            if (IntRange(1, 3).contains(newValueWithoutSpaces.length) && tableView.items.isNotEmpty()) {
+            date = if (IntRange(1, 3).contains(newValueWithoutSpaces.length) && tableView.items.isNotEmpty()) {
                 val lastRow = tableView.items[column.tablePosition.row - 1]
                 val year = lastRow.beginDateProperty.get().year
                 val month = lastRow.beginDateProperty.get().month.value
-                date = LocalDate.of(year, month, newValueWithoutSpaces.replace(".", "").toInt())
+                LocalDate.of(year, month, newValueWithoutSpaces.replace(".", "").toInt())
             } else {
-                date = LocalDate.parse(newValueWithoutSpaces, formatter)
+                LocalDate.parse(newValueWithoutSpaces, formatter)
             }
 
             super.set(date)

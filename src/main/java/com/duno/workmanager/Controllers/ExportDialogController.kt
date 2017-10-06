@@ -20,12 +20,12 @@ import java.net.URL
 import java.util.*
 
 class ExportDialogController : Initializable {
-    @FXML lateinit var monthPane: AnchorPane
-    @FXML lateinit var filePane: AnchorPane
-    @FXML lateinit var onlyOneMonthCheckbox: CheckBox
+    @FXML private lateinit var monthPane: AnchorPane
+    @FXML private lateinit var filePane: AnchorPane
+    @FXML private lateinit var onlyOneMonthCheckbox: CheckBox
 
     lateinit var exportButton: Node
-    var selectedFile: File? = null
+    private var selectedFile: File? = null
 
     /**
      * Initializes a listener to a "single month?" checkbox and changes the UI respectively
