@@ -10,7 +10,6 @@ import java.io.IOException
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
@@ -22,7 +21,7 @@ import java.time.format.DateTimeFormatter
  * Generates XLSX spreadsheet and saves it into a file.
  *
  * @param month Month between 1 and 12, will create one sheet with specified month
- * @param saveFile File to save all data into, example: result.xlsx
+ * @param saveFile File to saveFile all data into, example: result.xlsx
  */
 fun WorkYear.writeYearInXlsx(saveFile: File, month: Int) {
     if (month < 1 || month > 12) {
@@ -34,12 +33,11 @@ fun WorkYear.writeYearInXlsx(saveFile: File, month: Int) {
 
 /**
  * Generates XLSX spreadsheet and saves it into a file.
- *
  * @param monthRange Range between 1 and 12, each month will be a separate sheet
- * @param saveFile File to save all data into, example: result.xlsx
- * @return true if successfully written into a file, false if IOException was thrown
+ * @param saveFile File to saveFile all data into, example: result.xlsx
+ * @throws IOException if file export fails
  */
-fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
+fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
     if (monthRange.start < 1 || monthRange.endInclusive > 12) {
         throw IllegalArgumentException("Month range is between 1 and 12!")
     }
@@ -102,16 +100,16 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
             for (dataRowNumber in month!!.indices) {
                 val row = sheet.getRow(dataRowNumber + 2)
                 val session = WorkSession(month[dataRowNumber])
-                val localDate = session.beginDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                val localDate = session.beginDateProperty.get()
                 // Begin date
                 row.getCell(0).setCellValue(localDate.format(DateTimeFormatter.ofPattern("dd. L. u")))
                 // Begin hours
-                row.getCell(1).setCellValue(SimpleDateFormat("HH:mm").format(session.beginDate))
+                row.getCell(1).setCellValue(SimpleDateFormat("HH:mm").format(session.beginDateProperty))
                 // Duration in hours
-                val bigDecimal = BigDecimal((session.durationInMinutes / 60.0)).setScale(1, RoundingMode.HALF_UP)
+                val bigDecimal = BigDecimal((session.durationProperty.value.toMinutes().toDouble() / 60.0)).setScale(1, RoundingMode.HALF_UP)
                 row.getCell(2).setCellValue(bigDecimal.toDouble())
                 // Description
-                row.getCell(3).setCellValue(session.description)
+                row.getCell(3).setCellValue(session.descriptionProperty.get())
             }
         }
 
@@ -156,10 +154,8 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange): Boolean {
         val outputStream = saveFile.outputStream()
         wb.write(outputStream)
     } catch (e: IOException) {
-        return false
+        throw IOException("Exporting file ${saveFile.name} has failed")
     }
-
-    return true
 }
 
 private fun createDescriptionStyle(wb: XSSFWorkbook): XSSFCellStyle {

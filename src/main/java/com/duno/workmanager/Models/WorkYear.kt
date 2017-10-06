@@ -42,29 +42,21 @@ class WorkYear() {
         val monthsRaw = hashMapOf<Int, MutableList<WorkSessionRaw>>()
         for (i in 1..12) {
             monthsRaw[i] = mutableListOf()
-            months[i]?.forEach { monthsRaw[i]?.add(it.rawData) }
+            months[i]?.forEach { monthsRaw[i]?.add(it.getRawData()) }
         }
         return monthsRaw
     }
 
     /**
      * @return String containing JSON with a HashMap of WorkSessionRaw
+     * @throws com.fasterxml.jackson.core.JsonProcessingException
      */
     fun getYearInJson(): String = mapper.writeValueAsString(getMapOfRawWorkSessions())
 
     /**
-     * @param saveFile File to save all the data into, example: "result.json"
-     * @return false if exception is thrown, true otherwise
+     * @param saveFile File to saveFile all the data into, example: "result.json"
      */
-    fun writeYearInJson(saveFile: File): Boolean {
-        try {
-            mapper.writeValue(saveFile, getMapOfRawWorkSessions())
-        } catch (e: Exception) {
-            return false
-        }
-
-        return true
-    }
+    fun writeYearInJson(saveFile: File) = mapper.writeValue(saveFile, getMapOfRawWorkSessions())
 
     /**
      * @param month index
@@ -121,7 +113,7 @@ class WorkYear() {
         checkMonthNumber(month)
         var sum = 0.0
         months[month]?.forEach {
-            val profit = it.durationInMinutes * (it.hourlyWage.toDouble() / 60.0)
+            val profit = it.durationProperty.get().toMinutes() * (it.hourlyWageProperty.get().toDouble() / 60.0)
             sum += profit
         }
 
@@ -135,7 +127,7 @@ class WorkYear() {
         checkMonthNumber(month)
         var result = 0.0
         months[month]?.forEach {
-            result += it.durationInMinutes / 60.0
+            result += it.durationProperty.get().toMinutes() / 60.0
         }
 
         return result

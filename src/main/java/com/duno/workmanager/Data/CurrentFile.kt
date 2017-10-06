@@ -5,11 +5,7 @@ import java.io.File
 import java.util.prefs.Preferences
 
 /**
- * Created by Daniel Zvir on 6.10.17.
- */
-
-/**
- * Manages currently opened file, see getPrimaryStage() and setPrimaryStage() methods
+ * Manages currently opened file, see set and get methods
  */
 object CurrentFile {
     private const val LAST_USED_FILE = "last_used_file"
@@ -17,21 +13,17 @@ object CurrentFile {
     private var currentFile: File? = null
 
     /**
-     * @return true if file was setPrimaryStage properly, false if file was not valid
+     * @throws Exception if file is not valid
      */
-    fun set(file: File): Boolean {
-        val status: Boolean
-
-        if (isValid(file)) {
+    fun set(file: File) {
+        try {
+            validate(file)
             currentFile = file
             Preferences.userNodeForPackage(CurrentFile::class.java).put(LAST_USED_FILE, file.absolutePath)
-            status = true
-        } else {
-            status = false
+            VisibleData.reloadCurrentFile()
+        } catch (e: Exception) {
+            throw e
         }
-
-        VisibleData.reloadCurrentFile()
-        return status
     }
 
     /**
@@ -53,13 +45,14 @@ object CurrentFile {
         }
 
         val lastUsedFile = File(lastUsedPath)
-        if (isValid(lastUsedFile)) { // If last used file is valid, setPrimaryStage it as current
+        try {
+            validate(lastUsedFile)
             set(lastUsedFile)
             return get()
+        } catch (e: Exception) {
+            createAndSetTempFile()
+            return get()
         }
-
-        createAndSetTempFile()
-        return get()
     }
 
     /**
@@ -72,16 +65,10 @@ object CurrentFile {
     }
 
     /**
-     * @return true if file was parsed as a WorkYear, false if exception was thrown
-     * @param file to open
+     * @param file to openFile
+     * @throws Exception if file is not valid
      */
-    private fun isValid(file: File): Boolean {
-        try {
-            WorkYear(file)
-        } catch (e: Exception) {
-            return false
-        }
-
-        return true
+    private fun validate(file: File) {
+        WorkYear(file)
     }
 }

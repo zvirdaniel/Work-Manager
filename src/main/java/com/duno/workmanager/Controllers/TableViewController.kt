@@ -1,8 +1,8 @@
 package com.duno.workmanager.Controllers
 
 import com.duno.workmanager.Data.DataHolder
-import com.duno.workmanager.Models.ObservableSession
 import com.duno.workmanager.Models.WorkSession
+import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
@@ -13,12 +13,14 @@ import javafx.util.Callback
 import java.net.URL
 import java.util.*
 
+// TODO: Connect hourly wage to the controller
+
 class TableViewController : Initializable {
-    @FXML lateinit var table: TableView<ObservableSession>
-    @FXML lateinit var date: TableColumn<ObservableSession, String>
-    @FXML lateinit var time: TableColumn<ObservableSession, String>
-    @FXML lateinit var duration: TableColumn<ObservableSession, String>
-    @FXML lateinit var description: TableColumn<ObservableSession, String>
+    @FXML lateinit var table: TableView<WorkSession>
+    @FXML lateinit var date: TableColumn<WorkSession, String>
+    @FXML lateinit var time: TableColumn<WorkSession, String>
+    @FXML lateinit var duration: TableColumn<WorkSession, String>
+    @FXML lateinit var description: TableColumn<WorkSession, String>
     @FXML lateinit var hourlyWageField: TextField
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
@@ -49,10 +51,10 @@ class TableViewController : Initializable {
     }
 
     private fun commitHandlers() {
-        date.onEditCommit = EventHandler { it.rowValue.beginDateString = it.newValue }
-        time.onEditCommit = EventHandler { it.rowValue.beginTimeString = it.newValue }
-        duration.onEditCommit = EventHandler { it.rowValue.durationString = it.newValue }
-        description.onEditCommit = EventHandler { it.rowValue.descriptionString = it.newValue }
+        date.onEditCommit = EventHandler { it.rowValue.beginDateProperty.setCzechString(it) }
+//        time.onEditCommit = EventHandler { it.rowValue.beginTimeString = it.newValue }
+//        durationProperty.onEditCommit = EventHandler { it.rowValue.durationString = it.newValue }
+        description.onEditCommit = EventHandler { it.rowValue.descriptionProperty.value = it.newValue }
     }
 
     /**
@@ -69,20 +71,21 @@ class TableViewController : Initializable {
      * Responsible for populating the data for all cells within a single column
      */
     private fun cellValueFactories() {
-
-
-        date.setCellValueFactory { it.value.beginDateProperty }
-        time.setCellValueFactory { it.value.beginTimeProperty }
-        duration.setCellValueFactory { it.value.durationProperty }
-        description.setCellValueFactory { it.value.descriptionProperty }
+        date.cellValueFactory = Callback { it.value.beginDateProperty.getCzechString() }
+        time.cellValueFactory = Callback { it.value.beginTimeProperty.asString() }
+        duration.cellValueFactory = Callback { it.value.durationProperty.asString() }
+        description.cellValueFactory = Callback { it.value.descriptionProperty }
     }
 
+    /**
+     * Double-click on blank space creates a newFile row
+     */
     private fun blankRowCallback() {
         table.rowFactory = Callback {
-            val row = TableRow<ObservableSession>()
+            val row = TableRow<WorkSession>()
 
             row.onMouseClicked = EventHandler {
-                if (it.clickCount >= 2 && row.item !is ObservableSession) {
+                if (it.clickCount >= 2 && row.item !is WorkSession) {
                     createNewRow()
                 }
             }
@@ -91,14 +94,26 @@ class TableViewController : Initializable {
         }
     }
 
-    fun removeRow(row: ObservableSession) {
-        table.items.remove(row)
+    /**
+     * Removes a row if table is not empty
+     */
+    fun removeRow(row: WorkSession) {
+        if (table.items.isNotEmpty()) {
+            table.items.remove(row)
+        }
     }
 
+    /**
+     * Creates newFile row with some data, scrolls to the end of the table and selects it
+     */
     fun createNewRow() {
-        val lastSession = table.items.lastOrNull() ?: WorkSession(addMinutes = 30, hourlyWage = 0, description = "Doplnit!")
-        val session = WorkSession(addMinutes = 30, hourlyWage = lastSession.hourlyWage, description = lastSession.description)
-        table.items.add(ObservableSession(session))
-        table.selectionModel.selectLast()
+        val implicit = WorkSession(addMinutes = 30, hourlyWage = 0, description = "Doplnit!")
+        val lastSession = table.items.lastOrNull() ?: implicit
+        val session = WorkSession(addMinutes = 30, hourlyWage = lastSession.hourlyWageProperty.get(), description = lastSession.descriptionProperty.get())
+        table.items.add(session)
+        Platform.runLater {
+            table.scrollTo(table.items.last())
+            table.selectionModel.select(table.items.last())
+        }
     }
 }

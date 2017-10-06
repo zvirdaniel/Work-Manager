@@ -5,84 +5,57 @@ import com.duno.workmanager.Models.writeYearInXlsx
 import java.io.File
 
 /**
- * File management backend for GUI, called from controllers
+ * @param file selected from GUI
+ * Creates a newFile file and writes blank WorkYear into it
  */
-object FileManagement {
-    /**
-     * @param file selected from GUI
-     * @return true if file successfully written, false otherwise
-     * Creates a new file and writes blank WorkYear into it
-     */
-    fun new(file: File): Boolean {
-        try {
-            file.createNewFile()
-        } catch (e: Exception) {
-            return false
-        }
+fun newFile(file: File) {
+    file.createNewFile()
 
-        val workYear = WorkYear()
-        val writeStatus = workYear.writeYearInJson(file)
-        CurrentFile.set(file)
-        return writeStatus
-    }
+    val workYear = WorkYear()
+    workYear.writeYearInJson(file)
+    CurrentFile.set(file)
+}
 
-    /**
-     * @param file selected from GUI
-     * @return true if file is valid and was setPrimaryStage, false otherwise
-     */
-    fun open(file: File): Boolean {
-        return CurrentFile.set(file)
-    }
+/**
+ * @param file selected from GUI
+ */
+fun openFile(file: File) {
+    CurrentFile.set(file)
+}
 
-    /**
-     * @return true if file was successfully written; false otherwise
-     */
-    fun save(): Boolean {
-        val currentFile = CurrentFile.get()
-        return writeCurrentWorkYear(currentFile)
-    }
+/**
+ * Saves current file
+ */
+fun saveFile() {
+    val currentFile = CurrentFile.get()
+    writeCurrentWorkYear(currentFile)
+}
 
-    /**
-     * @return true if file was successfully written; false otherwise
-     * @param file selected from GUI
-     */
-    fun saveAs(file: File): Boolean {
-        try {
-            file.createNewFile()
-        } catch (e: Exception) {
-            return false
-        }
-
-        val writeStatus = writeCurrentWorkYear(file)
-        CurrentFile.set(file)
-        return writeStatus
-    }
-
-    /**
-     * @param file to write the data into, it will be overwritten
-     * @return false if exception is thrown, true otherwise
-     * Saves the data in memory into a given file as a JSON
-     */
-    private fun writeCurrentWorkYear(file: File): Boolean {
-        val workYear = VisibleData.generateWorkYearFromVisibleData()
-        return workYear.writeYearInJson(file)
-    }
+/**
+ * @param file selected from GUI
+ */
+fun saveFileAs(file: File) {
+    file.createNewFile()
+    writeCurrentWorkYear(file)
+    CurrentFile.set(file)
 }
 
 /**
  * Exports the visible data into a file as a spreadsheet
- * This has to be out of FileManagement, because it can't be referenced to a function in an object
- * @return true if file was successfully written; false otherwise
  * @param monthRange of months to export into file
  * @param file selected from GUI
  */
-fun exportToSpreadsheet(monthRange: IntRange, file: File): Boolean {
-    try {
-        file.createNewFile()
-    } catch (e: Exception) {
-        return false
-    }
-
+fun exportToSpreadsheet(monthRange: IntRange, file: File) {
+    file.createNewFile()
     val workYear = VisibleData.generateWorkYearFromVisibleData()
-    return workYear.writeYearInXlsx(file, monthRange)
+    workYear.writeYearInXlsx(file, monthRange)
+}
+
+/**
+ * @param file to write the data into, it will be overwritten
+ * Saves the data in memory into a given file as a JSON
+ */
+private fun writeCurrentWorkYear(file: File) {
+    val workYear = VisibleData.generateWorkYearFromVisibleData()
+    workYear.writeYearInJson(file)
 }

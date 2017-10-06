@@ -1,5 +1,6 @@
 package com.duno.workmanager.Controllers
 
+import com.duno.workmanager.Data.DataHolder
 import com.duno.workmanager.Other.saveChooser
 import javafx.application.Platform
 import javafx.collections.FXCollections
@@ -16,7 +17,6 @@ import javafx.stage.FileChooser
 import org.controlsfx.control.RangeSlider
 import java.io.File
 import java.net.URL
-import java.time.ZoneId
 import java.util.*
 
 class ExportDialogController : Initializable {
@@ -82,7 +82,7 @@ class ExportDialogController : Initializable {
 
     /**
      * Creates a link that opens a file chooser, and sets it into an anchor pane
-     * After selecting a file, a new hyperlink will be created for the given file
+     * After selecting a file, a newFile hyperlink will be created for the given file
      */
     private fun setAndShowLink() {
         val link = Hyperlink(selectedFile?.name)
@@ -142,7 +142,7 @@ class ExportDialogController : Initializable {
         )
 
         val choiceBox = ChoiceBox<String>(choices)
-        choiceBox.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
+        choiceBox.selectionModel.select(Date().toInstant().atZone(DataHolder.zone).toLocalDate().month.value - 1)
 
         setTopBottomAnchors(choiceBox, 20.0)
 

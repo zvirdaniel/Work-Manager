@@ -5,7 +5,8 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.duno.workmanager.Controllers.MainController">
+<?import javafx.scene.text.Text?>
+<StackPane fx:id="stackPane" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.duno.workmanager.Controllers.MainController">
     <BorderPane>
         <top>
             <MenuBar BorderPane.alignment="CENTER">
@@ -91,9 +92,11 @@
                      <Font size="15.0" />
                   </font>
                </Label>
-                    <TextField fx:id="hourlyWageField" ButtonBar.buttonData="LEFT" />
+                    <TextField fx:id="hourlyWageField" prefWidth="50.0" promptText="měna/hodina" ButtonBar.buttonData="LEFT" />
                     <Button fx:id="newRowButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Nový řádek" ButtonBar.buttonData="RIGHT" />
                     <Button fx:id="deleteButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Odstranit" ButtonBar.buttonData="RIGHT" />
+               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Suma celkem" ButtonBar.buttonData="LEFT"/>
+               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Celkem hodin" ButtonBar.buttonData="LEFT"/>
                 </buttons>
             <BorderPane.margin>
                <Insets />

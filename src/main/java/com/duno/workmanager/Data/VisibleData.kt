@@ -1,22 +1,18 @@
 package com.duno.workmanager.Data
 
-import com.duno.workmanager.Models.ObservableSession
+import com.duno.workmanager.Models.WorkSession
 import com.duno.workmanager.Models.WorkYear
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 
 /**
- * Created by Daniel Zvir on 6.10.17.
- */
-
-/**
- * Manages data in memory - in UI
+ * Manages data visible in the user interface
  */
 object VisibleData {
-    val visibleDataMap = hashMapOf<Int, ObservableList<ObservableSession>>() // Holds the visible data of all months
+    val visibleDataMap = hashMapOf<Int, ObservableList<WorkSession>>() // Holds the visible data of all months
 
     init {
-        for (i in 1..12) visibleDataMap[i] = FXCollections.observableArrayList<ObservableSession>()
+        for (i in 1..12) visibleDataMap[i] = FXCollections.observableArrayList<WorkSession>()
         reloadCurrentFile()
     }
 
@@ -49,7 +45,7 @@ object VisibleData {
     private fun setAndShowCurrentWorkYear(workYear: WorkYear) {
         for ((key, value) in workYear.months) {
             visibleDataMap[key]?.clear()
-            visibleDataMap[key]?.addAll(value.map(::ObservableSession))
+            visibleDataMap[key]?.addAll(value.map(::WorkSession))
         }
     }
 }

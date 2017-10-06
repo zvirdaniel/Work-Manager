@@ -1,9 +1,6 @@
 package com.duno.workmanager.Controllers
 
-import com.duno.workmanager.Data.CurrentFile
-import com.duno.workmanager.Data.DataHolder
-import com.duno.workmanager.Data.FileManagement
-import com.duno.workmanager.Data.exportToSpreadsheet
+import com.duno.workmanager.Data.*
 import com.duno.workmanager.Other.*
 import javafx.application.Platform
 import javafx.event.EventHandler
@@ -20,7 +17,6 @@ import javafx.util.Duration
 import org.controlsfx.control.Notifications
 import java.io.File
 import java.net.URL
-import java.time.ZoneId
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -43,24 +39,31 @@ class MainController : Initializable {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         // EventHandlers
-        newFileMenu.onAction = EventHandler { newFile() }
-        openFileMenu.onAction = EventHandler { openFile() }
-        saveFileMenu.onAction = EventHandler { saveFile() }
-        saveAsFileMenu.onAction = EventHandler { saveFileAs() }
+        newFileMenu.onAction = EventHandler { newFileDialog() }
+        openFileMenu.onAction = EventHandler { openFileDialog() }
+        saveFileMenu.onAction = EventHandler { saveFileNotificator() }
+        saveAsFileMenu.onAction = EventHandler { saveFileAsDialog() }
         deleteButton.onAction = EventHandler { deleteRow() }
         newRowButton.onAction = EventHandler { newRow() }
         aboutMenu.onAction = EventHandler { aboutDialog(window) }
-        exportMenu.onAction = EventHandler { exportData() }
+        exportMenu.onAction = EventHandler { exportDialog() }
 
         // MaskerPane is used to block the UI if needed
         stackPane.children.add(DataHolder.maskerPane)
 
-        // Select current month, focus table if tab is clicked
-        tabPane.selectionModel.select(Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().month.value - 1)
-        tabPane.selectionModel.selectedIndexProperty().addListener({ _, _, newValue ->
-            val tab = DataHolder.getTableViewController(newValue.toInt())
-            Platform.runLater { tab.table.requestFocus() }
-        })
+        // If a tab is selected, request focus to the table within it, and scroll to the bottom
+        tabPane.selectionModel.selectedIndexProperty().addListener { _, _, newValue ->
+            val tableViewController = DataHolder.getTableViewController(newValue.toInt())
+            Platform.runLater {
+                tableViewController.table.requestFocus()
+                if (tableViewController.table.items.isNotEmpty()) {
+                    tableViewController.table.scrollTo(tableViewController.table.items.count() - 1)
+                }
+            }
+        }
+
+        // Select tab with current month
+        tabPane.selectionModel.select(Date().toInstant().atZone(DataHolder.zone).toLocalDate().month.value - 1)
 
         Platform.runLater { window = tabPane.scene.window }
     }
@@ -68,31 +71,28 @@ class MainController : Initializable {
     /**
      * Opens an export dialog (file selector, and month range selector) and calls the backend function
      */
-    private fun exportData() {
+    private fun exportDialog() {
         val pair = exportDialog(window)
         val monthRange = pair.first
         val file = pair.second
 
         if (file != null) {
-            val blockedTask = object : ProgressTask<Boolean>({ exportToSpreadsheet(monthRange, file) }) {
+            val blockedTask = object : Utilities.BlockedTask<Unit>({ exportToSpreadsheet(monthRange, file) }) {
                 override fun succeeded() {
-                    notifySavedAs(file.name)
+                    savedAsNotification(file.name)
                 }
 
                 override fun failed() {
-                    notifyCantSave(file.name)
+                    cantSaveNotification(file.name)
                 }
             }
 
-            DataHolder.maskerPane.progressProperty().bind(blockedTask.progressProperty())
-            DataHolder.maskerPane.textProperty().bind(blockedTask.messageProperty())
-            DataHolder.maskerPane.visibleProperty().bind(blockedTask.runningProperty())
             thread { blockedTask.run() }
         }
     }
 
     /**
-     * Creates a new row in currently opened tab by calling it's controller
+     * Creates a newFile row in currently opened tab by calling it's controller
      */
     private fun newRow() {
         val currentTabIndex = tabPane.selectionModel.selectedIndex
@@ -115,36 +115,37 @@ class MainController : Initializable {
     /**
      * Opens a file selector and calls the backend function
      */
-    private fun newFile() {
+    private fun newFileDialog() {
         val file = saveChooser("Vytvořit nový soubor",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
                 extension = ".json",
                 ownerWindow = window)
 
         if (file != null) {
-            if (FileManagement.new(file)) {
-                notifySavedAs(file.name)
-            } else {
-                notifyCantSave(file.name)
+            try {
+                newFile(file)
+                savedAsNotification(file.name)
+            } catch (e: Exception) {
+                cantSaveNotification(file.name)
             }
         }
     }
 
     /**
-     * Calls backend's save function, creates a notification
+     * Calls backend's saveFile function, creates a notification
      */
-    private fun saveFile() {
-        if (FileManagement.save()) {
-            notifySavedAs(CurrentFile.get().name)
-        } else {
-            notifyCantSave(CurrentFile.get().name)
+    private fun saveFileNotificator() {
+        try {
+            savedAsNotification(CurrentFile.get().name)
+        } catch (e: Exception) {
+            cantSaveNotification(CurrentFile.get().name)
         }
     }
 
     /**
      * Opens a file selector, and calls the backend function
      */
-    private fun saveFileAs() {
+    private fun saveFileAsDialog() {
         val originalFile = CurrentFile.get()
 
         val file = saveChooser(title = "Uložit soubor jako...",
@@ -157,10 +158,11 @@ class MainController : Initializable {
 
 
         if (file != null) {
-            if (FileManagement.saveAs(file)) {
-                notifySavedAs(file.name)
-            } else {
-                notifyCantSave(file.name)
+            try {
+                saveFileAs(file)
+                savedAsNotification(file.name)
+            } catch (e: Exception) {
+                cantSaveNotification(file.name)
             }
         }
     }
@@ -168,7 +170,7 @@ class MainController : Initializable {
     /**
      * Opens a file selector in home directory, calls backend for opening the file itself
      */
-    private fun openFile() {
+    private fun openFileDialog() {
         val file = openChooser(
                 title = "Otevřít soubor",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
@@ -176,7 +178,9 @@ class MainController : Initializable {
         )
 
         if (file != null) {
-            if (!FileManagement.open(file)) {
+            try {
+                openFile(file)
+            } catch (e: Exception) {
                 Notifications.create()
                         .title("WorkManager")
                         .text("Soubor nelze otevřít, nebo není validní.")

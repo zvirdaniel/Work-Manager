@@ -8,10 +8,13 @@ import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 
+// TODO: File saving does not work
+// TODO: Refactor and check all the code
+
 class Main : Application() {
     override fun start(stage: Stage) {
         DataHolder.primaryStage = stage
-        DataHolder.services = hostServices // Used to open a hyperlink via the default browser in about dialog
+        DataHolder.services = hostServices // Used to openFile a hyperlink via the default browser in about dialog
 
         loadIcons()
 

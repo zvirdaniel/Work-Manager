@@ -1,32 +1,30 @@
 package com.duno.workmanager.Other
 
+import com.duno.workmanager.Data.DataHolder
 import javafx.concurrent.Task
-import java.time.ZoneId
-import java.util.*
 
-/**
- * @param body function reference
- */
-open class ProgressTask<T>(private val body: () -> T) : Task<T>() {
-    override fun call(): T {
-        updateMessage("Probíhá zpracování")
+object Utilities {
+    /**
+     * Executes body while blocking UI using MaskerPane
+     * @param body function reference
+     */
+    open class BlockedTask<T>(private val body: () -> T) : Task<T>() {
+        init {
+            DataHolder.maskerPane.progressProperty().bind(this.progressProperty())
+            DataHolder.maskerPane.textProperty().bind(this.messageProperty())
+            DataHolder.maskerPane.visibleProperty().bind(this.runningProperty())
+        }
 
-        val result = body()
+        override fun call(): T {
+            updateMessage("Probíhá zpracování")
 
-        Thread.sleep(1000)
-        updateMessage("Zpracování dokončeno")
-        updateProgress(100, 100)
+            val result = body()
 
-        return result
+            Thread.sleep(1000)
+            updateMessage("Zpracování dokončeno")
+            updateProgress(100, 100)
+
+            return result
+        }
     }
-}
-
-/**
- * @return true if dates are on the same day, does not compare time
- */
-fun isOnSameDay(first: Date, second: Date): Boolean {
-    val localFirst = first.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-    val localSecond = second.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-
-    return localFirst == localSecond
 }

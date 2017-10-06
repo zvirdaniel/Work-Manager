@@ -2,18 +2,18 @@ package com.duno.workmanager.Data
 
 import com.duno.workmanager.Controllers.TableViewController
 import javafx.application.HostServices
+import javafx.event.EventHandler
 import javafx.stage.Stage
 import org.controlsfx.control.MaskerPane
+import java.time.ZoneId
 
-/**
- * Created by Daniel Zvir on 6.10.17.
- */
 /**
  * Holds static variables
  */
 object DataHolder {
-    var services: HostServices? = null // Used in about dialog to open a link in a web browser
-    val maskerPane = MaskerPane()
+    var services: HostServices? = null // Used in about dialog to openFile a link in a web browser
+    val maskerPane = MaskerPane() // Used to block the UI
+    val zone = ZoneId.systemDefault() // This zone is used in all DateTime/Instant conversion
     lateinit var primaryStage: Stage
     private val tableViewControllers = mutableListOf<TableViewController>()
 
@@ -37,6 +37,15 @@ object DataHolder {
         if (tableViewControllers.count() == 12) {
             tableViewControllers.forEachIndexed { i, c ->
                 c.table.items = VisibleData.visibleDataMap[i + 1]
+            }
+
+            tableViewControllers.forEach { c ->
+                val table = c.table
+                table.onSort = EventHandler {
+                    if (table.items.isNotEmpty()) {
+                        table.scrollTo(0)
+                    }
+                }
             }
         }
     }
