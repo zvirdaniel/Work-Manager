@@ -1,8 +1,8 @@
-package com.duno.workmanager.Other
+package com.duno.workmanager.gui
 
-import com.duno.workmanager.Controllers.ExportDialogController
-import com.duno.workmanager.Data.DataHolder
 import com.duno.workmanager.Main
+import com.duno.workmanager.controllers.ExportDialogController
+import com.duno.workmanager.data.DataHolder
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.*
@@ -13,13 +13,7 @@ import javafx.stage.FileChooser
 import javafx.stage.Modality
 import javafx.stage.Window
 import javafx.util.Callback
-import javafx.util.Duration
-import org.controlsfx.control.Notifications
 import java.io.File
-
-/**
- * Dialogs
- */
 
 /**
  * @return range of months to export, .xlsx file to export data into
@@ -143,44 +137,4 @@ fun aboutDialog(parentWindow: Window) {
     alert.initModality(Modality.WINDOW_MODAL)
 
     alert.show()
-}
-
-
-/**
- * Notifications
- */
-
-/**
- * @param fileName that will show up in the notification
- * Creates a notification informing the user that the fileName cant be saved
- */
-fun cantSaveNotification(fileName: String) {
-    Notifications.create()
-            .title("WorkManager")
-            .text("Soubor nelze uložit jako $fileName.")
-            .hideAfter(Duration(4000.0))
-            .showError()
-}
-
-/**
- * @param fileName that will show up in the notification
- * Creates a notification informing the user about successful saving of the given file
- */
-fun savedAsNotification(fileName: String) {
-    Notifications.create()
-            .title("WorkManager")
-            .text("Soubor uložen jako $fileName.")
-            .hideAfter(Duration(4000.0))
-            .showInformation()
-}
-
-/**
- * Shows error notification with a given message
- */
-fun errorNotification(message: String) {
-    Notifications.create()
-            .title("WorkManager")
-            .text(message)
-            .hideAfter(Duration(4000.0))
-            .showError()
 }

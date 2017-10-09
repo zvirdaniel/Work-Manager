@@ -1,7 +1,7 @@
-package com.duno.workmanager.Data
+package com.duno.workmanager.data
 
-import com.duno.workmanager.Models.WorkYear
-import com.duno.workmanager.Models.writeYearInXlsx
+import com.duno.workmanager.models.WorkYear
+import com.duno.workmanager.models.writeYearInXlsx
 import java.io.File
 
 /**

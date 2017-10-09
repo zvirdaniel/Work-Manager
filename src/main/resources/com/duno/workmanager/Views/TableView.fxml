@@ -2,12 +2,12 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.duno.workmanager.Controllers.TableViewController">
+<AnchorPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.duno.workmanager.controllers.TableViewController">
      <TableView fx:id="table" editable="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <columns>
-             <TableColumn fx:id="date" maxWidth="130.0" minWidth="110.0" text="Datum" />
-             <TableColumn fx:id="time" maxWidth="120.0" minWidth="90.0" text="Začátek práce" />
-             <TableColumn fx:id="duration" maxWidth="100.0" minWidth="90.0" text="Celkový čas" />
+             <TableColumn fx:id="date" maxWidth="130.0" minWidth="130.0" text="Datum" />
+             <TableColumn fx:id="time" maxWidth="100.0" minWidth="100.0" text="Začátek práce" />
+             <TableColumn fx:id="duration" maxWidth="100.0" minWidth="100.0" text="Celkový čas" />
              <TableColumn fx:id="description" prefWidth="100.0" sortable="false" text="Popis práce" />
          </columns>
          <columnResizePolicy>

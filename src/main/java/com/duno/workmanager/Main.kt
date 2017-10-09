@@ -1,15 +1,12 @@
 package com.duno.workmanager
 
-import com.duno.workmanager.Data.DataHolder
+import com.duno.workmanager.data.DataHolder
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
-
-// TODO: File saving does not work
-// TODO: Refactor and check all the code
 
 class Main : Application() {
     override fun start(stage: Stage) {

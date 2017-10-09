@@ -1,7 +1,7 @@
-package com.duno.workmanager.Controllers
+package com.duno.workmanager.controllers
 
-import com.duno.workmanager.Data.*
-import com.duno.workmanager.Other.*
+import com.duno.workmanager.data.*
+import com.duno.workmanager.gui.*
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -77,7 +77,7 @@ class MainController : Initializable {
         val file = pair.second
 
         if (file != null) {
-            val blockedTask = object : Utilities.BlockedTask<Unit>({ exportToSpreadsheet(monthRange, file) }) {
+            val blockedTask = object : BlockedTask<Unit>({ exportToSpreadsheet(monthRange, file) }) {
                 override fun succeeded() {
                     savedAsNotification(file.name)
                 }

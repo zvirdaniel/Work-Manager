@@ -1,7 +1,8 @@
-package com.duno.workmanager.Controllers
+package com.duno.workmanager.controllers
 
-import com.duno.workmanager.Data.DataHolder
-import com.duno.workmanager.Models.WorkSession
+import com.duno.workmanager.data.DataHolder
+import com.duno.workmanager.gui.LocalDateCell
+import com.duno.workmanager.models.WorkSession
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -11,15 +12,15 @@ import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.input.KeyCode
 import javafx.util.Callback
 import java.net.URL
+import java.time.LocalDate
 import java.util.*
 
 // TODO: Connect hourly wage to the controller
 // TODO: Implement Time, Duration and Description cell value factories
-// TODO: Implement custom date cell factory
 
 class TableViewController : Initializable {
     @FXML lateinit var table: TableView<WorkSession>
-    @FXML lateinit var date: TableColumn<WorkSession, String>
+    @FXML lateinit var date: TableColumn<WorkSession, LocalDate>
     @FXML lateinit var time: TableColumn<WorkSession, String>
     @FXML lateinit var duration: TableColumn<WorkSession, String>
     @FXML lateinit var description: TableColumn<WorkSession, String>
@@ -52,10 +53,11 @@ class TableViewController : Initializable {
         }
     }
 
+    /**
+     * Responsible for saving the data when cell factories detect a change
+     */
     private fun commitHandlers() {
-        date.onEditCommit = EventHandler { it.rowValue.beginDateProperty.setCzechString(it) }
-//        time.onEditCommit = EventHandler { it.rowValue.beginTimeString = it.newValue }
-//        durationProperty.onEditCommit = EventHandler { it.rowValue.durationString = it.newValue }
+        date.onEditCommit = EventHandler { it.rowValue.beginDateProperty.value = it.newValue }
         description.onEditCommit = EventHandler { it.rowValue.descriptionProperty.value = it.newValue }
     }
 
@@ -63,7 +65,7 @@ class TableViewController : Initializable {
      * Responsible for rendering the data contained within each cell for a single column
      */
     private fun cellFactories() {
-        date.cellFactory = TextFieldTableCell.forTableColumn()
+        date.cellFactory = Callback { LocalDateCell() }
         time.cellFactory = TextFieldTableCell.forTableColumn()
         duration.cellFactory = TextFieldTableCell.forTableColumn()
         description.cellFactory = TextFieldTableCell.forTableColumn()
@@ -73,7 +75,7 @@ class TableViewController : Initializable {
      * Responsible for populating the data for all cells within a single column
      */
     private fun cellValueFactories() {
-        date.cellValueFactory = Callback { it.value.beginDateProperty.getCzechString() }
+        date.cellValueFactory = Callback { it.value.beginDateProperty }
         time.cellValueFactory = Callback { it.value.beginTimeProperty.asString() }
         duration.cellValueFactory = Callback { it.value.durationProperty.asString() }
         description.cellValueFactory = Callback { it.value.descriptionProperty }

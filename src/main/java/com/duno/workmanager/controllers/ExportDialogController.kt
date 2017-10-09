@@ -1,7 +1,7 @@
-package com.duno.workmanager.Controllers
+package com.duno.workmanager.controllers
 
-import com.duno.workmanager.Data.DataHolder
-import com.duno.workmanager.Other.saveChooser
+import com.duno.workmanager.data.DataHolder
+import com.duno.workmanager.gui.saveChooser
 import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.event.EventHandler

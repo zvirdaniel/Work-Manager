@@ -1,7 +1,7 @@
-package com.duno.workmanager.Data
+package com.duno.workmanager.data
 
-import com.duno.workmanager.Models.WorkSession
-import com.duno.workmanager.Models.WorkYear
+import com.duno.workmanager.models.WorkSession
+import com.duno.workmanager.models.WorkYear
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 

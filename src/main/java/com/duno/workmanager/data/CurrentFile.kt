@@ -1,6 +1,6 @@
-package com.duno.workmanager.Data
+package com.duno.workmanager.data
 
-import com.duno.workmanager.Models.WorkYear
+import com.duno.workmanager.models.WorkYear
 import java.io.File
 import java.util.prefs.Preferences
 
