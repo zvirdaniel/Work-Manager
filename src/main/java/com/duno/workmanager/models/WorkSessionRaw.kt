@@ -1,4 +1,4 @@
-package com.duno.workmanager.Models
+package com.duno.workmanager.models
 
 import java.util.*
 

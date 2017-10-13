@@ -1,7 +1,7 @@
 //package com.duno.workmanager.Models
 //
-//import com.duno.workmanager.Other.errorNotification
-//import com.duno.workmanager.Other.isOnSameDay
+//import com.duno.workmanager.gui.errorNotification
+//import com.duno.workmanager.gui.isOnSameDay
 //import javafx.beans.property.SimpleStringProperty
 //import javafx.beans.property.StringProperty
 //import java.text.DateFormat

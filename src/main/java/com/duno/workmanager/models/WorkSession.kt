@@ -1,9 +1,9 @@
-package com.duno.workmanager.Models
+package com.duno.workmanager.models
 
-import com.duno.workmanager.Data.DataHolder
-import com.duno.workmanager.Models.Properties.LocalDateProperty
+import com.duno.workmanager.data.DataHolder
 import javafx.beans.property.*
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
@@ -18,14 +18,14 @@ class WorkSession(beginDateTime: LocalDateTime,
                   duration: Duration,
                   hourlyWage: Int,
                   description: String) {
-    val beginDateProperty: LocalDateProperty
+    val beginDateProperty: ObjectProperty<LocalDate>
     val beginTimeProperty: ObjectProperty<LocalTime>
     val durationProperty: ObjectProperty<Duration>
     val hourlyWageProperty: IntegerProperty
     val descriptionProperty: StringProperty
 
     init {
-        this.beginDateProperty = LocalDateProperty(beginDateTime.toLocalDate())
+        this.beginDateProperty = SimpleObjectProperty(beginDateTime.toLocalDate())
         this.beginTimeProperty = SimpleObjectProperty(beginDateTime.toLocalTime())
         this.durationProperty = SimpleObjectProperty(duration)
         this.hourlyWageProperty = SimpleIntegerProperty(hourlyWage)
@@ -42,7 +42,6 @@ class WorkSession(beginDateTime: LocalDateTime,
         val endDate = Date.from(endDateTime.atZone(DataHolder.zone).toInstant())
         return WorkSessionRaw(beginDate, endDate, hourlyWageProperty.get(), descriptionProperty.get())
     }
-
 
     /**
      * @param beginDateTime Date when the session started

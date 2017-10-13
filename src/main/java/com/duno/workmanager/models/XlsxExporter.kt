@@ -1,4 +1,4 @@
-package com.duno.workmanager.Models
+package com.duno.workmanager.models
 
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddress
@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
 /**
- * Package: com.duno.workmanager.Data
+ * Package: com.duno.workmanager.data
  * Created by Daniel Zvir on 25.5.17.
  */
 
@@ -204,7 +204,7 @@ private fun createDataStyle(wb: XSSFWorkbook): XSSFCellStyle {
     style.setVerticalAlignment(VerticalAlignment.CENTER)
     style.setAlignment(HorizontalAlignment.CENTER)
 
-    // Other
+    // gui
     style.wrapText = true
     return style
 }
@@ -232,7 +232,7 @@ private fun createHeaderStyle(wb: XSSFWorkbook): XSSFCellStyle {
     style.setAlignment(HorizontalAlignment.CENTER)
     style.setVerticalAlignment(VerticalAlignment.CENTER)
 
-    // Other
+    // gui
     style.fillForegroundColor = IndexedColors.GREY_50_PERCENT.getIndex()
     style.setFillPattern(FillPatternType.SOLID_FOREGROUND)
     style.wrapText = true
