@@ -11,7 +11,7 @@ import java.time.ZoneId
  * Holds static variables
  */
 object DataHolder {
-    var services: HostServices? = null // Used in about dialog to openFile a link in a web browser
+    var services: HostServices? = null // Used in about dialog to open a link in a web browser
     val maskerPane = MaskerPane() // Used to block the UI
     val zone: ZoneId = ZoneId.systemDefault() // This zone is used in all DateTime/Instant conversion
     lateinit var primaryStage: Stage

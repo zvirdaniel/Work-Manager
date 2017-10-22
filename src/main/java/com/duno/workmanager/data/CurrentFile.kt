@@ -65,7 +65,7 @@ object CurrentFile {
     }
 
     /**
-     * @param file to openFile
+     * @param file to open
      * @throws Exception if file is not valid
      */
     private fun validate(file: File) {
