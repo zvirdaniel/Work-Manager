@@ -1,6 +1,6 @@
-package com.duno.workmanager.gui
+package cz.zvird.workmanager.gui
 
-import com.duno.workmanager.models.WorkSession
+import cz.zvird.workmanager.models.WorkSession
 import javafx.event.EventHandler
 import javafx.scene.control.ContentDisplay
 import javafx.scene.control.TableCell

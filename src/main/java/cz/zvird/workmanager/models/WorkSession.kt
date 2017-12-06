@@ -1,6 +1,6 @@
-package com.duno.workmanager.models
+package cz.zvird.workmanager.models
 
-import com.duno.workmanager.data.DataHolder
+import cz.zvird.workmanager.data.DataHolder
 import javafx.beans.property.*
 import java.time.Duration
 import java.time.LocalDate

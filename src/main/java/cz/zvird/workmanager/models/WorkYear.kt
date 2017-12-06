@@ -1,4 +1,4 @@
-package com.duno.workmanager.models
+package cz.zvird.workmanager.models
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

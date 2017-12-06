@@ -1,8 +1,8 @@
-package com.duno.workmanager.controllers
+package cz.zvird.workmanager.controllers
 
-import com.duno.workmanager.data.DataHolder
-import com.duno.workmanager.gui.LocalDateCell
-import com.duno.workmanager.models.WorkSession
+import cz.zvird.workmanager.data.DataHolder
+import cz.zvird.workmanager.gui.LocalDateCell
+import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
