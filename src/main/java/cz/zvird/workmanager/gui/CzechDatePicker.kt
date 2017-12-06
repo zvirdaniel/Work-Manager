@@ -1,6 +1,6 @@
-package com.duno.workmanager.gui
+package cz.zvird.workmanager.gui
 
-import com.duno.workmanager.models.WorkSession
+import cz.zvird.workmanager.models.WorkSession
 import javafx.beans.binding.StringBinding
 import javafx.scene.control.DatePicker
 import javafx.scene.control.TablePosition

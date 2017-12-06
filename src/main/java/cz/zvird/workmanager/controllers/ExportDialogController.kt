@@ -1,7 +1,7 @@
-package com.duno.workmanager.controllers
+package cz.zvird.workmanager.controllers
 
-import com.duno.workmanager.data.DataHolder
-import com.duno.workmanager.gui.saveChooser
+import cz.zvird.workmanager.data.DataHolder
+import cz.zvird.workmanager.gui.saveChooser
 import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
@@ -104,10 +104,10 @@ class ExportDialogController : Initializable {
      */
     private fun selectAndSetFile() {
         val file = saveChooser(
-                title = "Vyber soubor",
-                initialFileName = "K2 Práce",
-                filters = listOf(FileChooser.ExtensionFilter("Excel Tabulka", "*.xlsx")),
-                extension = ".xlsx"
+		        title = "Vyber soubor",
+		        initialFileName = "K2 Práce",
+		        filters = listOf(FileChooser.ExtensionFilter("Excel Tabulka", "*.xlsx")),
+		        extension = ".xlsx"
         )
 
         if (file != null) {

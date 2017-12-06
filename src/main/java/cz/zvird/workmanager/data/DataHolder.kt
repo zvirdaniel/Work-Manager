@@ -1,6 +1,6 @@
-package com.duno.workmanager.data
+package cz.zvird.workmanager.data
 
-import com.duno.workmanager.controllers.TableViewController
+import cz.zvird.workmanager.controllers.TableViewController
 import javafx.application.HostServices
 import javafx.event.EventHandler
 import javafx.stage.Stage

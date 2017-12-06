@@ -1,4 +1,4 @@
-package com.duno.workmanager.models
+package cz.zvird.workmanager.models
 
 import java.util.*
 

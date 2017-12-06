@@ -1,7 +1,7 @@
-package com.duno.workmanager.data
+package cz.zvird.workmanager.data
 
-import com.duno.workmanager.models.WorkSession
-import com.duno.workmanager.models.WorkYear
+import cz.zvird.workmanager.models.WorkSession
+import cz.zvird.workmanager.models.WorkYear
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 
@@ -13,7 +13,7 @@ object VisibleData {
 
     init {
         for (i in 1..12) visibleDataMap[i] = FXCollections.observableArrayList<WorkSession>()
-        reloadCurrentFile()
+	    reloadCurrentFile()
     }
 
     /**
@@ -22,7 +22,7 @@ object VisibleData {
     fun reloadCurrentFile() {
         val file = CurrentFile.get()
         val workYear = WorkYear(file)
-        setAndShowCurrentWorkYear(workYear)
+	    setAndShowCurrentWorkYear(workYear)
     }
 
     /**

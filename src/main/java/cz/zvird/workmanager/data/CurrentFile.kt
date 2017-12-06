@@ -1,6 +1,6 @@
-package com.duno.workmanager.data
+package cz.zvird.workmanager.data
 
-import com.duno.workmanager.models.WorkYear
+import cz.zvird.workmanager.models.WorkYear
 import java.io.File
 import java.util.prefs.Preferences
 
@@ -17,10 +17,10 @@ object CurrentFile {
      */
     fun set(file: File) {
         try {
-            validate(file)
+	        validate(file)
             currentFile = file
             Preferences.userNodeForPackage(CurrentFile::class.java).put(LAST_USED_FILE, file.absolutePath)
-            VisibleData.reloadCurrentFile()
+	        VisibleData.reloadCurrentFile()
         } catch (e: Exception) {
             throw e
         }
@@ -40,18 +40,18 @@ object CurrentFile {
 
         val lastUsedPath = Preferences.userNodeForPackage(CurrentFile::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
         if (lastUsedPath == FILE_NOT_EXISTS) { // If there is no last used file, create temporary one
-            createAndSetTempFile()
+	        createAndSetTempFile()
             return get()
         }
 
         val lastUsedFile = File(lastUsedPath)
         return try {
-            validate(lastUsedFile)
-            set(lastUsedFile)
-            get()
+	        validate(lastUsedFile)
+	        set(lastUsedFile)
+	        get()
         } catch (e: Exception) {
-            createAndSetTempFile()
-            get()
+	        createAndSetTempFile()
+	        get()
         }
     }
 
@@ -61,7 +61,7 @@ object CurrentFile {
     private fun createAndSetTempFile() {
         val file = File.createTempFile("TemporaryWorkYear", ".json")
         WorkYear().writeYearInJson(file)
-        set(file)
+	    set(file)
     }
 
     /**
@@ -69,6 +69,6 @@ object CurrentFile {
      * @throws Exception if file is not valid
      */
     private fun validate(file: File) {
-        WorkYear(file)
+	    WorkYear(file)
     }
 }

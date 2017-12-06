@@ -1,6 +1,6 @@
-package com.duno.workmanager
+package cz.zvird.workmanager
 
-import com.duno.workmanager.data.DataHolder
+import cz.zvird.workmanager.data.DataHolder
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent

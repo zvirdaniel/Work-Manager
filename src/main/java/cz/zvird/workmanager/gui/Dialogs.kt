@@ -1,8 +1,8 @@
-package com.duno.workmanager.gui
+package cz.zvird.workmanager.gui
 
-import com.duno.workmanager.Main
-import com.duno.workmanager.controllers.ExportDialogController
-import com.duno.workmanager.data.DataHolder
+import cz.zvird.workmanager.Main
+import cz.zvird.workmanager.controllers.ExportDialogController
+import cz.zvird.workmanager.data.DataHolder
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.*

@@ -1,4 +1,4 @@
-package com.duno.workmanager.gui
+package cz.zvird.workmanager.gui
 
 import javafx.util.Duration
 import org.controlsfx.control.Notifications

@@ -1,7 +1,7 @@
-package com.duno.workmanager.controllers
+package cz.zvird.workmanager.controllers
 
-import com.duno.workmanager.data.*
-import com.duno.workmanager.gui.*
+import cz.zvird.workmanager.data.*
+import cz.zvird.workmanager.gui.*
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML

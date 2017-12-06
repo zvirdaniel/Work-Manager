@@ -1,6 +1,6 @@
-package com.duno.workmanager.gui
+package cz.zvird.workmanager.gui
 
-import com.duno.workmanager.data.DataHolder
+import cz.zvird.workmanager.data.DataHolder
 import javafx.concurrent.Task
 
 /**

@@ -1,7 +1,7 @@
-package com.duno.workmanager.data
+package cz.zvird.workmanager.data
 
-import com.duno.workmanager.models.WorkYear
-import com.duno.workmanager.models.writeYearInXlsx
+import cz.zvird.workmanager.models.WorkYear
+import cz.zvird.workmanager.models.writeYearInXlsx
 import java.io.File
 
 /**
@@ -13,14 +13,14 @@ fun newFile(file: File) {
 
     val workYear = WorkYear()
     workYear.writeYearInJson(file)
-    CurrentFile.set(file)
+	CurrentFile.set(file)
 }
 
 /**
  * @param file selected from GUI
  */
 fun openFile(file: File) {
-    CurrentFile.set(file)
+	CurrentFile.set(file)
 }
 
 /**
@@ -28,7 +28,7 @@ fun openFile(file: File) {
  */
 fun saveFile() {
     val currentFile = CurrentFile.get()
-    writeCurrentWorkYear(currentFile)
+	writeCurrentWorkYear(currentFile)
 }
 
 /**
@@ -36,8 +36,8 @@ fun saveFile() {
  */
 fun saveFileAs(file: File) {
     file.createNewFile()
-    writeCurrentWorkYear(file)
-    CurrentFile.set(file)
+	writeCurrentWorkYear(file)
+	CurrentFile.set(file)
 }
 
 /**
