@@ -4,7 +4,7 @@ import cz.zvird.workmanager.data.DataHolder
 import javafx.concurrent.Task
 
 /**
- * Executes body while blocking UI using MaskerPane
+ * Executes body while blocking the entire UI using MaskerPane
  * @param body function reference
  */
 open class BlockedTask<T>(private val body: () -> T) : Task<T>() {

@@ -19,7 +19,7 @@ import java.io.File
  * @return range of months to export, .xlsx file to export data into
  */
 fun exportDialog(parentWindow: Window): Pair<IntRange, File?> {
-    val loader = FXMLLoader(Main::class.java.getResource("Views/ExportDialog.fxml"))
+    val loader = FXMLLoader(Main::class.java.getResource("views/ExportDialog.fxml"))
     val controller = ExportDialogController()
     loader.setController(controller)
     val content = loader.load<AnchorPane>()

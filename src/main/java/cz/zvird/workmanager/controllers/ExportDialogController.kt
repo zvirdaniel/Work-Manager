@@ -105,7 +105,7 @@ class ExportDialogController : Initializable {
     private fun selectAndSetFile() {
         val file = saveChooser(
 		        title = "Vyber soubor",
-		        initialFileName = "K2 Práce",
+		        initialFileName = "Práce",
 		        filters = listOf(FileChooser.ExtensionFilter("Excel Tabulka", "*.xlsx")),
 		        extension = ".xlsx"
         )

@@ -4,11 +4,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 
-
-/**
- * Package: com.duno.workmanager.data
- * Created by Daniel Zvir on 16.5.17.
- */
 class WorkYear() {
     private val mapper = jacksonObjectMapper()
     val months = hashMapOf<Int, MutableList<WorkSession>>()

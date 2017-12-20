@@ -12,13 +12,10 @@ import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
-/**
- * Package: com.duno.workmanager.data
- * Created by Daniel Zvir on 25.5.17.
- */
+// TODO: exporting does not work
 
 /**
- * Generates XLSX spreadsheet and saves it into a file.
+ * Generates XLSX spreadsheet and saves it into a file
  *
  * @param month Month between 1 and 12, will create one sheet with specified month
  * @param saveFile File to saveFile all data into, example: result.xlsx
@@ -32,7 +29,7 @@ fun WorkYear.writeYearInXlsx(saveFile: File, month: Int) {
 }
 
 /**
- * Generates XLSX spreadsheet and saves it into a file.
+ * Generates XLSX spreadsheet and saves it into a file
  * @param monthRange Range between 1 and 12, each month will be a separate sheet
  * @param saveFile File to saveFile all data into, example: result.xlsx
  * @throws IOException if file export fails

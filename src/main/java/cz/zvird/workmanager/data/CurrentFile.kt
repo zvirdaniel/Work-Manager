@@ -33,7 +33,7 @@ object CurrentFile {
         val file = currentFile
 
         if (file != null) {
-            println("File $file was returned")
+            println("Working with file: $file")
             DataHolder.primaryStage.title = "WorkManager - ${file.name}"
             return file
         }

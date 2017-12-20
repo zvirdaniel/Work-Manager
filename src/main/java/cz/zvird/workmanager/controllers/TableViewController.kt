@@ -17,6 +17,7 @@ import java.util.*
 
 // TODO: Connect hourly wage to the controller
 // TODO: Implement Time, Duration and Description cell value factories
+// TODO: Add cell multiselect
 
 class TableViewController : Initializable {
     @FXML lateinit var table: TableView<WorkSession>

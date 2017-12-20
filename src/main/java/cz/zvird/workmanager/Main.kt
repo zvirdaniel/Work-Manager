@@ -15,9 +15,9 @@ class Main : Application() {
 
         loadIcons()
 
-        val loader = FXMLLoader(javaClass.getResource("Views/MainView.fxml"))
+        val loader = FXMLLoader(javaClass.getResource("views/MainView.fxml"))
         val root = loader.load<Parent>()
-        val css = javaClass.getResource("Views/Main.css").toExternalForm()
+        val css = javaClass.getResource("views/Main.css").toExternalForm()
         root.stylesheets.add(css)
 
         DataHolder.primaryStage.scene = Scene(root, 1280.0, 800.0)
@@ -31,15 +31,15 @@ class Main : Application() {
      */
     private fun loadIcons() {
         DataHolder.primaryStage.icons.addAll(
-                Image(javaClass.getResource("Icons/16x16.png").toURI().toString(), 16.0, 16.0, true, true),
-                Image(javaClass.getResource("Icons/20x20.png").toURI().toString(), 20.0, 20.0, true, true),
-                Image(javaClass.getResource("Icons/24x24.png").toURI().toString(), 24.0, 24.0, true, true),
-                Image(javaClass.getResource("Icons/32x32.png").toURI().toString(), 32.0, 32.0, true, true),
-                Image(javaClass.getResource("Icons/48x48.png").toURI().toString(), 48.0, 48.0, true, true),
-                Image(javaClass.getResource("Icons/64x64.png").toURI().toString(), 64.0, 64.0, true, true),
-                Image(javaClass.getResource("Icons/128x128.png").toURI().toString(), 128.0, 128.0, true, true),
-                Image(javaClass.getResource("Icons/256x256.png").toURI().toString(), 256.0, 256.0, true, true),
-                Image(javaClass.getResource("Icons/512x512.png").toURI().toString(), 512.0, 512.0, true, true)
+                Image(javaClass.getResource("icons/16x16.png").toURI().toString(), 16.0, 16.0, true, true),
+                Image(javaClass.getResource("icons/20x20.png").toURI().toString(), 20.0, 20.0, true, true),
+                Image(javaClass.getResource("icons/24x24.png").toURI().toString(), 24.0, 24.0, true, true),
+                Image(javaClass.getResource("icons/32x32.png").toURI().toString(), 32.0, 32.0, true, true),
+                Image(javaClass.getResource("icons/48x48.png").toURI().toString(), 48.0, 48.0, true, true),
+                Image(javaClass.getResource("icons/64x64.png").toURI().toString(), 64.0, 64.0, true, true),
+                Image(javaClass.getResource("icons/128x128.png").toURI().toString(), 128.0, 128.0, true, true),
+                Image(javaClass.getResource("icons/256x256.png").toURI().toString(), 256.0, 256.0, true, true),
+                Image(javaClass.getResource("icons/512x512.png").toURI().toString(), 512.0, 512.0, true, true)
         )
     }
 }
