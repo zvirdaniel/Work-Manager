@@ -28,7 +28,7 @@ class ExportDialogController : Initializable {
     private var selectedFile: File? = null
 
     /**
-     * Initializes a listener to a "single month?" checkbox and changes the UI respectively
+     * Initializes a listener to a "single month" checkbox and changes the UI respectively
      */
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         setAndShowButton()

@@ -31,7 +31,7 @@ class WorkYear() {
     }
 
     /**
-     * @return Map of raw data containing WorkSessions
+     * @return map of raw data containing WorkSessions
      */
     fun getMapOfRawWorkSessions(): HashMap<Int, MutableList<WorkSessionRaw>> {
         val monthsRaw = hashMapOf<Int, MutableList<WorkSessionRaw>>()
@@ -49,7 +49,7 @@ class WorkYear() {
     fun getYearInJson(): String = mapper.writeValueAsString(getMapOfRawWorkSessions())
 
     /**
-     * @param saveFile File to saveFile all the data into, example: "result.json"
+     * @param saveFile file to save all the data into, example: "result.json"
      */
     fun writeYearInJson(saveFile: File) = mapper.writeValue(saveFile, getMapOfRawWorkSessions())
 
@@ -102,7 +102,7 @@ class WorkYear() {
     private fun checkMonthNumber(month: Int) = if (month !in 1..12) throw IllegalArgumentException("Months must be between 1 and 12!") else null
 
     /**
-     * @return Total profit for a given month, without currency
+     * @return total profit for a given month, without currency
      */
     fun getMonthProfit(month: Int): Double {
         checkMonthNumber(month)
@@ -116,7 +116,7 @@ class WorkYear() {
     }
 
     /**
-     * @return Total amount of hours in a given month
+     * @return total amount of hours in a given month
      */
     fun getMonthTotalHours(month: Int): Double {
         checkMonthNumber(month)
@@ -129,7 +129,7 @@ class WorkYear() {
     }
 
     /**
-     * @return Total profit for a given year, without currency
+     * @return total profit for a given year, without currency
      */
     fun getYearProfit(): Double {
         var result = 0.0
@@ -138,7 +138,7 @@ class WorkYear() {
     }
 
     /**
-     * @return Total amount of hours in a year
+     * @return total amount of hours in a year
      */
     fun getYearTotalHours(): Double {
         var result = 0.0

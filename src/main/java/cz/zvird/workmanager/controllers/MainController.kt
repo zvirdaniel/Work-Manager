@@ -132,7 +132,7 @@ class MainController : Initializable {
     }
 
     /**
-     * Calls backend's saveFile function, creates a notification
+     * Saves the file and notifies the user
      */
     private fun saveFileNotificator() {
         try {

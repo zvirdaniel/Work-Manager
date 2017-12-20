@@ -11,7 +11,7 @@ import javafx.stage.Stage
 class Main : Application() {
     override fun start(stage: Stage) {
         DataHolder.primaryStage = stage
-        DataHolder.services = hostServices // Used to open a hyperlink via the default browser in about dialog
+        DataHolder.services = hostServices // Used to open a hyperlink via the default browser in the about dialog
 
         loadIcons()
 

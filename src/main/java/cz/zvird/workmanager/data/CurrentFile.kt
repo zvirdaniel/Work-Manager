@@ -27,7 +27,7 @@ object CurrentFile {
     }
 
     /**
-     * @return Currently opened file (if one is opened), or last used file (if exists) or temporary blank file
+     * @return currently opened file (if one is opened), or last used file (if exists) or temporary blank file
      */
     fun get(): File {
         val file = currentFile

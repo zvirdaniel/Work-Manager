@@ -9,10 +9,10 @@ import java.time.LocalTime
 import java.util.*
 
 /**
- * @param beginDateTime Date when the session started
+ * @param beginDateTime date when the session started
  * @param duration of the session
- * @param hourlyWage Without any currency
- * @param description Preferred length is 90 characters or less, implicitly set to "Empty description"
+ * @param hourlyWage without any currency
+ * @param description preferred length is 90 characters or less, implicitly set to "Empty description"
  */
 class WorkSession(beginDateTime: LocalDateTime,
                   duration: Duration,
@@ -44,10 +44,10 @@ class WorkSession(beginDateTime: LocalDateTime,
     }
 
     /**
-     * @param beginDateTime Date when the session started
-     * @param endDateTime Date when the session ended
-     * @param hourlyWage Without any currency
-     * @param description Preferred length is 90 characters or less, implicitly set to "Empty description"
+     * @param beginDateTime date when the session started
+     * @param endDateTime date when the session ended
+     * @param hourlyWage without any currency
+     * @param description preferred length is 90 characters or less, implicitly set to "Empty description"
      */
     constructor(beginDateTime: LocalDateTime = LocalDateTime.now(),
                 endDateTime: LocalDateTime,
@@ -56,10 +56,10 @@ class WorkSession(beginDateTime: LocalDateTime,
             : this(beginDateTime, Duration.between(beginDateTime, endDateTime), hourlyWage, description)
 
     /**
-     * @param beginDateTime Date when the session started
-     * @param addMinutes Duration in minutes
-     * @param hourlyWage Without any currency
-     * @param description Preferred length is 90 characters or less, implicitly set to "Empty description"
+     * @param beginDateTime date when the session started
+     * @param addMinutes duration in minutes
+     * @param hourlyWage without any currency
+     * @param description preferred length is 90 characters or less, implicitly set to "Empty description"
      */
     constructor(beginDateTime: LocalDateTime = LocalDateTime.now(),
                 addMinutes: Long,
@@ -68,7 +68,8 @@ class WorkSession(beginDateTime: LocalDateTime,
             : this(beginDateTime, Duration.between(beginDateTime, LocalDateTime.from(beginDateTime).plusMinutes(addMinutes)), hourlyWage, description)
 
     /**
-     * @param raw Creates new WorkSession from any raw data
+     * Creates new WorkSession from any raw data
+     * @param raw data
      */
     constructor(raw: WorkSessionRaw) : this(
             LocalDateTime.ofInstant(raw.beginDate.toInstant(), DataHolder.zone),
@@ -78,7 +79,8 @@ class WorkSession(beginDateTime: LocalDateTime,
     )
 
     /**
-     * @param workSession Creates new WorkSession using its raw data
+     * Creates new WorkSession using its raw data
+     * @param workSession data
      */
     constructor(workSession: WorkSession) : this(workSession.getRawData())
 }

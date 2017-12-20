@@ -16,9 +16,8 @@ import java.time.format.DateTimeFormatter
 
 /**
  * Generates XLSX spreadsheet and saves it into a file
- *
- * @param month Month between 1 and 12, will create one sheet with specified month
- * @param saveFile File to saveFile all data into, example: result.xlsx
+ * @param month number between 1 and 12, will create one sheet with specified month
+ * @param saveFile file to save all data into, example: result.xlsx
  */
 fun WorkYear.writeYearInXlsx(saveFile: File, month: Int) {
     if (month < 1 || month > 12) {
@@ -30,8 +29,8 @@ fun WorkYear.writeYearInXlsx(saveFile: File, month: Int) {
 
 /**
  * Generates XLSX spreadsheet and saves it into a file
- * @param monthRange Range between 1 and 12, each month will be a separate sheet
- * @param saveFile File to saveFile all data into, example: result.xlsx
+ * @param monthRange range between 1 and 12, each month will be a separate sheet
+ * @param saveFile file to saveFile all data into, example: result.xlsx
  * @throws IOException if file export fails
  */
 fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
