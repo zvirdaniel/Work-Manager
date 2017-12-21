@@ -13,19 +13,20 @@ import java.time.ZoneId
 object DataHolder {
     var services: HostServices? = null // Used in about dialog to open a link in a web browser
     val maskerPane = MaskerPane() // Used to block the UI
-    val zone: ZoneId = ZoneId.systemDefault() // This zone is used in all DateTime/Instant conversion
-    lateinit var primaryStage: Stage
-    private val tableViewControllers = mutableListOf<TableViewController>()
+    val zone: ZoneId = ZoneId.systemDefault() // This zone is used in all DateTime/Instant conversions
+    lateinit var primaryStage: Stage // To make primaryStage accessible from everywhere
+    private val tableViewControllers = mutableListOf<TableViewController>() // Contains all controller
+    var currentTab: Int = -1 // Currently selected month, gets changed automatically
 
     init {
         maskerPane.visibleProperty().value = false
     }
 
     /**
-     * @return controller instance of a given month
+     * @return controller instance of currently selected month
      */
-    fun getTableViewController(index: Int): TableViewController {
-        return tableViewControllers[index]
+    fun getCurrentTableViewController(): TableViewController {
+        return tableViewControllers[currentTab]
     }
 
     /**

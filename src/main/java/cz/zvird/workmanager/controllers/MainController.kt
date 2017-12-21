@@ -51,9 +51,12 @@ class MainController : Initializable {
         // MaskerPane is used to block the UI if needed
         stackPane.children.add(DataHolder.maskerPane)
 
-        // If a tab is selected, request focus to the table within it, and scroll to the bottom
+        /**
+         * Requests focus, scrolls to the end of the table, and sets DataHolder.currentTab upon every tab selection
+         */
         tabPane.selectionModel.selectedIndexProperty().addListener { _, _, newValue ->
-            val tableViewController = DataHolder.getTableViewController(newValue.toInt())
+            DataHolder.currentTab = newValue.toInt()
+            val tableViewController = DataHolder.getCurrentTableViewController()
             Platform.runLater {
                 tableViewController.table.requestFocus()
                 if (tableViewController.table.items.isNotEmpty()) {
@@ -92,11 +95,10 @@ class MainController : Initializable {
     }
 
     /**
-     * Creates a newFile row in currently opened tab by calling it's controller
+     * Creates a new row in currently opened tab by calling it's controller
      */
     private fun newRow() {
-        val currentTabIndex = tabPane.selectionModel.selectedIndex
-        val currentTab = DataHolder.getTableViewController(currentTabIndex)
+        val currentTab = DataHolder.getCurrentTableViewController()
         currentTab.createNewRow()
     }
 
@@ -104,8 +106,7 @@ class MainController : Initializable {
      * Deletes a row by calling the controller for currently opened tab
      */
     private fun deleteRow() {
-        val currentTabIndex = tabPane.selectionModel.selectedIndex
-        val currentTab = DataHolder.getTableViewController(currentTabIndex)
+        val currentTab = DataHolder.getCurrentTableViewController()
         val currentRow = currentTab.table.selectionModel.selectedItem
         if (currentRow != null) {
             currentTab.removeRow(currentRow)

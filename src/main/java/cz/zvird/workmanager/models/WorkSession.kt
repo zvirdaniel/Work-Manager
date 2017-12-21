@@ -12,7 +12,7 @@ import java.util.*
  * @param beginDateTime date when the session started
  * @param duration of the session
  * @param hourlyWage without any currency
- * @param description preferred length is 90 characters or less, implicitly set to "Empty description"
+ * @param description preferred length is 90 characters or less, implicitly set to empty string
  */
 class WorkSession(beginDateTime: LocalDateTime,
                   duration: Duration,
@@ -52,7 +52,7 @@ class WorkSession(beginDateTime: LocalDateTime,
     constructor(beginDateTime: LocalDateTime = LocalDateTime.now(),
                 endDateTime: LocalDateTime,
                 hourlyWage: Int,
-                description: String = "Empty descriptionProperty")
+                description: String = "")
             : this(beginDateTime, Duration.between(beginDateTime, endDateTime), hourlyWage, description)
 
     /**
@@ -64,7 +64,7 @@ class WorkSession(beginDateTime: LocalDateTime,
     constructor(beginDateTime: LocalDateTime = LocalDateTime.now(),
                 addMinutes: Long,
                 hourlyWage: Int,
-                description: String = "Empty descriptionProperty")
+                description: String = "")
             : this(beginDateTime, Duration.between(beginDateTime, LocalDateTime.from(beginDateTime).plusMinutes(addMinutes)), hourlyWage, description)
 
     /**

@@ -83,7 +83,7 @@ class TableViewController : Initializable {
     }
 
     /**
-     * Double-click on blank space creates a newFile row
+     * Double-click on blank space creates a new row
      */
     private fun blankRowCallback() {
         table.rowFactory = Callback {
@@ -109,7 +109,7 @@ class TableViewController : Initializable {
     }
 
     /**
-     * Creates newFile row with some data, scrolls to the end of the table and selects it
+     * Creates new row with some data, scrolls to the end of the table and selects it
      */
     fun createNewRow() {
         val implicit = WorkSession(addMinutes = 30, hourlyWage = 0, description = "Doplnit!")

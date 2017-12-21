@@ -5,18 +5,20 @@ import cz.zvird.workmanager.models.writeYearInXlsx
 import java.io.File
 
 /**
+ * Creates a new file and writes blank WorkYear into it
  * @param file selected from GUI
- * Creates a newFile file and writes blank WorkYear into it
+ * @throws java.io.IOException if creating blank file failed
  */
 fun newFile(file: File) {
-    file.createNewFile()
+	file.createNewFile()
 
-    val workYear = WorkYear()
-    workYear.writeYearInJson(file)
+	val workYear = WorkYear()
+	workYear.writeYearInJson(file)
 	CurrentFile.set(file)
 }
 
 /**
+ * @throws Exception if file is not valid
  * @param file selected from GUI
  */
 fun openFile(file: File) {
@@ -24,18 +26,21 @@ fun openFile(file: File) {
 }
 
 /**
- * Saves current file
+ * Saves the visible data into currently opened file
+ * @throws java.io.IOException if creating blank file failed
  */
 fun saveFile() {
-    val currentFile = CurrentFile.get()
+	val currentFile = CurrentFile.get()
 	writeCurrentWorkYear(currentFile)
 }
 
 /**
+ * Saves the visible data into selected file
  * @param file selected from GUI
+ * @throws java.io.IOException if creating blank file failed
  */
 fun saveFileAs(file: File) {
-    file.createNewFile()
+	file.createNewFile()
 	writeCurrentWorkYear(file)
 	CurrentFile.set(file)
 }
@@ -46,16 +51,16 @@ fun saveFileAs(file: File) {
  * @param file selected from GUI
  */
 fun exportToSpreadsheet(monthRange: IntRange, file: File) {
-    file.createNewFile()
-    val workYear = VisibleData.generateWorkYearFromVisibleData()
-    workYear.writeYearInXlsx(file, monthRange)
+	file.createNewFile()
+	val workYear = VisibleData.generateWorkYearFromVisibleData()
+	workYear.writeYearInXlsx(file, monthRange)
 }
 
 /**
+ * Saves the visible data into a given file as a JSON
  * @param file to write the data into, it will be overwritten
- * Saves the data in memory into a given file as a JSON
  */
 private fun writeCurrentWorkYear(file: File) {
-    val workYear = VisibleData.generateWorkYearFromVisibleData()
-    workYear.writeYearInJson(file)
+	val workYear = VisibleData.generateWorkYearFromVisibleData()
+	workYear.writeYearInJson(file)
 }

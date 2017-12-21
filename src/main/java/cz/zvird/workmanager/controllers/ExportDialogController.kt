@@ -82,7 +82,7 @@ class ExportDialogController : Initializable {
 
     /**
      * Creates a link that opens a file chooser, and sets it into an anchor pane
-     * After selecting a file, a newFile hyperlink will be created for the given file
+     * After selecting a file, a new hyperlink will be created for the given file
      */
     private fun setAndShowLink() {
         val link = Hyperlink(selectedFile?.name)

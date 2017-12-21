@@ -1,12 +1,15 @@
 package cz.zvird.workmanager.gui
 
+import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
 import javafx.scene.control.ContentDisplay
+import javafx.scene.control.DateCell
 import javafx.scene.control.DatePicker
 import javafx.scene.control.TableCell
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.util.Callback
 import javafx.util.StringConverter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -101,6 +104,23 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 		datePicker.isEditable = true
 		datePicker.promptText = "dd. mm. yyyy"
 		datePicker.converter = generateLocalDateConverter()
+
+		val dayCellFactory = Callback<DatePicker, DateCell> { datePicker ->
+			object : DateCell() {
+				override fun updateItem(item: LocalDate, empty: Boolean) {
+					super.updateItem(item, empty)
+
+					val currentMonthNumber = DataHolder.currentTab + 1
+
+					if (item.isBefore(datePicker.value.plusDays(1))) {
+						isDisable = true
+						style = "-fx-background-color: #ffc0cb;"
+					}
+				}
+			}
+		}
+
+		datePicker.dayCellFactory = dayCellFactory
 
 		var lastDate = datePicker.value
 
