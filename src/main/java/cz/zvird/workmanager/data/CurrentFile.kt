@@ -1,13 +1,13 @@
 package cz.zvird.workmanager.data
 
-import cz.zvird.workmanager.models.WorkYear
 import java.io.File
 import java.util.prefs.Preferences
 
 // TODO: Repair data without saving them, dialog with year inconsistency
+// TODO: File validation
 
 /**
- * Manages currently opened file, see set and get methods
+ * Manages currently opened file, see load and retrieve methods
  */
 object CurrentFile {
 	private const val LAST_USED_FILE = "last_used_file"
@@ -15,58 +15,66 @@ object CurrentFile {
 	private var currentFile: File? = null
 
 	/**
+	 * Loads the file in to the memory
 	 * @throws Exception if file is not valid
 	 */
-	fun set(file: File) {
-		validate(file)
+	fun load(file: File) {
 		currentFile = file
 		Preferences.userNodeForPackage(CurrentFile::class.java).put(LAST_USED_FILE, file.absolutePath)
-		VisibleData.reloadCurrentFile()
+		MemoryData.reloadCurrentFile()
+		println("Working with file: $file")
+		DataHolder.primaryStage.title = "WorkManager - ${file.name}"
 	}
 
 	/**
 	 * @return currently opened file (if one is opened), or last used file (if exists) or temporary blank file
 	 */
-	fun get(): File {
+	fun retrieve(): File {
 		val file = currentFile
 
 		if (file != null) {
-			println("Working with file: $file")
-			DataHolder.primaryStage.title = "WorkManager - ${file.name}"
 			return file
 		}
 
 		val lastUsedPath = Preferences.userNodeForPackage(CurrentFile::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
 		if (lastUsedPath == FILE_NOT_EXISTS) { // If there is no last used file, create temporary one
-			createAndSetTempFile()
-			return get()
+			new()
+			return retrieve()
 		}
 
 		val lastUsedFile = File(lastUsedPath)
 		return try {
-			set(lastUsedFile)
-			get()
+			load(lastUsedFile)
+			retrieve()
 		} catch (e: Exception) {
-			createAndSetTempFile()
-			get()
+			new()
+			retrieve()
 		}
 	}
 
 	/**
-	 * Creates a temporary file in the filesystem and sets it as current
+	 * Saves all the data into the selected file, implicitly current file
+	 * @param target selected from the UI
+	 * @throws java.io.IOException if creating blank file failed
 	 */
-	private fun createAndSetTempFile() {
-		val file = File.createTempFile("TemporaryWorkYear", ".json")
-		WorkYear().writeYearInJson(file)
-		set(file)
+	fun save(target: File? = null) {
+		if (target != null) {
+			MemoryData.saveDataToFile(target)
+			load(target)
+		}
+
+		MemoryData.saveDataToFile()
 	}
 
 	/**
-	 * Attempts parsing the json into WorkYear, does not check the data structure
-	 * @param file to open
-	 * @throws Exception if file can not be parsed
+	 * Creates a file in the filesystem, implicitly a temporary one, writes blank data into it, and loads it as current
+	 * @param target to write blank data into
+	 * @throws java.io.IOException if creating blank file failed
 	 */
-	private fun validate(file: File) {
-		val workYear = WorkYear(file)
+	fun new(target: File? = null) {
+		val file = if (target != null) target else File.createTempFile("TemporaryWorkYear", ".json")
+
+		file?.let { MemoryData.saveBlankFile(it) }
+		file?.let { load(it) }
 	}
 }

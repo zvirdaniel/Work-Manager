@@ -1,6 +1,7 @@
 package cz.zvird.workmanager.controllers
 
-import cz.zvird.workmanager.data.*
+import cz.zvird.workmanager.data.CurrentFile
+import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.gui.*
 import javafx.application.Platform
 import javafx.event.EventHandler
@@ -21,7 +22,7 @@ import java.util.*
 import kotlin.concurrent.thread
 
 /**
- * Controller for the main GUI, not containing TableView
+ * Controller for the main UI, not containing TableView
  */
 class MainController : Initializable {
     @FXML lateinit var tabPane: TabPane
@@ -38,7 +39,6 @@ class MainController : Initializable {
     private lateinit var window: Window
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        // EventHandlers
         newFileMenu.onAction = EventHandler { newFileDialog() }
         openFileMenu.onAction = EventHandler { openFileDialog() }
         saveFileMenu.onAction = EventHandler { saveFileNotificator() }
@@ -80,7 +80,9 @@ class MainController : Initializable {
         val file = pair.second
 
         if (file != null) {
-            val blockedTask = object : BlockedTask<Unit>({ exportToSpreadsheet(monthRange, file) }) {
+            val blockedTask = object : BlockedTask<Unit>({
+                TODO("Not finished!")
+            }) {
                 override fun succeeded() {
                     savedAsNotification(file.name)
                 }
@@ -124,7 +126,8 @@ class MainController : Initializable {
 
         if (file != null) {
             try {
-                newFile(file)
+                // TODO: Implement year selection
+                CurrentFile.new(file)
                 savedAsNotification(file.name)
             } catch (e: Exception) {
                 cantSaveNotification(file.name)
@@ -137,10 +140,10 @@ class MainController : Initializable {
      */
     private fun saveFileNotificator() {
         try {
-            saveFile()
-            savedAsNotification(CurrentFile.get().name)
+            CurrentFile.save()
+            savedAsNotification(CurrentFile.retrieve().name)
         } catch (e: Exception) {
-            cantSaveNotification(CurrentFile.get().name)
+            cantSaveNotification(CurrentFile.retrieve().name)
         }
     }
 
@@ -148,7 +151,7 @@ class MainController : Initializable {
      * Opens a file selector, and calls the backend function
      */
     private fun saveFileAsDialog() {
-        val originalFile = CurrentFile.get()
+        val originalFile = CurrentFile.retrieve()
 
         val file = saveChooser(title = "Uložit soubor jako...",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
@@ -161,7 +164,7 @@ class MainController : Initializable {
 
         if (file != null) {
             try {
-                saveFileAs(file)
+                CurrentFile.save(file)
                 savedAsNotification(file.name)
             } catch (e: Exception) {
                 cantSaveNotification(file.name)
@@ -181,7 +184,7 @@ class MainController : Initializable {
 
         if (file != null) {
             try {
-                openFile(file)
+                CurrentFile.load(file)
             } catch (e: Exception) {
                 Notifications.create()
                         .title("WorkManager")

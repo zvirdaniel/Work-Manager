@@ -1,5 +1,6 @@
 package cz.zvird.workmanager.models
 
+import cz.zvird.workmanager.data.MemoryData
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddress
 import org.apache.poi.ss.util.RegionUtil
@@ -12,14 +13,12 @@ import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
-// TODO: exporting does not work
-
 /**
  * Generates XLSX spreadsheet and saves it into a file
  * @param month number between 1 and 12, will create one sheet with specified month
  * @param saveFile file to save all data into, example: result.xlsx
  */
-fun WorkYear.writeYearInXlsx(saveFile: File, month: Int) {
+fun MemoryData.writeYearInXlsx(saveFile: File, month: Int) {
     if (month < 1 || month > 12) {
         throw IllegalArgumentException("Month must be between 1 and 12!")
     }
@@ -33,7 +32,9 @@ fun WorkYear.writeYearInXlsx(saveFile: File, month: Int) {
  * @param saveFile file to saveFile all data into, example: result.xlsx
  * @throws IOException if file export fails
  */
-fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
+fun MemoryData.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
+    TODO("Not working")
+
     if (monthRange.start < 1 || monthRange.endInclusive > 12) {
         throw IllegalArgumentException("Month range is between 1 and 12!")
     }
@@ -41,11 +42,16 @@ fun WorkYear.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
     val titles = arrayOf("Datum", "Začátek práce", "Hodiny", "Popis práce")
     val monthsCzech = arrayOf("Leden", "Únor", "Březen", "Duben", "Květen",
             "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec")
-    val dataMap = getMapOfRawWorkSessions()
+    val monthsRaw = hashMapOf<Int, List<WorkSessionRaw>>()
+    for (i in 1..12) {
+        val list = mutableListOf<WorkSessionRaw>()
+        getMonth(i).forEach { list.add(it.getRawData()) }
+        monthsRaw[i] = list.toList()
+    }
     val wb = XSSFWorkbook()
 
     for (monthNumber in monthRange) {
-        val month = dataMap[monthNumber]
+        val month = monthsRaw[monthNumber]
         val monthName = monthsCzech[monthNumber - 1]
 
         val sheet = wb.createSheet() // Sheet with current month

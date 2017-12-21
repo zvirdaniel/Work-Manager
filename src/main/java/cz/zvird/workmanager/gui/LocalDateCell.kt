@@ -23,7 +23,6 @@ import kotlin.concurrent.thread
 class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 	private val datePicker = DatePicker()
 
-	// TODO: do something with different years
 	// TODO: make converter accept days only
 	// TODO: limit usable month using date cell factory
 

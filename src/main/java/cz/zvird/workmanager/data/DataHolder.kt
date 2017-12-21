@@ -8,7 +8,7 @@ import org.controlsfx.control.MaskerPane
 import java.time.ZoneId
 
 /**
- * Holds static variables
+ * Holds static variables accessible everywhere
  */
 object DataHolder {
     var services: HostServices? = null // Used in about dialog to open a link in a web browser
@@ -30,6 +30,7 @@ object DataHolder {
     }
 
     /**
+     * Initializes all controllers with data from the DataHolder
      * @param controller instance to be added into the list, can be retrieved later
      */
     fun addTableViewController(controller: TableViewController) {
@@ -37,7 +38,7 @@ object DataHolder {
 
         if (tableViewControllers.count() == 12) {
             tableViewControllers.forEachIndexed { i, c ->
-                c.table.items = VisibleData.visibleDataMap[i + 1]
+                c.table.items = MemoryData.getMonth(i + 1)
             }
 
             tableViewControllers.forEach { c ->
