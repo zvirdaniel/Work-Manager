@@ -7,23 +7,23 @@ import java.util.prefs.Preferences
 // TODO: File validation
 
 /**
- * Manages currently opened file, see load and retrieve methods
+ * Manages currently opened file
  */
-object CurrentFile {
+object DataFile {
 	private const val LAST_USED_FILE = "last_used_file"
 	private const val FILE_NOT_EXISTS = "file_not_exists"
 	private var currentFile: File? = null
 
 	/**
-	 * Loads the file in to the memory
+	 * Loads the file to the memory and displays it
 	 * @throws Exception if file is not valid
 	 */
 	fun load(file: File) {
 		currentFile = file
-		Preferences.userNodeForPackage(CurrentFile::class.java).put(LAST_USED_FILE, file.absolutePath)
+		Preferences.userNodeForPackage(DataFile::class.java).put(LAST_USED_FILE, file.absolutePath)
 		MemoryData.reloadCurrentFile()
 		println("Working with file: $file")
-		DataHolder.primaryStage.title = "WorkManager - ${file.name}"
+		DataHolder.primaryStage.title = "WorkManager - ${MemoryData.currentYear} - ${file.name}"
 	}
 
 	/**
@@ -36,7 +36,7 @@ object CurrentFile {
 			return file
 		}
 
-		val lastUsedPath = Preferences.userNodeForPackage(CurrentFile::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
+		val lastUsedPath = Preferences.userNodeForPackage(DataFile::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
 		if (lastUsedPath == FILE_NOT_EXISTS) { // If there is no last used file, create temporary one
 			new()
 			return retrieve()

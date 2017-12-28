@@ -1,6 +1,6 @@
 package cz.zvird.workmanager.controllers
 
-import cz.zvird.workmanager.data.CurrentFile
+import cz.zvird.workmanager.data.DataFile
 import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.gui.*
 import javafx.application.Platform
@@ -127,7 +127,7 @@ class MainController : Initializable {
         if (file != null) {
             try {
                 // TODO: Implement year selection
-                CurrentFile.new(file)
+                DataFile.new(file)
                 savedAsNotification(file.name)
             } catch (e: Exception) {
                 cantSaveNotification(file.name)
@@ -140,10 +140,10 @@ class MainController : Initializable {
      */
     private fun saveFileNotificator() {
         try {
-            CurrentFile.save()
-            savedAsNotification(CurrentFile.retrieve().name)
+            DataFile.save()
+            savedAsNotification(DataFile.retrieve().name)
         } catch (e: Exception) {
-            cantSaveNotification(CurrentFile.retrieve().name)
+            cantSaveNotification(DataFile.retrieve().name)
         }
     }
 
@@ -151,7 +151,7 @@ class MainController : Initializable {
      * Opens a file selector, and calls the backend function
      */
     private fun saveFileAsDialog() {
-        val originalFile = CurrentFile.retrieve()
+        val originalFile = DataFile.retrieve()
 
         val file = saveChooser(title = "Uložit soubor jako...",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
@@ -164,7 +164,7 @@ class MainController : Initializable {
 
         if (file != null) {
             try {
-                CurrentFile.save(file)
+                DataFile.save(file)
                 savedAsNotification(file.name)
             } catch (e: Exception) {
                 cantSaveNotification(file.name)
@@ -184,7 +184,7 @@ class MainController : Initializable {
 
         if (file != null) {
             try {
-                CurrentFile.load(file)
+                DataFile.load(file)
             } catch (e: Exception) {
                 Notifications.create()
                         .title("WorkManager")
