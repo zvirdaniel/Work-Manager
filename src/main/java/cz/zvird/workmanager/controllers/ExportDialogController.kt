@@ -1,7 +1,7 @@
 package cz.zvird.workmanager.controllers
 
 import cz.zvird.workmanager.data.DataHolder
-import cz.zvird.workmanager.gui.saveChooser
+import cz.zvird.workmanager.gui.showSaveFileDialog
 import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
@@ -103,7 +103,7 @@ class ExportDialogController : Initializable {
      * Opens a file chooser, and sets the given file
      */
     private fun selectAndSetFile() {
-        val file = saveChooser(
+        val file = showSaveFileDialog(
 		        title = "Vyber soubor",
 		        initialFileName = "Práce",
 		        filters = listOf(FileChooser.ExtensionFilter("Excel Tabulka", "*.xlsx")),

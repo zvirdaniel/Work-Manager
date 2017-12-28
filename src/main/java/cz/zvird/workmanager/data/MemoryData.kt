@@ -33,11 +33,11 @@ object MemoryData {
 	}
 
 	/**
-	 * Parses the JSON and loads it into the memory, does not check the data structure
+	 * Reloads the JSON and displays it
 	 * @throws Exception if parsing the JSON fails irrecoverably
 	 */
 	fun reloadCurrentFile() {
-		val file = CurrentFile.retrieve()
+		val file = DataFile.retrieve()
 		val data: Pair<Int, HashMap<Int, List<WorkSessionRaw>>> = mapper.readValue(file)
 		val monthsRaw = data.second
 		currentYear = data.first
@@ -78,7 +78,7 @@ object MemoryData {
 	 * @throws com.fasterxml.jackson.databind.JsonMappingException
 	 */
 	fun saveDataToFile(target: File? = null) {
-		val file: File = if (target != null) target else CurrentFile.retrieve()
+		val file: File = if (target != null) target else DataFile.retrieve()
 
 		val monthsRaw = hashMapOf<Int, List<WorkSessionRaw>>()
 		for (i in 1..12) {

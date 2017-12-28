@@ -18,7 +18,7 @@ import java.io.File
 /**
  * @return range of months to export, selected xlsx file to export data into
  */
-fun exportDialog(parentWindow: Window): Pair<IntRange, File?> {
+fun showExportFileDialog(parentWindow: Window): Pair<IntRange, File?> {
 	val loader = FXMLLoader(Main::class.java.getResource("views/ExportDialog.fxml"))
 	val controller = ExportDialogController()
 	loader.setController(controller)
@@ -52,14 +52,14 @@ fun exportDialog(parentWindow: Window): Pair<IntRange, File?> {
 }
 
 /**
- * Opens an open file dialog
+ * Shows an open file dialog
  * @param title file chooser title
  * @param filters file extension filters
  * @param initialDir opened when chooser dialog opens
  * @param ownerWindow given to file chooser itself as owner
  * @return selected file
  */
-fun openChooser(
+fun showOpenFileDialog(
 		title: String,
 		filters: Collection<FileChooser.ExtensionFilter>? = null,
 		initialDir: File = File(System.getProperty("user.home")),
@@ -77,7 +77,7 @@ fun openChooser(
 }
 
 /**
- * Opens a save file dialog
+ * Shows a save file dialog
  * @param title file chooser title
  * @param filters file extension filters
  * @param initialDir opened when chooser dialog opens
@@ -86,7 +86,7 @@ fun openChooser(
  * @param extension will be added to the file name, if not already there
  * @return selected file
  */
-fun saveChooser(
+fun showSaveFileDialog(
 		title: String,
 		filters: Collection<FileChooser.ExtensionFilter>? = null,
 		initialDir: File = File(System.getProperty("user.home")),
@@ -118,9 +118,9 @@ fun saveChooser(
 }
 
 /**
- * Shows about dialog with GitHub link
+ * Shows about dialog with a GitHub link
  */
-fun aboutDialog(parentWindow: Window) {
+fun showAboutDialog(parentWindow: Window) {
 	val link = Hyperlink("GitHub")
 	link.onAction = EventHandler {
 		DataHolder.services?.showDocument("https://github.com/zvirdaniel/Work-Manager")

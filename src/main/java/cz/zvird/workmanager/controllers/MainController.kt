@@ -1,6 +1,6 @@
 package cz.zvird.workmanager.controllers
 
-import cz.zvird.workmanager.data.CurrentFile
+import cz.zvird.workmanager.data.DataFile
 import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.gui.*
 import javafx.application.Platform
@@ -39,14 +39,14 @@ class MainController : Initializable {
     private lateinit var window: Window
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        newFileMenu.onAction = EventHandler { newFileDialog() }
-        openFileMenu.onAction = EventHandler { openFileDialog() }
-        saveFileMenu.onAction = EventHandler { saveFileNotificator() }
-        saveAsFileMenu.onAction = EventHandler { saveFileAsDialog() }
+        newFileMenu.onAction = EventHandler { newFileUI() }
+        openFileMenu.onAction = EventHandler { openFileUI() }
+        saveFileMenu.onAction = EventHandler { saveFileUI() }
+        saveAsFileMenu.onAction = EventHandler { saveFileAsUI() }
         deleteButton.onAction = EventHandler { deleteRow() }
         newRowButton.onAction = EventHandler { newRow() }
-        aboutMenu.onAction = EventHandler { aboutDialog(window) }
-        exportMenu.onAction = EventHandler { exportDialog() }
+        aboutMenu.onAction = EventHandler { showAboutDialog(window) }
+        exportMenu.onAction = EventHandler { exportFileUI() }
 
         // MaskerPane is used to block the UI if needed
         stackPane.children.add(DataHolder.maskerPane)
@@ -74,8 +74,8 @@ class MainController : Initializable {
     /**
      * Opens an export dialog (file selector, and month range selector) and calls the backend function
      */
-    private fun exportDialog() {
-        val pair = exportDialog(window)
+    private fun exportFileUI() {
+        val pair = showExportFileDialog(window)
         val monthRange = pair.first
         val file = pair.second
 
@@ -118,8 +118,8 @@ class MainController : Initializable {
     /**
      * Opens a file selector and calls the backend function
      */
-    private fun newFileDialog() {
-        val file = saveChooser("Vytvořit nový soubor",
+    private fun newFileUI() {
+        val file = showSaveFileDialog("Vytvořit nový soubor",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
                 extension = ".json",
                 ownerWindow = window)
@@ -127,7 +127,7 @@ class MainController : Initializable {
         if (file != null) {
             try {
                 // TODO: Implement year selection
-                CurrentFile.new(file)
+                DataFile.new(file)
                 savedAsNotification(file.name)
             } catch (e: Exception) {
                 cantSaveNotification(file.name)
@@ -138,22 +138,22 @@ class MainController : Initializable {
     /**
      * Saves the file and notifies the user
      */
-    private fun saveFileNotificator() {
+    private fun saveFileUI() {
         try {
-            CurrentFile.save()
-            savedAsNotification(CurrentFile.retrieve().name)
+            DataFile.save()
+            savedAsNotification(DataFile.retrieve().name)
         } catch (e: Exception) {
-            cantSaveNotification(CurrentFile.retrieve().name)
+            cantSaveNotification(DataFile.retrieve().name)
         }
     }
 
     /**
      * Opens a file selector, and calls the backend function
      */
-    private fun saveFileAsDialog() {
-        val originalFile = CurrentFile.retrieve()
+    private fun saveFileAsUI() {
+        val originalFile = DataFile.retrieve()
 
-        val file = saveChooser(title = "Uložit soubor jako...",
+        val file = showSaveFileDialog(title = "Uložit soubor jako...",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
                 initialDir = File(originalFile.parent),
                 initialFileName = originalFile.nameWithoutExtension + " kopie",
@@ -164,7 +164,7 @@ class MainController : Initializable {
 
         if (file != null) {
             try {
-                CurrentFile.save(file)
+                DataFile.save(file)
                 savedAsNotification(file.name)
             } catch (e: Exception) {
                 cantSaveNotification(file.name)
@@ -175,8 +175,8 @@ class MainController : Initializable {
     /**
      * Opens a file selector in home directory, calls backend for opening the file itself
      */
-    private fun openFileDialog() {
-        val file = openChooser(
+    private fun openFileUI() {
+        val file = showOpenFileDialog(
                 title = "Otevřít soubor",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
                 ownerWindow = window
@@ -184,7 +184,7 @@ class MainController : Initializable {
 
         if (file != null) {
             try {
-                CurrentFile.load(file)
+                DataFile.load(file)
             } catch (e: Exception) {
                 Notifications.create()
                         .title("WorkManager")
