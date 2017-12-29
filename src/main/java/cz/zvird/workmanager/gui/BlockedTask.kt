@@ -7,28 +7,29 @@ import javafx.concurrent.Task
  * Executes body while blocking the entire UI using MaskerPane
  * @param body function reference
  */
-open class BlockedTask<T>(private val body: () -> T) : Task<T>() {
-    init {
-        DataHolder.maskerPane.progressProperty().bind(this.progressProperty())
-        DataHolder.maskerPane.textProperty().bind(this.messageProperty())
-        DataHolder.maskerPane.visibleProperty().bind(this.runningProperty())
-    }
+open class BlockedTask(private val body: () -> Unit) : Task<Unit>() {
+	init {
+		DataHolder.maskerPane.progressProperty().bind(this.progressProperty())
+		DataHolder.maskerPane.textProperty().bind(this.messageProperty())
+		DataHolder.maskerPane.visibleProperty().bind(this.runningProperty())
+	}
 
-    override fun done() {
-        DataHolder.maskerPane.progressProperty().unbind()
-        DataHolder.maskerPane.textProperty().unbind()
-        DataHolder.maskerPane.visibleProperty().unbind()
-    }
+	override fun done() {
+		DataHolder.maskerPane.progressProperty().unbind()
+		DataHolder.maskerPane.textProperty().unbind()
+		DataHolder.maskerPane.visibleProperty().unbind()
+		DataHolder.maskerPane.visibleProperty().value = false
+	}
 
-    override fun call(): T {
-        updateMessage("Probíhá zpracování")
+	override fun call() {
+		updateMessage("Probíhá zpracování")
 
-        val result = body()
+		body()
 
-        Thread.sleep(1000)
-        updateMessage("Zpracování dokončeno")
-        updateProgress(100, 100)
+		Thread.sleep(1000)
+		updateMessage("Zpracování dokončeno")
+		updateProgress(100, 100)
 
-        return result
-    }
+		return
+	}
 }

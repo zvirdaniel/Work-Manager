@@ -2,11 +2,14 @@ package cz.zvird.workmanager.data
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import cz.zvird.workmanager.gui.errorNotification
+import cz.zvird.workmanager.gui.showYearSelectorDialog
 import cz.zvird.workmanager.models.WorkSession
 import cz.zvird.workmanager.models.WorkSessionRaw
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import java.io.File
+import java.time.Year
 
 /**
  * Manages the data visible in the user interface, and handles the file interaction
@@ -27,21 +30,36 @@ object MemoryData {
 		for (i in 1..12) {
 			monthsInMemory[i] = FXCollections.observableArrayList<WorkSession>()
 		}
-
-		reloadCurrentFile()
 	}
 
 	/**
-	 * Reloads the JSON and displays it
-	 * @throws Exception if parsing the JSON fails irrecoverably
+	 * Reloads the JSON and displays it, automatically corrects the data structure if needed (without saving)
+	 * @throws Exception if parsing or correcting the JSON fails irrecoverably
 	 */
-	fun reloadCurrentFile() {
+	fun reloadCurrentFile(validate: Boolean = false) {
 		val file = DataFile.retrieve()
 		val data: Pair<Int, HashMap<Int, List<WorkSessionRaw>>> = mapper.readValue(file)
 		val monthsRaw = data.second
-		currentYear = data.first
+		var year = data.first
+
+		if (validate) {
+			if (year <= 0) {
+				val newYear = showYearSelectorDialog(
+						DataHolder.primaryStage.scene.window,
+						"Korekce dat"
+				)
+
+				if (newYear == null || newYear <= 0) {
+					errorNotification("Špatně zadaný rok, použije se aktuální.")
+					year = Year.now().value
+				} else {
+					year = newYear
+				}
+			}
+		}
 
 		clearYearData()
+		currentYear = year
 		for (i in 1..12) {
 			val monthFromFile = monthsRaw[i]?.map { WorkSession(it) }
 
@@ -49,6 +67,8 @@ object MemoryData {
 				monthsInMemory[i]?.addAll(it)
 			}
 		}
+
+		DataHolder.primaryStage.title = "WorkManager - Rok ${MemoryData.currentYear} - ${file.name}"
 	}
 
 	/**

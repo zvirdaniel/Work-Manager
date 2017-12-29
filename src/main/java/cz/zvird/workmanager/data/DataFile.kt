@@ -4,9 +4,6 @@ import java.io.File
 import java.time.Year
 import java.util.prefs.Preferences
 
-// TODO: Repair data without saving them, dialog with year inconsistency
-// TODO: File validation
-
 /**
  * Manages currently opened file
  */
@@ -19,12 +16,18 @@ object DataFile {
 	 * Loads the file to the memory and displays it
 	 * @throws Exception if file is not valid
 	 */
-	fun load(file: File) {
+	fun load(file: File, validate: Boolean = false) {
+		val lastFile = currentFile
 		currentFile = file
-		Preferences.userNodeForPackage(DataFile::class.java).put(LAST_USED_FILE, file.absolutePath)
-		MemoryData.reloadCurrentFile()
-		println("Working with file: $file")
-		DataHolder.primaryStage.title = "WorkManager - ${MemoryData.currentYear} - ${file.name}"
+
+		try {
+			MemoryData.reloadCurrentFile(validate)
+			Preferences.userNodeForPackage(DataFile::class.java).put(LAST_USED_FILE, file.absolutePath)
+		} catch (e: Exception) {
+			currentFile = lastFile
+			throw e
+		}
+
 	}
 
 	/**
@@ -39,18 +42,13 @@ object DataFile {
 
 		val lastUsedPath = Preferences.userNodeForPackage(DataFile::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
 		if (lastUsedPath == FILE_NOT_EXISTS) { // If there is no last used file, create temporary one
-			new()
+			currentFile = new()
 			return retrieve()
 		}
 
-		val lastUsedFile = File(lastUsedPath)
-		return try {
-			load(lastUsedFile)
-			retrieve()
-		} catch (e: Exception) {
-			new()
-			retrieve()
-		}
+		// Return last used file
+		currentFile = File(lastUsedPath)
+		return retrieve()
 	}
 
 	/**
@@ -68,15 +66,15 @@ object DataFile {
 	}
 
 	/**
-	 * Creates a file in the filesystem, implicitly a temporary one, writes blank data into it, and loads it as current
+	 * Creates a file in the filesystem, implicitly a temporary one, writes blank data into it, and returns it
 	 * @param target to write blank data into
 	 * @param year implicitly set to the current year
 	 * @throws java.io.IOException if creating blank file failed
+	 * @returns created file
 	 */
-	fun new(target: File? = null, year: Int = Year.now().value) {
-		val file = if (target != null) target else File.createTempFile("TemporaryWorkYear", ".json")
-
-		file?.let { MemoryData.saveBlankFile(it, year) }
-		file?.let { load(it) }
+	fun new(target: File? = null, year: Int = Year.now().value): File {
+		val file: File = target ?: File.createTempFile("TemporaryWorkYear", ".json")
+		MemoryData.saveBlankFile(file, year)
+		return file
 	}
 }
