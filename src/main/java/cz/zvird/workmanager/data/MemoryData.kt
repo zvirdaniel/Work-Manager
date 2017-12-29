@@ -2,7 +2,7 @@ package cz.zvird.workmanager.data
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import cz.zvird.workmanager.gui.errorNotification
+import cz.zvird.workmanager.gui.informativeNotification
 import cz.zvird.workmanager.gui.showYearSelectorDialog
 import cz.zvird.workmanager.models.WorkSession
 import cz.zvird.workmanager.models.WorkSessionRaw
@@ -34,11 +34,12 @@ object MemoryData {
 
 	/**
 	 * Reloads the JSON and displays it, automatically corrects the data structure if needed (without saving)
+	 * @param validate will check and repair the data structure, shows dialogs to the user if needed
 	 * @throws Exception if parsing or correcting the JSON fails irrecoverably
 	 */
 	fun reloadCurrentFile(validate: Boolean = false) {
 		val file = DataFile.retrieve()
-		val data: Pair<Int, HashMap<Int, List<WorkSessionRaw>>> = mapper.readValue(file)
+		val data: Pair<Int, HashMap<Int, List<WorkSessionRaw>>> = mapper.readValue(file) // Throws an exception if reading the file fails
 		val monthsRaw = data.second
 		var year = data.first
 
@@ -50,7 +51,7 @@ object MemoryData {
 				)
 
 				if (newYear == null || newYear <= 0) {
-					errorNotification("Špatně zadaný rok, použije se aktuální.")
+					informativeNotification("Špatně zadaný rok, použije se aktuální.")
 					year = Year.now().value
 				} else {
 					year = newYear
@@ -64,6 +65,22 @@ object MemoryData {
 			val monthFromFile = monthsRaw[i]?.map { WorkSession(it) }
 
 			monthFromFile?.let {
+				if (validate) {
+					var changed = false
+
+					it.filter { it.beginDateProperty.value.monthValue != i }.forEach {
+						it.beginDateProperty.value = it.beginDateProperty.value.withMonth(i)
+						changed = true
+					}
+
+					it.filter { it.beginDateProperty.value.year != currentYear }.forEach {
+						it.beginDateProperty.value = it.beginDateProperty.value.withYear(currentYear)
+						changed = true
+					}
+
+					if (changed) informativeNotification("Datová struktura opravena")
+				}
+
 				monthsInMemory[i]?.addAll(it)
 			}
 		}

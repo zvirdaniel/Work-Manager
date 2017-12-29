@@ -28,7 +28,20 @@ fun savedAsNotification(fileName: String) {
 }
 
 /**
+ * Shows informative message with a given text
+ * @param text that will show up in the notification
+ */
+fun informativeNotification(text: String) {
+	Notifications.create()
+			.title("WorkManager")
+			.text(text)
+			.hideAfter(Duration(4000.0))
+			.showInformation()
+}
+
+/**
  * Shows error notification with a given message
+ * @param message that will show up in the notification
  */
 fun errorNotification(message: String) {
 	Notifications.create()

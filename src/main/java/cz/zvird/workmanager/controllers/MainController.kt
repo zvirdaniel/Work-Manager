@@ -14,8 +14,6 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.StackPane
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Window
-import javafx.util.Duration
-import org.controlsfx.control.Notifications
 import java.io.File
 import java.net.URL
 import java.util.*
@@ -195,11 +193,7 @@ class MainController : Initializable {
 					try {
 						DataFile.load(file, true)
 					} catch (e: Exception) {
-						Notifications.create()
-								.title("WorkManager")
-								.text("Soubor nelze otevřít, nebo není validní.")
-								.hideAfter(Duration(4000.0))
-								.showInformation()
+						informativeNotification("Soubor nelze otevřít, nebo není validní.")
 					}
 				}.run()
 			}
