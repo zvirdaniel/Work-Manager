@@ -1,6 +1,7 @@
 package cz.zvird.workmanager.data
 
 import java.io.File
+import java.time.Year
 import java.util.prefs.Preferences
 
 // TODO: Repair data without saving them, dialog with year inconsistency
@@ -69,12 +70,13 @@ object DataFile {
 	/**
 	 * Creates a file in the filesystem, implicitly a temporary one, writes blank data into it, and loads it as current
 	 * @param target to write blank data into
+	 * @param year implicitly set to the current year
 	 * @throws java.io.IOException if creating blank file failed
 	 */
-	fun new(target: File? = null) {
+	fun new(target: File? = null, year: Int = Year.now().value) {
 		val file = if (target != null) target else File.createTempFile("TemporaryWorkYear", ".json")
 
-		file?.let { MemoryData.saveBlankFile(it) }
+		file?.let { MemoryData.saveBlankFile(it, year) }
 		file?.let { load(it) }
 	}
 }

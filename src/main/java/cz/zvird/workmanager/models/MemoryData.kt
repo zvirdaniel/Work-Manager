@@ -1,9 +1,7 @@
-package cz.zvird.workmanager.data
+package cz.zvird.workmanager.models
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import cz.zvird.workmanager.models.WorkSession
-import cz.zvird.workmanager.models.WorkSessionRaw
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import java.io.File
@@ -11,10 +9,9 @@ import java.io.File
 /**
  * Manages the data visible in the user interface, and handles the file interaction
  */
-object MemoryData {
-	private val mapper = jacksonObjectMapper()
+class Data(year: Int) {
 	private val monthsInMemory = hashMapOf<Int, ObservableList<WorkSession>>() // contains all the data visible in the UI
-	var currentYear = 0
+	var currentYear = year
 		set(value) {
 			if (value < 0) {
 				throw IllegalArgumentException("Year number must be bigger than zero!")
@@ -25,18 +22,21 @@ object MemoryData {
 
 	init {
 		for (i in 1..12) {
-			monthsInMemory[i] = FXCollections.observableArrayList<WorkSession>()
+			this.monthsInMemory[i] = FXCollections.observableArrayList<WorkSession>()
 		}
+	}
 
-		reloadCurrentFile()
+	constructor(file: File) : this(0) {
+		loadFromFile(file)
 	}
 
 	/**
-	 * Reloads the JSON and displays it
+	 * Parses the JSON and loads it into the memory, does not check the data structure
+	 * @param file to save the data into
 	 * @throws Exception if parsing the JSON fails irrecoverably
 	 */
-	fun reloadCurrentFile() {
-		val file = DataFile.retrieve()
+	fun loadFromFile(file: File) {
+		val mapper = jacksonObjectMapper()
 		val data: Pair<Int, HashMap<Int, List<WorkSessionRaw>>> = mapper.readValue(file)
 		val monthsRaw = data.second
 		currentYear = data.first
@@ -52,32 +52,14 @@ object MemoryData {
 	}
 
 	/**
-	 * Creates a blank JSON with basic data structure
+	 * Generates a JSON containing a Pair with the current year, and a list with all months saved as WorkSessionRaw
 	 * @param file to save the data into
-	 * @param year used in the file
 	 * @throws java.io.IOException
 	 * @throws com.fasterxml.jackson.core.JsonGenerationException
 	 * @throws com.fasterxml.jackson.databind.JsonMappingException
 	 */
-	fun saveBlankFile(file: File, year: Int) {
-		val monthsRaw = hashMapOf<Int, List<WorkSessionRaw>>()
-		for (i in 1..12) {
-			monthsRaw[i] = listOf()
-		}
-
-		val data = Pair(year, monthsRaw)
-		mapper.writeValue(file, data)
-	}
-
-	/**
-	 * Creates a JSON containing a Pair with the current year, and a list with all months saved as WorkSessionRaw
-	 * @param target to save data into, implicitly current file
-	 * @throws java.io.IOException
-	 * @throws com.fasterxml.jackson.core.JsonGenerationException
-	 * @throws com.fasterxml.jackson.databind.JsonMappingException
-	 */
-	fun saveDataToFile(target: File? = null) {
-		val file: File = if (target != null) target else DataFile.retrieve()
+	fun saveToFile(file: File) {
+		val mapper = jacksonObjectMapper()
 
 		val monthsRaw = hashMapOf<Int, List<WorkSessionRaw>>()
 		for (i in 1..12) {
@@ -103,7 +85,7 @@ object MemoryData {
 	 * @return list with WorkSessions for a given month
 	 * @param monthNumber between 1 and 12
 	 */
-	fun getMonth(monthNumber: Int): ObservableList<WorkSession> {
+	fun getMonth(monthNumber: Int): MutableList<WorkSession> {
 		val month = monthsInMemory[monthNumber]
 
 		if (monthNumber in 1..12 && month != null) {

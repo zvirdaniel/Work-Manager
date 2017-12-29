@@ -119,6 +119,13 @@ class MainController : Initializable {
      * Opens a file selector and calls the backend function
      */
     private fun newFileUI() {
+        val year = showYearSelectorDialog(window)
+
+	    if (year == null || year <= 0) {
+		    errorNotification("Špatně zadané číslo!")
+		    return
+	    }
+
         val file = showSaveFileDialog("Vytvořit nový soubor",
                 filters = listOf(ExtensionFilter("JSON", "*.json")),
                 extension = ".json",
@@ -126,8 +133,7 @@ class MainController : Initializable {
 
         if (file != null) {
             try {
-                // TODO: Implement year selection
-                DataFile.new(file)
+                DataFile.new(file, year)
                 savedAsNotification(file.name)
             } catch (e: Exception) {
                 cantSaveNotification(file.name)

@@ -14,11 +14,35 @@ import javafx.stage.Modality
 import javafx.stage.Window
 import javafx.util.Callback
 import java.io.File
+import java.time.Year
+
+/**
+ * Shows text input dialog to enter a year
+ * @return integer, or null if user entered wrong values
+ */
+fun showYearSelectorDialog(ownerWindow: Window?): Int? {
+	val dialog = TextInputDialog(Year.now().value.toString())
+	dialog.title = "Zadejte rok"
+	dialog.headerText = "Zadejte rok"
+	dialog.contentText = "Prosím zadejte rok:"
+
+	ownerWindow?.let { dialog.initOwner(it) }
+	dialog.initModality(Modality.WINDOW_MODAL)
+
+	val result = dialog.showAndWait()
+
+	var year: Int? = null
+	result.ifPresent {
+		year = it.toIntOrNull()
+	}
+
+	return year
+}
 
 /**
  * @return range of months to export, selected xlsx file to export data into
  */
-fun showExportFileDialog(parentWindow: Window): Pair<IntRange, File?> {
+fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?> {
 	val loader = FXMLLoader(Main::class.java.getResource("views/ExportDialog.fxml"))
 	val controller = ExportDialogController()
 	loader.setController(controller)
@@ -41,7 +65,7 @@ fun showExportFileDialog(parentWindow: Window): Pair<IntRange, File?> {
 	// Set content from FXML
 	dialog.dialogPane.content = content
 	dialog.dialogPane.minWidth = 400.0
-	dialog.initOwner(parentWindow)
+	dialog.initOwner(ownerWindow)
 	dialog.initModality(Modality.WINDOW_MODAL)
 
 	dialog.resultConverter = Callback {
@@ -120,7 +144,7 @@ fun showSaveFileDialog(
 /**
  * Shows about dialog with a GitHub link
  */
-fun showAboutDialog(parentWindow: Window) {
+fun showAboutDialog(ownerWindow: Window) {
 	val link = Hyperlink("GitHub")
 	link.onAction = EventHandler {
 		DataHolder.services?.showDocument("https://github.com/zvirdaniel/Work-Manager")
@@ -131,9 +155,9 @@ fun showAboutDialog(parentWindow: Window) {
 	val alert = Alert(Alert.AlertType.INFORMATION)
 	alert.title = "Autor"
 	alert.headerText = "Daniel Zvir"
-	alert.dialogPane.contentProperty().set(flow)
+	alert.dialogPane.content = flow
 
-	parentWindow.let { alert.initOwner(it) }
+	ownerWindow.let { alert.initOwner(it) }
 	alert.initModality(Modality.WINDOW_MODAL)
 
 	alert.show()
