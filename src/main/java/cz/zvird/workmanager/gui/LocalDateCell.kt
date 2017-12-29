@@ -1,6 +1,7 @@
 package cz.zvird.workmanager.gui
 
 import cz.zvird.workmanager.data.DataHolder
+import cz.zvird.workmanager.data.MemoryData
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
 import javafx.scene.control.ContentDisplay
@@ -12,9 +13,8 @@ import javafx.scene.input.KeyEvent
 import javafx.util.Callback
 import javafx.util.StringConverter
 import java.time.LocalDate
+import java.time.Month
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.DateTimeParseException
 import kotlin.concurrent.thread
 
 /**
@@ -22,9 +22,6 @@ import kotlin.concurrent.thread
  */
 class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 	private val datePicker = DatePicker()
-
-	// TODO: make converter accept days only
-	// TODO: limit usable month using date cell factory
 
 	init {
 		initDatePicker()
@@ -80,7 +77,7 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 			reset()
 		} else {
 			datePicker.value = item
-			text = datePicker.converter.toString(item)
+			text = dateToFancyString(item)
 			graphic = datePicker
 			contentDisplay = ContentDisplay.TEXT_ONLY // TEXT_ONLY should be set when not editing
 		}
@@ -104,14 +101,19 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 		datePicker.promptText = "dd. mm. yyyy"
 		datePicker.converter = generateLocalDateConverter()
 
-		val dayCellFactory = Callback<DatePicker, DateCell> { datePicker ->
+		val dayCellFactory = Callback<DatePicker, DateCell> {
 			object : DateCell() {
 				override fun updateItem(item: LocalDate, empty: Boolean) {
 					super.updateItem(item, empty)
 
-					val currentMonthNumber = DataHolder.currentTab + 1
+					val currentMonth = Month.of(DataHolder.currentTab + 1)
+					val firstDayOfCurrentMonth = LocalDate.of(MemoryData.currentYear, currentMonth, 1)
+					val firstDayOfPreviousMonth = firstDayOfCurrentMonth.minusMonths(1)
+					val lastDayOfPreviousMonth = firstDayOfPreviousMonth.withDayOfMonth(firstDayOfPreviousMonth.lengthOfMonth())
+					val firstDayOfNextMonth = firstDayOfCurrentMonth.plusMonths(1)
 
-					if (item.isBefore(datePicker.value.plusDays(1))) {
+					if (item.isBefore(lastDayOfPreviousMonth) || item.isEqual(lastDayOfPreviousMonth) ||
+							item.isAfter(firstDayOfNextMonth) || item.isEqual(firstDayOfNextMonth)) {
 						isDisable = true
 						style = "-fx-background-color: #ffc0cb;"
 					}
@@ -156,8 +158,8 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 					try {
 						val date = datePicker.converter.fromString(text)
 						commitEdit(date)
-					} catch (e: DateTimeParseException) {
-						val error = "$text není validní datum."
+					} catch (e: Exception) {
+						val error = "$text není validní den. Pouze dny v měsíci!"
 						errorNotification(error)
 					}
 				}
@@ -166,15 +168,28 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 	}
 
 	/**
+	 * Converts LocalDate to string with full date
+	 */
+	private fun dateToFancyString(date: LocalDate?): String? {
+		val formatter = DateTimeFormatter.ofPattern("dd. MM. yyyy")
+
+		if (date != null) {
+			return formatter.format(date)
+		}
+
+		return null
+	}
+
+	/**
 	 * StringConverter converts LocalDate to string and vice versa
 	 */
 	private fun generateLocalDateConverter(): StringConverter<LocalDate> {
 		return object : StringConverter<LocalDate>() {
 			/**
-			 * Converts LocalDate into string
+			 * Converts LocalDate to short string
 			 */
 			override fun toString(date: LocalDate?): String? {
-				val formatter = DateTimeFormatter.ofPattern("dd. MM. yyyy")
+				val formatter = DateTimeFormatter.ofPattern("dd.")
 
 				if (date != null) {
 					return formatter.format(date)
@@ -187,25 +202,13 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 			 * Parses text into LocalDate
 			 */
 			override fun fromString(text: String?): LocalDate? {
-				val textWithoutSpaces = text?.replace("[\\s|\u00A0]+".toRegex(), "")
-				val formatter = DateTimeFormatterBuilder()
-						.parseCaseInsensitive()
-						.optionalStart()
-						.appendPattern("dd.MM.yyyy")
-						.optionalEnd()
-						.optionalStart()
-						.appendPattern("dd.M.yyyy")
-						.optionalEnd()
-						.optionalStart()
-						.appendPattern("d.M.yyyy")
-						.optionalEnd()
-						.optionalStart()
-						.appendPattern("d.MM.yyyy")
-						.optionalEnd()
-						.toFormatter()
+				val textWithoutDots = text?.replace('.', ' ')
+				val textWithoutSpaces = textWithoutDots?.replace("[\\s|\u00A0]+".toRegex(), "")
 
 				if (textWithoutSpaces != null && textWithoutSpaces.isNotEmpty()) {
-					return LocalDate.parse(textWithoutSpaces, formatter)
+					val day = textWithoutSpaces.toInt()
+					val date = LocalDate.of(MemoryData.currentYear, DataHolder.currentTab + 1, day)
+					return date
 				}
 
 				return null
