@@ -72,7 +72,7 @@ object DataFile {
 	 * @throws java.io.IOException if creating blank file failed
 	 * @returns created file
 	 */
-	fun new(target: File? = null, year: Int = Year.now().value): File {
+	fun new(target: File? = null, year: Int = Year.now(DataHolder.zone).value): File {
 		val file: File = target ?: File.createTempFile("TemporaryWorkYear", ".json")
 		MemoryData.saveBlankFile(file, year)
 		return file

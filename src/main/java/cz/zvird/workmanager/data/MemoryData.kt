@@ -52,7 +52,7 @@ object MemoryData {
 
 				if (newYear == null || newYear <= 0) {
 					informativeNotification("Špatně zadaný rok, použije se aktuální.")
-					year = Year.now().value
+					year = Year.now(DataHolder.zone).value
 				} else {
 					year = newYear
 				}

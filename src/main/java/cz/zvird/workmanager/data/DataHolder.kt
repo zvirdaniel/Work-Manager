@@ -1,5 +1,6 @@
 package cz.zvird.workmanager.data
 
+import cz.zvird.workmanager.controllers.MainController
 import cz.zvird.workmanager.controllers.TableViewController
 import javafx.application.HostServices
 import javafx.event.EventHandler
@@ -17,6 +18,7 @@ object DataHolder {
     lateinit var primaryStage: Stage // To make primaryStage accessible from everywhere
     private val tableViewControllers = mutableListOf<TableViewController>() // Contains all controller
     var currentTab: Int = -1 // Currently selected month, gets changed automatically
+    lateinit var mainController: MainController // Month controllers need to hook to the main one in order to recalculate wages
 
     init {
         maskerPane.visibleProperty().value = false

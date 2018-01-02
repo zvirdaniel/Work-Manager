@@ -3,31 +3,37 @@ package cz.zvird.workmanager.controllers
 import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.data.MemoryData
 import cz.zvird.workmanager.gui.LocalDateCell
+import cz.zvird.workmanager.gui.errorNotification
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.control.*
+import javafx.scene.control.Label
+import javafx.scene.control.TableColumn
+import javafx.scene.control.TableRow
+import javafx.scene.control.TableView
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.input.KeyCode
 import javafx.util.Callback
+import javafx.util.StringConverter
 import java.net.URL
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.*
 
 // TODO: Connect hourly wage to the controller
-// TODO: Implement Time, Duration and Description cell value factories
 
 class TableViewController : Initializable {
 	@FXML lateinit var table: TableView<WorkSession>
 	@FXML lateinit var date: TableColumn<WorkSession, LocalDate>
-	@FXML lateinit var time: TableColumn<WorkSession, String>
-	@FXML lateinit var duration: TableColumn<WorkSession, String>
+	@FXML lateinit var time: TableColumn<WorkSession, LocalTime>
+	@FXML lateinit var duration: TableColumn<WorkSession, Duration>
 	@FXML lateinit var description: TableColumn<WorkSession, String>
-	@FXML lateinit var hourlyWageField: TextField
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
@@ -69,8 +75,51 @@ class TableViewController : Initializable {
 	 */
 	private fun cellFactories() {
 		date.cellFactory = Callback { LocalDateCell() }
-		time.cellFactory = TextFieldTableCell.forTableColumn()
-		duration.cellFactory = TextFieldTableCell.forTableColumn()
+
+		time.cellFactory = TextFieldTableCell.forTableColumn(object : StringConverter<LocalTime>() {
+			override fun toString(time: LocalTime): String {
+				return time.format(DateTimeFormatter.ofPattern("HH:mm"))
+			}
+
+			override fun fromString(string: String): LocalTime {
+				if (string.contains(':')) {
+					try {
+						return LocalTime.parse(string, DateTimeFormatter.ofPattern("HH:mm"))
+					} catch (e: DateTimeParseException) {
+						errorNotification("$string není validní čas!")
+					}
+				} else {
+					try {
+						return LocalTime.parse(string, DateTimeFormatter.ofPattern("HH"))
+					} catch (e: DateTimeParseException) {
+						errorNotification("$string není validní čas!")
+					}
+				}
+
+				return LocalTime.now(DataHolder.zone)
+			}
+		})
+
+		duration.cellFactory = TextFieldTableCell.forTableColumn(object : StringConverter<Duration>() {
+			override fun toString(duration: Duration): String {
+				return duration.toString()
+						.substring(2)
+						.replace("(\\d[HMS])(?!$)".toRegex(), "$1 ")
+						.toLowerCase()
+			}
+
+			override fun fromString(string: String): Duration {
+				try {
+					val minutes = string.toLong()
+					return Duration.ofMinutes(minutes)
+				} catch (e: NumberFormatException) {
+					errorNotification("$string není validní počet minut! Pouze celé čísla.")
+				}
+
+				return Duration.ofMinutes(30)
+			}
+		})
+
 		description.cellFactory = TextFieldTableCell.forTableColumn()
 	}
 
@@ -79,8 +128,8 @@ class TableViewController : Initializable {
 	 */
 	private fun cellValueFactories() {
 		date.cellValueFactory = Callback { it.value.beginDateProperty }
-		time.cellValueFactory = Callback { it.value.beginTimeProperty.asString() }
-		duration.cellValueFactory = Callback { it.value.durationProperty.asString() }
+		time.cellValueFactory = Callback { it.value.beginTimeProperty }
+		duration.cellValueFactory = Callback { it.value.durationProperty }
 		description.cellValueFactory = Callback { it.value.descriptionProperty }
 	}
 
@@ -130,7 +179,7 @@ class TableViewController : Initializable {
 				session = WorkSession(lastDateTime, 180, 0, lastSession.descriptionProperty.value)
 			}
 		} else {
-			if (currentMonth == LocalDate.now().monthValue) {
+			if (currentMonth == LocalDate.now(DataHolder.zone).monthValue) {
 				session = WorkSession(addMinutes = 180, hourlyWage = 0, description = "Doplnit!")
 			} else {
 				val localDate = LocalDate.of(MemoryData.currentYear, currentMonth, 1)

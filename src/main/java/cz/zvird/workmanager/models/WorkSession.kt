@@ -49,7 +49,7 @@ class WorkSession(beginDateTime: LocalDateTime,
      * @param hourlyWage without any currency
      * @param description preferred length is 90 characters or less, implicitly set to empty string
      */
-    constructor(beginDateTime: LocalDateTime = LocalDateTime.now(),
+    constructor(beginDateTime: LocalDateTime = LocalDateTime.now(DataHolder.zone),
                 endDateTime: LocalDateTime,
                 hourlyWage: Int,
                 description: String = "")
@@ -61,7 +61,7 @@ class WorkSession(beginDateTime: LocalDateTime,
      * @param hourlyWage without any currency
      * @param description preferred length is 90 characters or less, implicitly set to empty string
      */
-    constructor(beginDateTime: LocalDateTime = LocalDateTime.now(),
+    constructor(beginDateTime: LocalDateTime = LocalDateTime.now(DataHolder.zone),
                 addMinutes: Long,
                 hourlyWage: Int,
                 description: String = "")

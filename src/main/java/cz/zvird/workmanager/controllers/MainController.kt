@@ -2,6 +2,7 @@ package cz.zvird.workmanager.controllers
 
 import cz.zvird.workmanager.data.DataFile
 import cz.zvird.workmanager.data.DataHolder
+import cz.zvird.workmanager.data.MemoryData
 import cz.zvird.workmanager.gui.*
 import javafx.application.Platform
 import javafx.event.EventHandler
@@ -37,6 +38,9 @@ class MainController : Initializable {
 	private lateinit var window: Window
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
+		// Ads the controller to the DataHolder in order to be accessible everywhere
+		DataHolder.mainController = this
+
 		newFileMenu.onAction = EventHandler { newFileUI() }
 		openFileMenu.onAction = EventHandler { openFileUI() }
 		saveFileMenu.onAction = EventHandler { saveFileUI() }
@@ -49,9 +53,7 @@ class MainController : Initializable {
 		// MaskerPane is used to block the UI if needed
 		stackPane.children.add(DataHolder.maskerPane)
 
-		/**
-		 * Requests focus, scrolls to the end of the table, and sets DataHolder.currentTab upon every tab selection
-		 */
+		// Requests focus, scrolls to the end of the table, and sets DataHolder.currentTab upon every tab selection
 		tabPane.selectionModel.selectedIndexProperty().addListener { _, _, newValue ->
 			DataHolder.currentTab = newValue.toInt()
 			val tableViewController = DataHolder.getCurrentTableViewController()
@@ -64,9 +66,26 @@ class MainController : Initializable {
 		}
 
 		// Select tab with current month
-		tabPane.selectionModel.select(Date().toInstant().atZone(DataHolder.zone).toLocalDate().month.value - 1)
+		val currentMonthIndex = Date().toInstant().atZone(DataHolder.zone).toLocalDate().month.value - 1
+		tabPane.selectionModel.select(currentMonthIndex)
+		DataHolder.currentTab = currentMonthIndex
 
+		// Assigns the variable after it is loaded properly
 		Platform.runLater { window = tabPane.scene.window }
+
+		// Recalculates wages
+		recalculateMonthlyWage()
+	}
+
+	// TODO: recalculate monthly wage
+	fun recalculateMonthlyWage(monthNumber: Int = DataHolder.currentTab) {
+		val month = MemoryData.getMonth(monthNumber)
+
+		var hours = 0.0
+		for (session in month) {
+			hours += session.durationProperty.get().toHours()
+		}
+
 	}
 
 	/**
@@ -133,6 +152,7 @@ class MainController : Initializable {
 		if (file != null) {
 			try {
 				DataFile.new(file, year)
+				DataFile.load(file)
 				savedAsNotification(file.name)
 			} catch (e: Exception) {
 				cantSaveNotification(file.name)
