@@ -2,9 +2,11 @@ package cz.zvird.workmanager.controllers
 
 import cz.zvird.workmanager.data.DataFile
 import cz.zvird.workmanager.data.DataHolder
-import cz.zvird.workmanager.data.MemoryData
 import cz.zvird.workmanager.gui.*
+import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
+import javafx.beans.value.ChangeListener
+import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
@@ -13,6 +15,7 @@ import javafx.scene.control.MenuItem
 import javafx.scene.control.TabPane
 import javafx.scene.control.TextField
 import javafx.scene.layout.StackPane
+import javafx.scene.text.Text
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Window
 import java.io.File
@@ -35,7 +38,10 @@ class MainController : Initializable {
 	@FXML lateinit var newRowButton: Button
 	@FXML lateinit var stackPane: StackPane
 	@FXML lateinit var hourlyWageField: TextField
+	@FXML lateinit var monthlyWageText: Text
+	@FXML lateinit var hoursTotalText: Text
 	private lateinit var window: Window
+	private var hourlyWage = 0 // Connect it to the data within the table
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		// Ads the controller to the DataHolder in order to be accessible everywhere
@@ -54,13 +60,28 @@ class MainController : Initializable {
 		stackPane.children.add(DataHolder.maskerPane)
 
 		// Requests focus, scrolls to the end of the table, and sets DataHolder.currentTab upon every tab selection
-		tabPane.selectionModel.selectedIndexProperty().addListener { _, _, newValue ->
+		tabPane.selectionModel.selectedIndexProperty().addListener { _, oldValue, newValue ->
 			DataHolder.currentTab = newValue.toInt()
-			val tableViewController = DataHolder.getCurrentTableViewController()
+
+			// TODO: change listener not working
+			val changeListener: ChangeListener<ObservableList<WorkSession>> = ChangeListener { _, _, sessions ->
+				val hours = sessions.sumBy { it.durationProperty.value.toMinutes().toInt() } / 60.0
+				val monthlyWage = hours * hourlyWage
+
+				hoursTotalText.text = hours.toString()
+				monthlyWageText.text = monthlyWage.toString()
+
+			}
+
+			val oldTab = DataHolder.getTableViewController(oldValue.toInt())
+			oldTab.table.itemsProperty().removeListener(changeListener)
+
+			val newTab = DataHolder.getCurrentTableViewController()
+			newTab.table.itemsProperty().addListener(changeListener)
 			Platform.runLater {
-				tableViewController.table.requestFocus()
-				if (tableViewController.table.items.isNotEmpty()) {
-					tableViewController.table.scrollTo(tableViewController.table.items.count() - 1)
+				newTab.table.requestFocus()
+				if (newTab.table.items.isNotEmpty()) {
+					newTab.table.scrollTo(newTab.table.items.count() - 1)
 				}
 			}
 		}
@@ -72,20 +93,6 @@ class MainController : Initializable {
 
 		// Assigns the variable after it is loaded properly
 		Platform.runLater { window = tabPane.scene.window }
-
-		// Recalculates wages
-		recalculateMonthlyWage()
-	}
-
-	// TODO: recalculate monthly wage
-	fun recalculateMonthlyWage(monthNumber: Int = DataHolder.currentTab) {
-		val month = MemoryData.getMonth(monthNumber)
-
-		var hours = 0.0
-		for (session in month) {
-			hours += session.durationProperty.get().toHours()
-		}
-
 	}
 
 	/**

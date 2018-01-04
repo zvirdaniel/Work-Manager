@@ -26,8 +26,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.*
 
-// TODO: Connect hourly wage to the controller
-
 class TableViewController : Initializable {
 	@FXML lateinit var table: TableView<WorkSession>
 	@FXML lateinit var date: TableColumn<WorkSession, LocalDate>
@@ -82,18 +80,18 @@ class TableViewController : Initializable {
 			}
 
 			override fun fromString(string: String): LocalTime {
-				if (string.contains(':')) {
-					try {
+				try {
+					if (string.contains(':')) {
 						return LocalTime.parse(string, DateTimeFormatter.ofPattern("HH:mm"))
-					} catch (e: DateTimeParseException) {
-						errorNotification("$string není validní čas!")
 					}
-				} else {
-					try {
-						return LocalTime.parse(string, DateTimeFormatter.ofPattern("HH"))
-					} catch (e: DateTimeParseException) {
-						errorNotification("$string není validní čas!")
+
+					if (string.length == 4) {
+						return LocalTime.parse(string, DateTimeFormatter.ofPattern("HHmm"))
 					}
+
+					return LocalTime.parse(string, DateTimeFormatter.ofPattern("HH"))
+				} catch (e: DateTimeParseException) {
+					errorNotification("$string není validní čas!")
 				}
 
 				return LocalTime.now(DataHolder.zone)
