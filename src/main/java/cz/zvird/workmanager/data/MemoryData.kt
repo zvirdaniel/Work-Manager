@@ -28,7 +28,14 @@ object MemoryData {
 
 	init {
 		for (i in 1..12) {
-			monthsInMemory[i] = FXCollections.observableArrayList<WorkSession>()
+			/**
+			 * When using listeners on observable lists, they fire events only if something is added or removed within the lists themselves.
+			 * The following lambda specifies which properties of T used in the list should be checked for changes as well. Therefore,
+			 * when user changes something in that specific property, ChangeEvent is fired from the list itself and listeners can catch it.
+			 */
+			monthsInMemory[i] = FXCollections.observableArrayList<WorkSession> {
+				arrayOf(it.durationProperty)
+			}
 		}
 	}
 
@@ -75,6 +82,12 @@ object MemoryData {
 
 					it.filter { it.beginDateProperty.value.year != currentYear }.forEach {
 						it.beginDateProperty.value = it.beginDateProperty.value.withYear(currentYear)
+						changed = true
+					}
+
+					val hourlyWage = it.firstOrNull()?.hourlyWageProperty?.value
+					it.filter { it.hourlyWageProperty.value != hourlyWage }.forEach {
+						it.hourlyWageProperty.value = hourlyWage
 						changed = true
 					}
 

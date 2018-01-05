@@ -29,8 +29,8 @@ class Main : Application() {
 		DataHolder.primaryStage.minHeight = 800.0
 		DataHolder.primaryStage.show()
 
-		// Loads last used file, or a temporary one, after the UI is loaded
 		Platform.runLater {
+			// Loads last used file, or a temporary one, after the UI is loaded
 			BlockedTask {
 				try {
 					MemoryData.reloadCurrentFile(true)
@@ -39,6 +39,8 @@ class Main : Application() {
 					DataFile.load(temporaryFile)
 				}
 			}.run()
+
+			DataHolder.mainController.refreshBottomBarUI()
 		}
 	}
 

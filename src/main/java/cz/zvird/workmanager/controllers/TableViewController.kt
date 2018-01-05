@@ -161,7 +161,6 @@ class TableViewController : Initializable {
 	 * Creates new row with some data, scrolls to the end of the table and selects it
 	 */
 	fun createNewRow() {
-		// TODO: fix hourly wage
 		val session: WorkSession
 		val currentMonth = DataHolder.currentTab + 1
 		val lastSession = table.items.lastOrNull()
@@ -170,14 +169,15 @@ class TableViewController : Initializable {
 			val lastDatePlusOneDay = lastSession.beginDateProperty.get().plusDays(1)
 			if (lastDatePlusOneDay.monthValue == currentMonth) {
 				val lastDateTime = LocalDateTime.of(lastDatePlusOneDay, LocalTime.of(12, 0))
-				session = WorkSession(lastDateTime, 180, 0, lastSession.descriptionProperty.value)
+				session = WorkSession(lastDateTime, 180, lastSession.hourlyWageProperty.value, lastSession.descriptionProperty.value)
 			} else {
 				val lastDate = lastSession.beginDateProperty.get()
 				val lastDateTime = LocalDateTime.of(lastDate, LocalTime.of(12, 0))
-				session = WorkSession(lastDateTime, 180, 0, lastSession.descriptionProperty.value)
+				session = WorkSession(lastDateTime, 180, lastSession.hourlyWageProperty.value, lastSession.descriptionProperty.value)
 			}
 		} else {
 			if (currentMonth == LocalDate.now(DataHolder.zone).monthValue) {
+				// TODO: Change implicit hourly wage for new tabs
 				session = WorkSession(addMinutes = 180, hourlyWage = 0, description = "Doplnit!")
 			} else {
 				val localDate = LocalDate.of(MemoryData.currentYear, currentMonth, 1)

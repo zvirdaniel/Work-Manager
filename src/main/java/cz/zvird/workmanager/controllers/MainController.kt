@@ -5,8 +5,7 @@ import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.gui.*
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
-import javafx.beans.value.ChangeListener
-import javafx.collections.ObservableList
+import javafx.collections.ListChangeListener
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
@@ -14,17 +13,25 @@ import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TabPane
 import javafx.scene.control.TextField
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.StackPane
 import javafx.scene.text.Text
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Window
+import org.jetbrains.kotlin.utils.addToStdlib.sumByLong
 import java.io.File
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.net.URL
+import java.time.Duration
 import java.util.*
 import kotlin.concurrent.thread
 
+// TODO: Change implicit hourly wage for new tabs
+
 /**
- * Controller for the main UI, not containing TableView
+ * Controller for the main UI, not controlling TableView
  */
 class MainController : Initializable {
 	@FXML lateinit var tabPane: TabPane
@@ -38,10 +45,12 @@ class MainController : Initializable {
 	@FXML lateinit var newRowButton: Button
 	@FXML lateinit var stackPane: StackPane
 	@FXML lateinit var hourlyWageField: TextField
-	@FXML lateinit var monthlyWageText: Text
-	@FXML lateinit var hoursTotalText: Text
+	@FXML lateinit var wageText: Text
 	private lateinit var window: Window
-	private var hourlyWage = 0 // Connect it to the data within the table
+
+	private val listChangeListener = ListChangeListener<WorkSession> {
+		refreshBottomBarUI()
+	}
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		// Ads the controller to the DataHolder in order to be accessible everywhere
@@ -55,34 +64,26 @@ class MainController : Initializable {
 		newRowButton.onAction = EventHandler { newRow() }
 		aboutMenu.onAction = EventHandler { showAboutDialog(window) }
 		exportMenu.onAction = EventHandler { exportFileUI() }
+		hourlyWageField.onKeyPressed = EventHandler { hourlyWageKeyPress(it) }
 
 		// MaskerPane is used to block the UI if needed
 		stackPane.children.add(DataHolder.maskerPane)
 
-		// Requests focus, scrolls to the end of the table, and sets DataHolder.currentTab upon every tab selection
+		// Requests focus, scrolls to the end of the table, sets DataHolder.currentTab, and hooks listeners for wage calculation
 		tabPane.selectionModel.selectedIndexProperty().addListener { _, oldValue, newValue ->
 			DataHolder.currentTab = newValue.toInt()
-
-			// TODO: change listener not working
-			val changeListener: ChangeListener<ObservableList<WorkSession>> = ChangeListener { _, _, sessions ->
-				val hours = sessions.sumBy { it.durationProperty.value.toMinutes().toInt() } / 60.0
-				val monthlyWage = hours * hourlyWage
-
-				hoursTotalText.text = hours.toString()
-				monthlyWageText.text = monthlyWage.toString()
-
-			}
-
 			val oldTab = DataHolder.getTableViewController(oldValue.toInt())
-			oldTab.table.itemsProperty().removeListener(changeListener)
-
 			val newTab = DataHolder.getCurrentTableViewController()
-			newTab.table.itemsProperty().addListener(changeListener)
 			Platform.runLater {
 				newTab.table.requestFocus()
 				if (newTab.table.items.isNotEmpty()) {
 					newTab.table.scrollTo(newTab.table.items.count() - 1)
 				}
+
+				refreshBottomBarUI()
+
+				oldTab.table.items.removeListener(listChangeListener)
+				newTab.table.items.addListener(listChangeListener)
 			}
 		}
 
@@ -91,8 +92,72 @@ class MainController : Initializable {
 		tabPane.selectionModel.select(currentMonthIndex)
 		DataHolder.currentTab = currentMonthIndex
 
-		// Assigns the variable after it is loaded properly
-		Platform.runLater { window = tabPane.scene.window }
+		// Assigns the window variable after it is loaded properly, adds a listener to current tab
+		Platform.runLater {
+			window = tabPane.scene.window
+			DataHolder.getCurrentTableViewController().table.items.addListener(listChangeListener)
+		}
+	}
+
+	/**
+	 * Changes the hourlyWage property for all sessions within current tab, and updates the bottom bar UI
+	 */
+	private fun hourlyWageKeyPress(event: KeyEvent) {
+		if (event.code == KeyCode.ENTER) {
+			if (hourlyWageField.text.trim().isEmpty()) {
+				errorNotification("Nebylo zadáno číslo!")
+				return
+			}
+
+			try {
+				val hourlyWage = hourlyWageField.text.toInt()
+				if (hourlyWage <= 0) throw IllegalArgumentException("Hourly wage must be bigger than zero!")
+
+				for (session in DataHolder.getCurrentTableViewController().table.items) {
+					session.hourlyWageProperty.value = hourlyWage
+				}
+
+				informativeNotification("Hodinový plat byl změněn na $hourlyWage Kč")
+				refreshBottomBarUI()
+			} catch (e: NumberFormatException) {
+				errorNotification("${hourlyWageField.text} není celé číslo větší než 0!")
+			}
+		}
+	}
+
+	/**
+	 * Recalculates total time and monthly wage for the current month, and displays it in the bottom bar
+	 */
+	fun refreshBottomBarUI() {
+		val sessions = DataHolder.getCurrentTableViewController().table.items
+		val hourlyWage = sessions.firstOrNull()?.hourlyWageProperty?.value ?: 0
+		// TODO: Use hourly wage from safe variable
+		hourlyWageField.text = hourlyWage.toString()
+		val duration = Duration.ofMinutes(sessions.sumByLong { it.durationProperty.value.toMinutes() })
+		val monthlyWageGross = (hourlyWage * duration.toHours()).toInt()
+		var monthlyWageTaxed = monthlyWageGross
+		var tax = 0
+
+		if (monthlyWageGross > 10000) {
+			val superGrossWage = monthlyWageGross.toDouble() * 1.34
+			val superGrossWageRounded = BigDecimal(superGrossWage / 100.0).setScale(0, RoundingMode.HALF_UP)
+			val incomeTax = superGrossWageRounded.toDouble() * 100.0 * 0.15
+			monthlyWageTaxed = (monthlyWageGross * 0.89 - incomeTax + 2070).toInt()
+			tax = monthlyWageGross - monthlyWageTaxed
+		}
+
+		val monthlyWageText = when (tax) {
+			0 -> "Mzda: $monthlyWageTaxed Kč"
+			else -> "Hrubá mzda: $monthlyWageGross Kč -> Čistá mzda: $monthlyWageTaxed Kč -> Daň: $tax Kč"
+		}
+
+		val hoursText = "Čas celkem: " +
+				duration.toString()
+						.substring(2)
+						.replace("(\\d[HMS])(?!$)".toRegex(), "$1 ")
+						.toLowerCase()
+
+		wageText.text = "$hoursText -> $monthlyWageText"
 	}
 
 	/**
