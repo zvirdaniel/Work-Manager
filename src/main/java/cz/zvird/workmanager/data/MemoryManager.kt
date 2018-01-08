@@ -147,7 +147,7 @@ object MemoryManager {
 	 * @throws com.fasterxml.jackson.databind.JsonMappingException
 	 */
 	fun saveDataToFile(target: File? = null) {
-		val file: File = if (target != null) target else FileManager.retrieve()
+		val file: File = target ?: FileManager.retrieve()
 
 		val months: HashMap<Int, Pair<List<WorkSessionRaw>, Int>> = hashMapOf()
 		for (i in 1..12) {
@@ -170,8 +170,8 @@ object MemoryManager {
 	fun getMonth(monthNumber: Int = DataHolder.currentMonth): WorkMonth {
 		val month = workYear.months[monthNumber]
 
-		if (monthNumber in 1..12 && month != null) {
-			return month
+		return if (monthNumber in 1..12 && month != null) {
+			month
 		} else {
 			throw IllegalArgumentException("Month numbers can only be between 1 and 12!")
 		}

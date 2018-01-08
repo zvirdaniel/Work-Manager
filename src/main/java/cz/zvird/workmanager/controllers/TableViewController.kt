@@ -168,21 +168,21 @@ class TableViewController : Initializable {
 
 		if (lastSession != null) {
 			val lastDatePlusOneDay = lastSession.beginDateProperty.get().plusDays(1)
-			if (lastDatePlusOneDay.monthValue == DataHolder.currentMonth) {
+			session = if (lastDatePlusOneDay.monthValue == DataHolder.currentMonth) {
 				val lastDateTime = LocalDateTime.of(lastDatePlusOneDay, LocalTime.of(12, 0))
-				session = WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
+				WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
 			} else {
 				val lastDate = lastSession.beginDateProperty.get()
 				val lastDateTime = LocalDateTime.of(lastDate, LocalTime.of(12, 0))
-				session = WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
+				WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
 			}
 		} else {
-			if (DataHolder.currentMonth == LocalDate.now(DataHolder.zone).monthValue) {
-				session = WorkSession(addMinutes = 180, description = "Doplnit!")
+			session = if (DataHolder.currentMonth == LocalDate.now(DataHolder.zone).monthValue) {
+				WorkSession(addMinutes = 180, description = "Doplnit!")
 			} else {
 				val localDate = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, 1)
 				val dateTime = LocalDateTime.of(localDate, LocalTime.of(12, 0))
-				session = WorkSession(dateTime, 180, "Doplnit!")
+				WorkSession(dateTime, 180, "Doplnit!")
 			}
 		}
 

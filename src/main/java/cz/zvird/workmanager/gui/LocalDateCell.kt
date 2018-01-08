@@ -207,8 +207,7 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 
 				if (textWithoutSpaces != null && textWithoutSpaces.isNotEmpty()) {
 					val day = textWithoutSpaces.toInt()
-					val date = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, day)
-					return date
+					return LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, day)
 				}
 
 				return null

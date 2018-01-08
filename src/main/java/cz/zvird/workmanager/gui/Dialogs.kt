@@ -23,7 +23,7 @@ import java.time.Year
 fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): Int? {
 	val dialog = TextInputDialog(Year.now(DataHolder.zone).value.toString())
 	dialog.title = "Zadejte rok"
-	dialog.headerText = if (headerText == null) "Zadejte rok" else headerText
+	dialog.headerText = headerText ?: "Zadejte rok"
 	dialog.contentText = "Prosím zadejte rok:"
 
 	ownerWindow?.let { dialog.initOwner(it) }
