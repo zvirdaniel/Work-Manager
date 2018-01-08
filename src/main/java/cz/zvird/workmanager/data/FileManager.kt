@@ -7,7 +7,7 @@ import java.util.prefs.Preferences
 /**
  * Manages currently opened file
  */
-object DataFile {
+object FileManager {
 	private const val LAST_USED_FILE = "last_used_file"
 	private const val FILE_NOT_EXISTS = "file_not_exists"
 	private var currentFile: File? = null
@@ -21,8 +21,8 @@ object DataFile {
 		currentFile = file
 
 		try {
-			MemoryData.reloadCurrentFile(validate)
-			Preferences.userNodeForPackage(DataFile::class.java).put(LAST_USED_FILE, file.absolutePath)
+			MemoryManager.fileRefresh(validate)
+			Preferences.userNodeForPackage(FileManager::class.java).put(LAST_USED_FILE, file.absolutePath)
 		} catch (e: Exception) {
 			currentFile = lastFile
 			throw e
@@ -40,7 +40,7 @@ object DataFile {
 			return file
 		}
 
-		val lastUsedPath = Preferences.userNodeForPackage(DataFile::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
+		val lastUsedPath = Preferences.userNodeForPackage(FileManager::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
 		if (lastUsedPath == FILE_NOT_EXISTS) { // If there is no last used file, create temporary one
 			currentFile = new()
 			return retrieve()
@@ -58,11 +58,11 @@ object DataFile {
 	 */
 	fun save(target: File? = null) {
 		if (target != null) {
-			MemoryData.saveDataToFile(target)
+			MemoryManager.saveDataToFile(target)
 			load(target)
 		}
 
-		MemoryData.saveDataToFile()
+		MemoryManager.saveDataToFile()
 	}
 
 	/**
@@ -74,7 +74,7 @@ object DataFile {
 	 */
 	fun new(target: File? = null, year: Int = Year.now(DataHolder.zone).value): File {
 		val file: File = target ?: File.createTempFile("TemporaryWorkYear", ".json")
-		MemoryData.saveBlankFile(file, year)
+		MemoryManager.saveBlankFile(file, year)
 		return file
 	}
 }

@@ -1,7 +1,7 @@
 package cz.zvird.workmanager.controllers
 
 import cz.zvird.workmanager.data.DataHolder
-import cz.zvird.workmanager.data.MemoryData
+import cz.zvird.workmanager.data.MemoryManager
 import cz.zvird.workmanager.gui.LocalDateCell
 import cz.zvird.workmanager.gui.errorNotification
 import cz.zvird.workmanager.models.WorkSession
@@ -66,6 +66,8 @@ class TableViewController : Initializable {
 	private fun commitHandlers() {
 		date.onEditCommit = EventHandler { it.rowValue.beginDateProperty.value = it.newValue }
 		description.onEditCommit = EventHandler { it.rowValue.descriptionProperty.value = it.newValue }
+		duration.onEditCommit = EventHandler { it.rowValue.durationProperty.value = it.newValue }
+		time.onEditCommit = EventHandler { it.rowValue.beginTimeProperty.value = it.newValue }
 	}
 
 	/**
@@ -162,27 +164,25 @@ class TableViewController : Initializable {
 	 */
 	fun createNewRow() {
 		val session: WorkSession
-		val currentMonth = DataHolder.currentTab + 1
 		val lastSession = table.items.lastOrNull()
 
 		if (lastSession != null) {
 			val lastDatePlusOneDay = lastSession.beginDateProperty.get().plusDays(1)
-			if (lastDatePlusOneDay.monthValue == currentMonth) {
+			if (lastDatePlusOneDay.monthValue == DataHolder.currentMonth) {
 				val lastDateTime = LocalDateTime.of(lastDatePlusOneDay, LocalTime.of(12, 0))
-				session = WorkSession(lastDateTime, 180, lastSession.hourlyWageProperty.value, lastSession.descriptionProperty.value)
+				session = WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
 			} else {
 				val lastDate = lastSession.beginDateProperty.get()
 				val lastDateTime = LocalDateTime.of(lastDate, LocalTime.of(12, 0))
-				session = WorkSession(lastDateTime, 180, lastSession.hourlyWageProperty.value, lastSession.descriptionProperty.value)
+				session = WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
 			}
 		} else {
-			if (currentMonth == LocalDate.now(DataHolder.zone).monthValue) {
-				// TODO: Change implicit hourly wage for new tabs
-				session = WorkSession(addMinutes = 180, hourlyWage = 0, description = "Doplnit!")
+			if (DataHolder.currentMonth == LocalDate.now(DataHolder.zone).monthValue) {
+				session = WorkSession(addMinutes = 180, description = "Doplnit!")
 			} else {
-				val localDate = LocalDate.of(MemoryData.currentYear, currentMonth, 1)
+				val localDate = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, 1)
 				val dateTime = LocalDateTime.of(localDate, LocalTime.of(12, 0))
-				session = WorkSession(dateTime, 180, 0, "Doplnit!")
+				session = WorkSession(dateTime, 180, "Doplnit!")
 			}
 		}
 

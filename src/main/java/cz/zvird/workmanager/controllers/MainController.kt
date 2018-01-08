@@ -1,7 +1,8 @@
 package cz.zvird.workmanager.controllers
 
-import cz.zvird.workmanager.data.DataFile
 import cz.zvird.workmanager.data.DataHolder
+import cz.zvird.workmanager.data.FileManager
+import cz.zvird.workmanager.data.MemoryManager
 import cz.zvird.workmanager.gui.*
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
@@ -27,8 +28,6 @@ import java.net.URL
 import java.time.Duration
 import java.util.*
 import kotlin.concurrent.thread
-
-// TODO: Change implicit hourly wage for new tabs
 
 /**
  * Controller for the main UI, not controlling TableView
@@ -113,9 +112,7 @@ class MainController : Initializable {
 				val hourlyWage = hourlyWageField.text.toInt()
 				if (hourlyWage <= 0) throw IllegalArgumentException("Hourly wage must be bigger than zero!")
 
-				for (session in DataHolder.getCurrentTableViewController().table.items) {
-					session.hourlyWageProperty.value = hourlyWage
-				}
+				MemoryManager.getMonth().hourlyWage = hourlyWage
 
 				informativeNotification("Hodinový plat byl změněn na $hourlyWage Kč")
 				refreshBottomBarUI()
@@ -130,8 +127,7 @@ class MainController : Initializable {
 	 */
 	fun refreshBottomBarUI() {
 		val sessions = DataHolder.getCurrentTableViewController().table.items
-		val hourlyWage = sessions.firstOrNull()?.hourlyWageProperty?.value ?: 0
-		// TODO: Use hourly wage from safe variable
+		val hourlyWage = MemoryManager.getMonth().hourlyWage
 		hourlyWageField.text = hourlyWage.toString()
 		val duration = Duration.ofMinutes(sessions.sumByLong { it.durationProperty.value.toMinutes() })
 		val monthlyWageGross = (hourlyWage * duration.toHours()).toInt()
@@ -223,8 +219,8 @@ class MainController : Initializable {
 
 		if (file != null) {
 			try {
-				DataFile.new(file, year)
-				DataFile.load(file)
+				FileManager.new(file, year)
+				FileManager.load(file)
 				savedAsNotification(file.name)
 			} catch (e: Exception) {
 				cantSaveNotification(file.name)
@@ -237,10 +233,10 @@ class MainController : Initializable {
 	 */
 	private fun saveFileUI() {
 		try {
-			DataFile.save()
-			savedAsNotification(DataFile.retrieve().name)
+			FileManager.save()
+			savedAsNotification(FileManager.retrieve().name)
 		} catch (e: Exception) {
-			cantSaveNotification(DataFile.retrieve().name)
+			cantSaveNotification(FileManager.retrieve().name)
 		}
 	}
 
@@ -248,7 +244,7 @@ class MainController : Initializable {
 	 * Opens a file selector, and calls the backend function
 	 */
 	private fun saveFileAsUI() {
-		val originalFile = DataFile.retrieve()
+		val originalFile = FileManager.retrieve()
 
 		val file = showSaveFileDialog(title = "Uložit soubor jako...",
 				filters = listOf(ExtensionFilter("JSON", "*.json")),
@@ -261,7 +257,7 @@ class MainController : Initializable {
 
 		if (file != null) {
 			try {
-				DataFile.save(file)
+				FileManager.save(file)
 				savedAsNotification(file.name)
 			} catch (e: Exception) {
 				cantSaveNotification(file.name)
@@ -283,7 +279,7 @@ class MainController : Initializable {
 			Platform.runLater {
 				BlockedTask {
 					try {
-						DataFile.load(file, true)
+						FileManager.load(file, true)
 					} catch (e: Exception) {
 						informativeNotification("Soubor nelze otevřít, nebo není validní.")
 					}

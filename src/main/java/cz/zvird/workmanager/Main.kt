@@ -1,8 +1,8 @@
 package cz.zvird.workmanager
 
-import cz.zvird.workmanager.data.DataFile
 import cz.zvird.workmanager.data.DataHolder
-import cz.zvird.workmanager.data.MemoryData
+import cz.zvird.workmanager.data.FileManager
+import cz.zvird.workmanager.data.MemoryManager
 import cz.zvird.workmanager.gui.BlockedTask
 import javafx.application.Application
 import javafx.application.Platform
@@ -33,10 +33,10 @@ class Main : Application() {
 			// Loads last used file, or a temporary one, after the UI is loaded
 			BlockedTask {
 				try {
-					MemoryData.reloadCurrentFile(true)
+					MemoryManager.fileRefresh(true)
 				} catch (e: Exception) {
-					val temporaryFile = DataFile.new()
-					DataFile.load(temporaryFile)
+					val temporaryFile = FileManager.new()
+					FileManager.load(temporaryFile)
 				}
 			}.run()
 

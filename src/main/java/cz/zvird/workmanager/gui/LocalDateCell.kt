@@ -1,7 +1,7 @@
 package cz.zvird.workmanager.gui
 
 import cz.zvird.workmanager.data.DataHolder
-import cz.zvird.workmanager.data.MemoryData
+import cz.zvird.workmanager.data.MemoryManager
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
 import javafx.scene.control.ContentDisplay
@@ -106,8 +106,8 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 				override fun updateItem(item: LocalDate, empty: Boolean) {
 					super.updateItem(item, empty)
 
-					val currentMonth = Month.of(DataHolder.currentTab + 1)
-					val firstDayOfCurrentMonth = LocalDate.of(MemoryData.currentYear, currentMonth, 1)
+					val currentMonth = Month.of(DataHolder.currentMonth)
+					val firstDayOfCurrentMonth = LocalDate.of(MemoryManager.currentYear, currentMonth, 1)
 					val firstDayOfPreviousMonth = firstDayOfCurrentMonth.minusMonths(1)
 					val lastDayOfPreviousMonth = firstDayOfPreviousMonth.withDayOfMonth(firstDayOfPreviousMonth.lengthOfMonth())
 					val firstDayOfNextMonth = firstDayOfCurrentMonth.plusMonths(1)
@@ -207,7 +207,7 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 
 				if (textWithoutSpaces != null && textWithoutSpaces.isNotEmpty()) {
 					val day = textWithoutSpaces.toInt()
-					val date = LocalDate.of(MemoryData.currentYear, DataHolder.currentTab + 1, day)
+					val date = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, day)
 					return date
 				}
 

@@ -17,8 +17,10 @@ object DataHolder {
 	val zone: ZoneId = ZoneId.systemDefault() // This zone is used in all DateTime/Instant conversions
 	lateinit var primaryStage: Stage // To make primaryStage accessible from everywhere
 	private val tableViewControllers = mutableListOf<TableViewController>() // Contains all controller
-	var currentTab: Int = -1 // Currently selected month, gets changed automatically
+	var currentTab: Int = -1 // Currently selected tab, gets changed automatically
 	lateinit var mainController: MainController // Month controllers need to hook to the main one in order to recalculate wages
+	val currentMonth: Int // Currently selected month, gets changed automatically
+		get() = currentTab + 1
 
 	init {
 		maskerPane.visibleProperty().value = false
@@ -44,7 +46,7 @@ object DataHolder {
 
 		if (tableViewControllers.count() == 12) {
 			tableViewControllers.forEachIndexed { i, c ->
-				c.table.items = MemoryData.getMonth(i + 1)
+				c.table.items = MemoryManager.workYear.months[i + 1]?.sessions
 			}
 
 			tableViewControllers.forEach { c ->
