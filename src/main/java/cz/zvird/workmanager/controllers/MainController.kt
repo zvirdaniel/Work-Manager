@@ -5,6 +5,7 @@ import cz.zvird.workmanager.data.FileManager
 import cz.zvird.workmanager.data.MemoryManager
 import cz.zvird.workmanager.gui.*
 import cz.zvird.workmanager.models.WorkSession
+import cz.zvird.workmanager.models.writeYearInXlsx
 import javafx.application.Platform
 import javafx.collections.ListChangeListener
 import javafx.event.EventHandler
@@ -207,13 +208,14 @@ class MainController : Initializable {
 
 		if (file != null) {
 			val blockedTask = object : BlockedTask({
-				TODO("Not finished!")
+				MemoryManager.writeYearInXlsx(file, monthRange)
 			}) {
 				override fun succeeded() {
 					savedAsNotification(file.name)
 				}
 
 				override fun failed() {
+					this.exception.printStackTrace()
 					cantSaveNotification(file.name)
 				}
 			}
