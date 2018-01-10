@@ -75,6 +75,7 @@ object MemoryManager {
 			monthInMemory?.hourlyWage = workYearFromFile.months[i]?.hourlyWage ?: 0
 		}
 
+		DataHolder.mainController.refreshBottomBarUI()
 		DataHolder.primaryStage.title = "WorkManager - Rok ${MemoryManager.currentYear} - ${file.name}"
 	}
 
@@ -174,6 +175,6 @@ object MemoryManager {
 			month
 		} else {
 			throw IllegalArgumentException("Month numbers can only be between 1 and 12!")
-		}
+		}                                                                           
 	}
 }

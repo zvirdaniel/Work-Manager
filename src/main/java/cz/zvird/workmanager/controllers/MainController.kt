@@ -39,6 +39,7 @@ class MainController : Initializable {
 	@FXML lateinit var saveAsFileMenu: MenuItem
 	@FXML lateinit var newFileMenu: MenuItem
 	@FXML lateinit var aboutMenu: MenuItem
+	@FXML lateinit var clearMonthMenu: MenuItem
 	@FXML lateinit var exportMenu: MenuItem
 	@FXML lateinit var deleteButton: Button
 	@FXML lateinit var newRowButton: Button
@@ -63,6 +64,7 @@ class MainController : Initializable {
 		newRowButton.onAction = EventHandler { newRow() }
 		aboutMenu.onAction = EventHandler { showAboutDialog(window) }
 		exportMenu.onAction = EventHandler { exportFileUI() }
+		clearMonthMenu.onAction = EventHandler { clearCurrentMonth() }
 		hourlyWageField.onKeyPressed = EventHandler { hourlyWageKeyPress(it) }
 
 		// MaskerPane is used to block the UI if needed
@@ -99,6 +101,13 @@ class MainController : Initializable {
 	}
 
 	/**
+	 * Deletes data of the currently selected month
+	 */
+	private fun clearCurrentMonth() {
+		MemoryManager.getMonth().sessions.clear()
+	}
+
+	/**
 	 * Changes the hourlyWage property for all sessions within current tab, and updates the bottom bar UI
 	 */
 	private fun hourlyWageKeyPress(event: KeyEvent) {
@@ -116,7 +125,7 @@ class MainController : Initializable {
 
 				informativeNotification("Hodinový plat byl změněn na $hourlyWage Kč")
 				refreshBottomBarUI()
-			} catch (e: NumberFormatException) {
+			} catch (e: Exception) {
 				errorNotification("${hourlyWageField.text} není celé číslo větší než 0!")
 			}
 		}
@@ -131,20 +140,20 @@ class MainController : Initializable {
 		hourlyWageField.text = hourlyWage.toString()
 		val duration = Duration.ofMinutes(sessions.sumByLong { it.durationProperty.value.toMinutes() })
 		val monthlyWageGross = (hourlyWage * duration.toHours()).toInt()
-		var monthlyWageTaxed = monthlyWageGross
+		var monthlyWage = monthlyWageGross
 		var tax = 0
 
 		if (monthlyWageGross > 10000) {
 			val superGrossWage = monthlyWageGross.toDouble() * 1.34
 			val superGrossWageRounded = BigDecimal(superGrossWage / 100.0).setScale(0, RoundingMode.HALF_UP)
 			val incomeTax = superGrossWageRounded.toDouble() * 100.0 * 0.15
-			monthlyWageTaxed = (monthlyWageGross * 0.89 - incomeTax + 2070).toInt()
-			tax = monthlyWageGross - monthlyWageTaxed
+			monthlyWage = (monthlyWageGross * 0.89 - incomeTax + 2070).toInt()
+			tax = monthlyWageGross - monthlyWage
 		}
 
 		val monthlyWageText = when (tax) {
-			0 -> "Mzda: $monthlyWageTaxed Kč"
-			else -> "Hrubá mzda: $monthlyWageGross Kč -> Čistá mzda: $monthlyWageTaxed Kč -> Daň: $tax Kč"
+			0 -> "Mzda: ${formatWage(monthlyWage)} Kč"
+			else -> "Hrubá mzda: ${formatWage(monthlyWageGross)} Kč -> Čistá mzda: ${formatWage(monthlyWage)} Kč -> Daň: ${formatWage(tax)} Kč"
 		}
 
 		val hoursText = "Čas celkem: " +
@@ -154,6 +163,38 @@ class MainController : Initializable {
 						.toLowerCase()
 
 		wageText.text = "$hoursText -> $monthlyWageText"
+	}
+
+	/**
+	 * @param wage number to format
+	 * @return string containing a number separated every 3 digits with spaces
+	 */
+	private fun formatWage(wage: Int): String {
+		val charArray = wage.toString().toCharArray()
+		val length = charArray.size
+		var groups = length / 3
+		var remainder = length % 3
+
+		var result = ""
+		var index = 0
+
+		while (remainder > 0) {
+			result += charArray[index]
+			index++
+			remainder--
+		}
+
+		while (groups > 0) {
+			result+= ' '
+			groups--
+
+			for (i in 0 until 3) {
+				result += charArray[index]
+				index++
+			}
+		}
+		
+		return result
 	}
 
 	/**

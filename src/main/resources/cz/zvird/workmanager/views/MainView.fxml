@@ -40,6 +40,7 @@
                     </MenuItem>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Ostatní">
+                    <MenuItem fx:id="clearMonthMenu" mnemonicParsing="false" text="Vymazat data aktuálního měsíce" />
                     <MenuItem fx:id="aboutMenu" mnemonicParsing="false" text="Autor..." />
                 </Menu>
             </MenuBar>
