@@ -42,6 +42,9 @@ class Main : Application() {
 
 			DataHolder.mainController.refreshBottomBarUI()
 		}
+
+		DataHolder.getTableViewController().table.requestFocus()
+		Platform.runLater { DataHolder.getTableViewController().table.selectionModel.selectFirst() }
 	}
 
 	/**

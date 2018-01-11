@@ -27,15 +27,10 @@ object DataHolder {
 	}
 
 	/**
-	 * @return controller instance of currently selected month
-	 */
-	fun getCurrentTableViewController() = getTableViewController(currentTab)
-
-	/**
-	 * @param tabIndex which tab should be returned
+	 * @param tabIndex which tab should be returned, implicitly set to the currently selected tab
 	 * @return controller instance of the given tab
 	 */
-	fun getTableViewController(tabIndex: Int) = tableViewControllers[tabIndex]
+	fun getTableViewController(tabIndex: Int = currentTab) = tableViewControllers[tabIndex]
 
 	/**
 	 * Initializes all controllers with data from the DataHolder

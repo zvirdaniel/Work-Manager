@@ -75,7 +75,7 @@ class MainController : Initializable {
 		tabPane.selectionModel.selectedIndexProperty().addListener { _, oldValue, newValue ->
 			DataHolder.currentTab = newValue.toInt()
 			val oldTab = DataHolder.getTableViewController(oldValue.toInt())
-			val newTab = DataHolder.getCurrentTableViewController()
+			val newTab = DataHolder.getTableViewController()
 			Platform.runLater {
 				newTab.table.requestFocus()
 				if (newTab.table.items.isNotEmpty()) {
@@ -97,7 +97,7 @@ class MainController : Initializable {
 		// Assigns the window variable after it is loaded properly, adds a listener to current tab
 		Platform.runLater {
 			window = tabPane.scene.window
-			DataHolder.getCurrentTableViewController().table.items.addListener(listChangeListener)
+			DataHolder.getTableViewController().table.items.addListener(listChangeListener)
 		}
 	}
 
@@ -136,7 +136,7 @@ class MainController : Initializable {
 	 * Recalculates total time and monthly wage for the current month, and displays it in the bottom bar
 	 */
 	fun refreshBottomBarUI() {
-		val sessions = DataHolder.getCurrentTableViewController().table.items
+		val sessions = DataHolder.getTableViewController().table.items
 		val hourlyWage = MemoryManager.getMonth().hourlyWage
 		hourlyWageField.text = hourlyWage.toString()
 		val duration = Duration.ofMinutes(sessions.sumByLong { it.durationProperty.value.toMinutes() })
@@ -228,7 +228,7 @@ class MainController : Initializable {
 	 * Creates a new row in currently opened tab by calling it's controller
 	 */
 	private fun newRow() {
-		val currentTab = DataHolder.getCurrentTableViewController()
+		val currentTab = DataHolder.getTableViewController()
 		currentTab.createNewRow()
 	}
 
@@ -236,7 +236,7 @@ class MainController : Initializable {
 	 * Deletes a row by calling the controller for currently opened tab
 	 */
 	private fun deleteRow() {
-		val currentTab = DataHolder.getCurrentTableViewController()
+		val currentTab = DataHolder.getTableViewController()
 		val currentRow = currentTab.table.selectionModel.selectedItem
 		if (currentRow != null) {
 			currentTab.removeRow(currentRow)

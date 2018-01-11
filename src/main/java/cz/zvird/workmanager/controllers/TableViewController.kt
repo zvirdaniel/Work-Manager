@@ -25,6 +25,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.*
+import kotlin.concurrent.thread
 
 class TableViewController : Initializable {
 	@FXML lateinit var table: TableView<WorkSession>
@@ -33,8 +34,16 @@ class TableViewController : Initializable {
 	@FXML lateinit var duration: TableColumn<WorkSession, Duration>
 	@FXML lateinit var description: TableColumn<WorkSession, String>
 
+	// The following variables are required for the row editor to function properly
+	private enum class EditingState { STARTED, CANCELED, FINISHED }
+	private var dateEditing = EditingState.FINISHED
+	private var timeEditing = EditingState.FINISHED
+	private var durationEditing = EditingState.FINISHED
+	private var descriptionEditing = EditingState.FINISHED
+
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
+		initEditingStateListener()
 		keyHandlers()
 		blankRowCallback()
 		cellValueFactories()
@@ -44,11 +53,32 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Ctrl-N and Delete key handlers
+	 * Changes the variables to save the current state of editor columns, a requirement for row editor
+	 */
+	private fun initEditingStateListener() {
+		date.onEditStart = EventHandler { dateEditing = EditingState.STARTED }
+		date.onEditCancel = EventHandler { dateEditing = EditingState.CANCELED }
+		date.onEditCommit = EventHandler { dateEditing = EditingState.FINISHED }
+
+		time.onEditStart = EventHandler { timeEditing = EditingState.STARTED }
+		time.onEditCancel = EventHandler { timeEditing = EditingState.CANCELED }
+		time.onEditCommit = EventHandler { timeEditing = EditingState.FINISHED }
+
+		duration.onEditStart = EventHandler { durationEditing = EditingState.STARTED }
+		duration.onEditCancel = EventHandler { durationEditing = EditingState.CANCELED }
+		duration.onEditCommit = EventHandler { durationEditing = EditingState.FINISHED }
+
+		description.onEditStart = EventHandler { descriptionEditing = EditingState.STARTED }
+		description.onEditCancel = EventHandler { descriptionEditing = EditingState.CANCELED }
+		description.onEditCommit = EventHandler { descriptionEditing = EditingState.FINISHED }
+	}
+
+	/**
+	 * Ctrl+N, Ctrl+E and Delete key handlers
 	 */
 	private fun keyHandlers() {
 		table.onKeyPressed = EventHandler {
-			if (it.isControlDown && it.code == KeyCode.N && !it.isShiftDown) {
+			if (it.isControlDown && !it.isShiftDown && it.code == KeyCode.N) {
 				createNewRow()
 			}
 
@@ -56,6 +86,10 @@ class TableViewController : Initializable {
 				if (table.selectionModel.selectedItem != null) {
 					removeRow(table.selectionModel.selectedItem)
 				}
+			}
+
+			if (!it.isControlDown && !it.isShiftDown && it.code == KeyCode.ENTER) {
+				editRow()
 			}
 		}
 	}
@@ -190,6 +224,48 @@ class TableViewController : Initializable {
 		Platform.runLater {
 			table.scrollTo(table.items.last())
 			table.selectionModel.select(table.items.last())
+		}
+	}
+
+	// TODO: Finish this
+	private fun editRow() {
+		var run = true
+
+		thread {
+			while (run) {
+				val selectedIndex = table.selectionModel.selectedIndex
+
+				try {
+//					editCell({ table.edit(selectedIndex, date) }, dateEditing)
+					editCell({ table.edit(selectedIndex, time) }, timeEditing)
+					editCell({ table.edit(selectedIndex, duration) }, durationEditing)
+					editCell({ table.edit(selectedIndex, description) }, descriptionEditing)
+				} catch (e: IllegalStateException) {
+					e.printStackTrace()
+					run = false
+				}
+
+				run = false
+			}
+		}
+	}
+
+	/**
+	 * @param body lambda with a function body which should be executed in the JavaFX thread
+	 * @param state to evaluate
+	 * @throws IllegalStateException if state becomes EditingState.CANCELED
+	 */
+	private fun editCell(body: () -> Unit, state: EditingState) {
+		Platform.runLater {
+			body()
+		}
+
+		do {
+			Thread.sleep(100)
+		} while (state == EditingState.STARTED)
+
+		if (state == EditingState.CANCELED) {
+			throw IllegalStateException("This state is not allowed: $state")
 		}
 	}
 }
