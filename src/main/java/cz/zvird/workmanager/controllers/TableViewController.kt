@@ -1,11 +1,13 @@
 package cz.zvird.workmanager.controllers
 
+import cz.zvird.workmanager.controllers.TableViewController.EditingStateHolder.EditingState.*
 import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.data.MemoryManager
 import cz.zvird.workmanager.gui.LocalDateCell
 import cz.zvird.workmanager.gui.errorNotification
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
+import javafx.beans.value.ChangeListener
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
@@ -28,22 +30,19 @@ import java.util.*
 import kotlin.concurrent.thread
 
 class TableViewController : Initializable {
-	@FXML lateinit var table: TableView<WorkSession>
-	@FXML lateinit var date: TableColumn<WorkSession, LocalDate>
-	@FXML lateinit var time: TableColumn<WorkSession, LocalTime>
-	@FXML lateinit var duration: TableColumn<WorkSession, Duration>
-	@FXML lateinit var description: TableColumn<WorkSession, String>
-
-	// The following variables are required for the row editor to function properly
-	private enum class EditingState { STARTED, CANCELED, FINISHED }
-	private var dateEditing = EditingState.FINISHED
-	private var timeEditing = EditingState.FINISHED
-	private var durationEditing = EditingState.FINISHED
-	private var descriptionEditing = EditingState.FINISHED
+	@FXML
+	lateinit var table: TableView<WorkSession>
+	@FXML
+	lateinit var date: TableColumn<WorkSession, LocalDate>
+	@FXML
+	lateinit var time: TableColumn<WorkSession, LocalTime>
+	@FXML
+	lateinit var duration: TableColumn<WorkSession, Duration>
+	@FXML
+	lateinit var description: TableColumn<WorkSession, String>
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
-		initEditingStateListener()
 		keyHandlers()
 		blankRowCallback()
 		cellValueFactories()
@@ -53,28 +52,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Changes the variables to save the current state of editor columns, a requirement for row editor
-	 */
-	private fun initEditingStateListener() {
-		date.onEditStart = EventHandler { dateEditing = EditingState.STARTED }
-		date.onEditCancel = EventHandler { dateEditing = EditingState.CANCELED }
-		date.onEditCommit = EventHandler { dateEditing = EditingState.FINISHED }
-
-		time.onEditStart = EventHandler { timeEditing = EditingState.STARTED }
-		time.onEditCancel = EventHandler { timeEditing = EditingState.CANCELED }
-		time.onEditCommit = EventHandler { timeEditing = EditingState.FINISHED }
-
-		duration.onEditStart = EventHandler { durationEditing = EditingState.STARTED }
-		duration.onEditCancel = EventHandler { durationEditing = EditingState.CANCELED }
-		duration.onEditCommit = EventHandler { durationEditing = EditingState.FINISHED }
-
-		description.onEditStart = EventHandler { descriptionEditing = EditingState.STARTED }
-		description.onEditCancel = EventHandler { descriptionEditing = EditingState.CANCELED }
-		description.onEditCommit = EventHandler { descriptionEditing = EditingState.FINISHED }
-	}
-
-	/**
-	 * Ctrl+N, Ctrl+E and Delete key handlers
+	 * Ctrl+N, Enter and Delete key handlers
 	 */
 	private fun keyHandlers() {
 		table.onKeyPressed = EventHandler {
@@ -89,7 +67,7 @@ class TableViewController : Initializable {
 			}
 
 			if (!it.isControlDown && !it.isShiftDown && it.code == KeyCode.ENTER) {
-				editRow()
+				editCurrentRow()
 			}
 		}
 	}
@@ -223,26 +201,61 @@ class TableViewController : Initializable {
 		table.items.add(session)
 		Platform.runLater {
 			table.scrollTo(table.items.last())
-			table.selectionModel.select(table.items.last())
+			table.requestFocus()
+			table.selectionModel.selectLast()
 		}
 	}
 
-	// TODO: Finish this
-	private fun editRow() {
+
+	/**
+	 * Listener informs the row editor about changes in the current column by editing the state
+	 * @param state to modify when the user makes a change to the column
+	 * @return ChangeListener that can be added or removed from any given observable value
+	 */
+	private fun <T> generateListener(state: EditingStateHolder): ChangeListener<T> = ChangeListener { _, _, _ ->
+		state.value = FINISHED
+	}
+
+	/**
+	 * State can not be stored simply in the enum variable, because just it's value is being passed to the function, not the variable reference,
+	 * therefore those functions can not edit the state. Example: fun (s: State) { s = INIT } will not work, because the reference to the
+	 * variable "s" is not passed, only it's value is. So the function actually attempts something like "INIT = INIT" which does not work.
+	 * The solution is to hold the variable in a class, and pass the class instance to the functions instead.
+	 */
+	private class EditingStateHolder(initial: EditingState) {
+		enum class EditingState { EDITING, CANCELLED, FINISHED }
+
+		var value = initial
+	}
+
+	// TODO: Make it impossible to edit more than one row
+	// TODO: Export dialog with implicitly selected month does not pass the month instance
+
+	/**
+	 * Edits the currently selected row, cell after cell
+	 */
+	private fun editCurrentRow() {
+		val rowIndex = table.selectionModel.selectedIndex
 		var run = true
 
 		thread {
 			while (run) {
-				val selectedIndex = table.selectionModel.selectedIndex
-
 				try {
-//					editCell({ table.edit(selectedIndex, date) }, dateEditing)
-					editCell({ table.edit(selectedIndex, time) }, timeEditing)
-					editCell({ table.edit(selectedIndex, duration) }, durationEditing)
-					editCell({ table.edit(selectedIndex, description) }, descriptionEditing)
+					editCell(rowIndex, date)
+					editCell(rowIndex, time)
+					editCell(rowIndex, duration)
+					editCell(rowIndex, description)
 				} catch (e: IllegalStateException) {
-					e.printStackTrace()
+					println("WARNING: ${e.message}")
 					run = false
+				}
+
+				Thread.sleep(100)
+				Platform.runLater {
+					table.requestFocus()
+					table.selectionModel.select(rowIndex)
+					table.focusModel.focus(rowIndex)
+
 				}
 
 				run = false
@@ -251,21 +264,35 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * @param body lambda with a function body which should be executed in the JavaFX thread
-	 * @param state to evaluate
-	 * @throws IllegalStateException if state becomes EditingState.CANCELED
+	 * @param column specified to edit on a given row
+	 * @param row specified to edit
+	 * @throws IllegalStateException if editing goes on for over 5 seconds
 	 */
-	private fun editCell(body: () -> Unit, state: EditingState) {
+	private fun <T> editCell(row: Int, column: TableColumn<WorkSession, T>) {
+		var time = 0
+		val state = EditingStateHolder(EDITING)
+		val listener = generateListener<T>(state)
+		column.getCellObservableValue(row).addListener(listener)
+
 		Platform.runLater {
-			body()
+			table.selectionModel.select(row, column)
+			table.focusModel.focus(row, column)
+			table.edit(row, column)
 		}
 
 		do {
 			Thread.sleep(100)
-		} while (state == EditingState.STARTED)
+			time += 100
 
-		if (state == EditingState.CANCELED) {
-			throw IllegalStateException("This state is not allowed: $state")
+			if (time >= 5000) {
+				state.value = CANCELLED
+			}
+		} while (state.value == EDITING)
+
+		column.getCellObservableValue(row).removeListener(listener)
+
+		if (state.value == CANCELLED) {
+			throw IllegalStateException("Editing has been cancelled in the column: ${column.text}")
 		}
 	}
 }

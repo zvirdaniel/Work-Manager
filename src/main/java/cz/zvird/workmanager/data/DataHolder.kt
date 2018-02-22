@@ -14,9 +14,9 @@ import java.time.ZoneId
 object DataHolder {
 	var services: HostServices? = null // Used in about dialog to open a link in a web browser
 	val maskerPane = MaskerPane() // Used to block the UI
-	val zone: ZoneId = ZoneId.systemDefault() // This zone is used in all DateTime/Instant conversions
-	lateinit var primaryStage: Stage // To make primaryStage accessible from everywhere
-	private val tableViewControllers = mutableListOf<TableViewController>() // Contains all controller
+	val zone: ZoneId = ZoneId.of("Europe/Prague") // This zone is used in all DateTime/Instant conversions
+	lateinit var primaryStage: Stage // To make primary stage accessible from everywhere
+	private val tableViewControllers = mutableListOf<TableViewController>() // Contains all controllers
 	var currentTab: Int = -1 // Currently selected tab, gets changed automatically
 	lateinit var mainController: MainController // Month controllers need to hook to the main one in order to recalculate wages
 	val currentMonth: Int // Currently selected month, gets changed automatically

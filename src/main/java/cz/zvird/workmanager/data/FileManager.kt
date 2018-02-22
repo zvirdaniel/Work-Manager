@@ -31,7 +31,7 @@ object FileManager {
 	}
 
 	/**
-	 * @return currently opened file (if one is opened), or last used file (if exists) or temporary blank file
+	 * @return currently opened file (if one is opened), or last used file (if exists) or a temporary blank file
 	 */
 	fun retrieve(): File {
 		val file = currentFile
@@ -52,8 +52,8 @@ object FileManager {
 	}
 
 	/**
-	 * Saves all the data into the selected file, implicitly current file
-	 * @param target selected from the UI
+	 * Saves all the data into the selected file
+	 * @param target file to save, implicitly current file
 	 * @throws java.io.IOException if creating blank file failed
 	 */
 	fun save(target: File? = null) {
@@ -66,8 +66,8 @@ object FileManager {
 	}
 
 	/**
-	 * Creates a file in the filesystem, implicitly a temporary one, writes blank data into it, and returns it
-	 * @param target to write blank data into
+	 * Creates a file in the filesystem, writes blank data into it, and returns it
+	 * @param target to write blank data into, implicitly a temporary one
 	 * @param year implicitly set to the current year
 	 * @throws java.io.IOException if creating blank file failed
 	 * @returns created file

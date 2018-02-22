@@ -43,13 +43,13 @@ class ExportDialogController : Initializable {
     }
 
     /**
-     * @return range of months and the file a user selected (can be null)
+     * @return range of months and the selected file (can be null)
      * Converts the UI elements into a Pair<IntRange, File?>
      */
     fun getResult(): Pair<IntRange, File?> {
         val months: IntRange = if (onlyOneMonthCheckbox.isSelected) {
-            val choiceBox: ChoiceBox<*> = monthPane.children[0] as ChoiceBox<*>
-            val selectedMonth = choiceBox.selectionModel.selectedIndex - 1
+            val choiceBox = monthPane.children[0] as ChoiceBox<*>
+            val selectedMonth = choiceBox.selectionModel.selectedIndex + 1
             selectedMonth..selectedMonth
         } else {
             val slider: RangeSlider = monthPane.children[0] as RangeSlider
@@ -116,7 +116,7 @@ class ExportDialogController : Initializable {
     }
 
     /**
-     * Creates a month slider and sets it into anchor pane
+     * Creates a month slider and sets it into an anchor pane
      */
     private fun setAndShowSlider() {
         val slider = RangeSlider(1.0, 12.0, 1.0, 12.0)
@@ -142,7 +142,8 @@ class ExportDialogController : Initializable {
         )
 
         val choiceBox = ChoiceBox<String>(choices)
-        choiceBox.selectionModel.select(Date().toInstant().atZone(DataHolder.zone).toLocalDate().month.value - 1)
+        val currentMonth = Date().toInstant().atZone(DataHolder.zone).toLocalDate().month.value - 1
+        choiceBox.selectionModel.select(currentMonth)
 
         setTopBottomAnchors(choiceBox, 20.0)
 

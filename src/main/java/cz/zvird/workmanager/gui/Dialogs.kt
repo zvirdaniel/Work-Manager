@@ -40,7 +40,7 @@ fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): In
 }
 
 /**
- * @return range of months to export, selected xlsx file to export data into
+ * @return range of months to export, selected xlsx file to export the data into
  */
 fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?> {
 	val loader = FXMLLoader(Main::class.java.getResource("views/ExportDialog.fxml"))
@@ -147,7 +147,7 @@ fun showSaveFileDialog(
 fun showAboutDialog(ownerWindow: Window) {
 	val link = Hyperlink("GitHub")
 	link.onAction = EventHandler {
-		DataHolder.services?.showDocument("https://github.com/zvirdaniel/Work-Manager")
+		DataHolder.services?.showDocument("https://github.com/zvirdaniel/WorkManager")
 	}
 
 	val flow = TextFlow(Text("Chyby pište na"), link)

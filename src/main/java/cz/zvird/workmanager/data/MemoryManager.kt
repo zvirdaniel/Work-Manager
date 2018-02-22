@@ -47,7 +47,7 @@ object MemoryManager {
 		get() = workYear.year
 
 	/**
-	 * Reloads the JSON and displays it, automatically corrects the data structure if needed (without saving)
+	 * Reloads the JSON and displays it, automatically corrects the data structure if needed
 	 * @param validate will check and repair the data structure, shows dialogs to the user if needed
 	 * @throws Exception if parsing or correcting the JSON fails irrecoverably
 	 */
@@ -142,7 +142,7 @@ object MemoryManager {
 
 	/**
 	 * Creates a JSON containing the user data
-	 * @param target to save data into
+	 * @param target to save data into, implicitly currently opened one
 	 * @throws java.io.IOException
 	 * @throws com.fasterxml.jackson.core.JsonGenerationException
 	 * @throws com.fasterxml.jackson.databind.JsonMappingException

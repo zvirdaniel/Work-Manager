@@ -30,8 +30,8 @@ class Main : Application() {
 		DataHolder.primaryStage.show()
 
 		Platform.runLater {
-			// Loads last used file, or a temporary one, after the UI is loaded
 			BlockedTask {
+				// Loads last used file, or a temporary one, after the UI is loaded
 				try {
 					MemoryManager.fileRefresh(true)
 				} catch (e: Exception) {

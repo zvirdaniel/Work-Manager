@@ -54,7 +54,7 @@ class MainController : Initializable {
 	}
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
-		// Ads the controller to the DataHolder in order to be accessible everywhere
+		// Adds the controller to the DataHolder in order to be accessible everywhere
 		DataHolder.mainController = this
 
 		newFileMenu.onAction = EventHandler { newFileUI() }
@@ -86,6 +86,7 @@ class MainController : Initializable {
 
 				oldTab.table.items.removeListener(listChangeListener)
 				newTab.table.items.addListener(listChangeListener)
+				newTab.table.selectionModel.selectLast()
 			}
 		}
 
@@ -94,7 +95,7 @@ class MainController : Initializable {
 		tabPane.selectionModel.select(currentMonthIndex)
 		DataHolder.currentTab = currentMonthIndex
 
-		// Assigns the window variable after it is loaded properly, adds a listener to current tab
+		// Assigns the window variable after it is loaded properly, adds a listener to the current tab
 		Platform.runLater {
 			window = tabPane.scene.window
 			DataHolder.getTableViewController().table.items.addListener(listChangeListener)
@@ -109,7 +110,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Changes the hourlyWage property for all sessions within current tab, and updates the bottom bar UI
+	 * Changes the hourly wage for the current tab, and updates the bottom bar UI
 	 */
 	private fun hourlyWageKeyPress(event: KeyEvent) {
 		if (event.code == KeyCode.ENTER) {
@@ -199,7 +200,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Opens an export dialog (file selector, and month range selector) and calls the backend function
+	 * Opens an export dialog (file selector, and month range selector) and exports the file
 	 */
 	private fun exportFileUI() {
 		val pair = showExportFileDialog(window)
@@ -208,7 +209,7 @@ class MainController : Initializable {
 
 		if (file != null) {
 			val blockedTask = object : BlockedTask({
-				MemoryManager.writeYearInXlsx(file, monthRange)
+				writeYearInXlsx(file, monthRange)
 			}) {
 				override fun succeeded() {
 					savedAsNotification(file.name)
@@ -225,7 +226,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Creates a new row in currently opened tab by calling it's controller
+	 * Creates a new row in currently opened tab by calling its controller
 	 */
 	private fun newRow() {
 		val currentTab = DataHolder.getTableViewController()
@@ -244,7 +245,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Opens a file selector and calls the backend function
+	 * Opens a file selector and creates new file
 	 */
 	private fun newFileUI() {
 		val year = showYearSelectorDialog(window)
@@ -284,12 +285,12 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Opens a file selector, and calls the backend function
+	 * Opens a file selector, and saves the file
 	 */
 	private fun saveFileAsUI() {
 		val originalFile = FileManager.retrieve()
 
-		val file = showSaveFileDialog(title = "Uložit soubor jako...",
+		val file = showSaveFileDialog(title = "Uložit soubor jako",
 				filters = listOf(ExtensionFilter("JSON", "*.json")),
 				initialDir = File(originalFile.parent),
 				initialFileName = originalFile.nameWithoutExtension + " kopie",
@@ -309,7 +310,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Opens a file selector in home directory, calls backend for opening the file itself
+	 * Opens a file selector in home directory and opens the file
 	 */
 	private fun openFileUI() {
 		val file = showOpenFileDialog(

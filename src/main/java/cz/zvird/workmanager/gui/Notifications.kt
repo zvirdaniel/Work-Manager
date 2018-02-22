@@ -4,7 +4,7 @@ import javafx.util.Duration
 import org.controlsfx.control.Notifications
 
 /**
- * Creates a notification informing the user that the fileName cant be saved
+ * Creates a notification informing the user that the file cant be saved
  * @param fileName that will show up in the notification
  */
 fun cantSaveNotification(fileName: String) {

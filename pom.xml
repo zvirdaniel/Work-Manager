@@ -12,28 +12,28 @@
         <!--Kotlin-->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jre8</artifactId>
-            <version>1.2.10</version>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>1.2.21</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
-            <version>1.2.10</version>
+            <version>1.2.21</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
-            <version>1.2.10</version>
+            <version>1.2.21</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-            <version>1.2.10</version>
+            <version>1.2.21</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-maven-plugin</artifactId>
-            <version>1.2.10</version>
+            <version>1.2.21</version>
             <scope>provided</scope>
         </dependency>
         <!--Kotlin end-->
@@ -62,13 +62,7 @@
             <artifactId>poi</artifactId>
             <version>3.17</version>
         </dependency>
-
-        <!--TestNG-->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.11</version>
-        </dependency>
+        
         <!--Jackson for Kotlin-->
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
@@ -89,6 +83,7 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+                <version>1.2.21</version>
                 <configuration>
                     <jvmTarget>1.8</jvmTarget>
                 </configuration>
@@ -112,6 +107,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>compile</id>

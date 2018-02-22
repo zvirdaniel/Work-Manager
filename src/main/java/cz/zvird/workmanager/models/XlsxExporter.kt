@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter
  * @param saveFile file to save all data into, example: result.xlsx
  * @throws IOException if file export fails
  */
-fun MemoryManager.writeYearInXlsx(saveFile: File, monthRange: IntRange) {
+fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 	if (monthRange.start < 1 || monthRange.endInclusive > 12) {
 		throw IllegalArgumentException("Month range must be between 1 and 12!")
 	}
