@@ -40,6 +40,7 @@ class TableViewController : Initializable {
 	lateinit var duration: TableColumn<WorkSession, Duration>
 	@FXML
 	lateinit var description: TableColumn<WorkSession, String>
+	var editing = false
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
@@ -227,38 +228,38 @@ class TableViewController : Initializable {
 
 		var value = initial
 	}
-
-	// TODO: Make it impossible to edit more than one row
-	// TODO: Export dialog with implicitly selected month does not pass the month instance
-
+	
 	/**
 	 * Edits the currently selected row, cell after cell
 	 */
 	private fun editCurrentRow() {
-		val rowIndex = table.selectionModel.selectedIndex
-		var run = true
+		if (!editing) {
+			println("INFO: Editing row ${table.selectionModel.selectedIndex}")
+			val rowIndex = table.selectionModel.selectedIndex
+			editing = true
 
-		thread {
-			while (run) {
-				try {
-					editCell(rowIndex, date)
-					editCell(rowIndex, time)
-					editCell(rowIndex, duration)
-					editCell(rowIndex, description)
-				} catch (e: IllegalStateException) {
-					println("WARNING: ${e.message}")
-					run = false
+			thread {
+				while (editing) {
+					try {
+						editCell(rowIndex, date)
+						editCell(rowIndex, time)
+						editCell(rowIndex, duration)
+						editCell(rowIndex, description)
+
+						Thread.sleep(100)
+						Platform.runLater {
+							table.requestFocus()
+							table.selectionModel.select(rowIndex)
+							table.focusModel.focus(rowIndex)
+
+						}
+					} catch (e: IllegalStateException) {
+						println("WARNING: ${e.message}")
+						editing = false
+					}
+
+					editing = false
 				}
-
-				Thread.sleep(100)
-				Platform.runLater {
-					table.requestFocus()
-					table.selectionModel.select(rowIndex)
-					table.focusModel.focus(rowIndex)
-
-				}
-
-				run = false
 			}
 		}
 	}
@@ -292,7 +293,7 @@ class TableViewController : Initializable {
 		column.getCellObservableValue(row).removeListener(listener)
 
 		if (state.value == CANCELLED) {
-			throw IllegalStateException("Editing has been cancelled in the column: ${column.text}")
+			throw IllegalStateException("Editing has been cancelled in column '${column.text}' on row $row")
 		}
 	}
 }
