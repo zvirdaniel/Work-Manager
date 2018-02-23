@@ -16,7 +16,8 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
 import javafx.scene.control.cell.TextFieldTableCell
-import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyCode.*
+import javafx.scene.input.KeyEvent
 import javafx.util.Callback
 import javafx.util.StringConverter
 import java.net.URL
@@ -40,7 +41,10 @@ class TableViewController : Initializable {
 	lateinit var duration: TableColumn<WorkSession, Duration>
 	@FXML
 	lateinit var description: TableColumn<WorkSession, String>
-	var editing = false
+
+	// The following variables are used in row editor
+	private var isEditing = false
+	private var editingRow = 0
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
@@ -52,25 +56,28 @@ class TableViewController : Initializable {
 		DataHolder.addTableViewController(this)
 	}
 
+
 	/**
 	 * Ctrl+N, Enter and Delete key handlers
 	 */
 	private fun keyHandlers() {
-		table.onKeyPressed = EventHandler {
-			if (it.isControlDown && !it.isShiftDown && it.code == KeyCode.N) {
-				createNewRow()
-			}
-
-			if (it.code == KeyCode.DELETE) {
-				if (table.selectionModel.selectedItem != null) {
+		table.addEventFilter(KeyEvent.KEY_PRESSED, {
+			when {
+				it.code == DELETE && table.selectionModel.selectedItem != null ->
 					removeRow(table.selectionModel.selectedItem)
+
+				it.isControlDown && !it.isShiftDown && it.code == N ->
+					createNewRow()
+
+				!it.isControlDown && !it.isShiftDown && it.code == ENTER -> {
+					editCurrentRow()
+
+					if (editingRow != table.selectionModel.selectedIndex) {
+						it.consume()
+					}
 				}
 			}
-
-			if (!it.isControlDown && !it.isShiftDown && it.code == KeyCode.ENTER) {
-				editCurrentRow()
-			}
-		}
+		})
 	}
 
 	/**
@@ -228,37 +235,37 @@ class TableViewController : Initializable {
 
 		var value = initial
 	}
-	
+
 	/**
 	 * Edits the currently selected row, cell after cell
 	 */
 	private fun editCurrentRow() {
-		if (!editing) {
-			println("INFO: Editing row ${table.selectionModel.selectedIndex}")
-			val rowIndex = table.selectionModel.selectedIndex
-			editing = true
+		if (!isEditing) {
+			editingRow = table.selectionModel.selectedIndex
+			isEditing = true
+			println("INFO: Editing row $editingRow")
 
 			thread {
-				while (editing) {
+				while (isEditing) {
 					try {
-						editCell(rowIndex, date)
-						editCell(rowIndex, time)
-						editCell(rowIndex, duration)
-						editCell(rowIndex, description)
+						editCell(date)
+						editCell(time)
+						editCell(duration)
+						editCell(description)
 
 						Thread.sleep(100)
 						Platform.runLater {
 							table.requestFocus()
-							table.selectionModel.select(rowIndex)
-							table.focusModel.focus(rowIndex)
+							table.selectionModel.select(editingRow)
+							table.focusModel.focus(editingRow)
 
 						}
 					} catch (e: IllegalStateException) {
 						println("WARNING: ${e.message}")
-						editing = false
+						isEditing = false
 					}
 
-					editing = false
+					isEditing = false
 				}
 			}
 		}
@@ -266,19 +273,18 @@ class TableViewController : Initializable {
 
 	/**
 	 * @param column specified to edit on a given row
-	 * @param row specified to edit
 	 * @throws IllegalStateException if editing goes on for over 5 seconds
 	 */
-	private fun <T> editCell(row: Int, column: TableColumn<WorkSession, T>) {
+	private fun <T> editCell(column: TableColumn<WorkSession, T>) {
 		var time = 0
 		val state = EditingStateHolder(EDITING)
 		val listener = generateListener<T>(state)
-		column.getCellObservableValue(row).addListener(listener)
+		column.getCellObservableValue(editingRow).addListener(listener)
 
 		Platform.runLater {
-			table.selectionModel.select(row, column)
-			table.focusModel.focus(row, column)
-			table.edit(row, column)
+			table.selectionModel.select(editingRow, column)
+			table.focusModel.focus(editingRow, column)
+			table.edit(editingRow, column)
 		}
 
 		do {
@@ -290,10 +296,10 @@ class TableViewController : Initializable {
 			}
 		} while (state.value == EDITING)
 
-		column.getCellObservableValue(row).removeListener(listener)
+		column.getCellObservableValue(editingRow).removeListener(listener)
 
 		if (state.value == CANCELLED) {
-			throw IllegalStateException("Editing has been cancelled in column '${column.text}' on row $row")
+			throw IllegalStateException("Editing has been cancelled in column '${column.text}' on row $editingRow")
 		}
 	}
 }
