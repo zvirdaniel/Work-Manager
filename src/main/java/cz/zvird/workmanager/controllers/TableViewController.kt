@@ -56,9 +56,8 @@ class TableViewController : Initializable {
 		DataHolder.addTableViewController(this)
 	}
 
-
 	/**
-	 * Ctrl+N, Enter and Delete key handlers
+	 * Ctrl+N, Enter and Delete key handlers, consumes the Enter key if row editing is in progress
 	 */
 	private fun keyHandlers() {
 		table.addEventFilter(KeyEvent.KEY_PRESSED, {
