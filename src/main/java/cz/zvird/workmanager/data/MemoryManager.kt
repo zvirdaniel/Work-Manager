@@ -118,7 +118,7 @@ object MemoryManager {
 			}
 		}
 
-		if (hasChanged) informativeNotification("Datová struktura opravena")
+		if (hasChanged) informativeNotification("Datová struktura opravena.")
 	}
 
 	/**

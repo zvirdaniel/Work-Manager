@@ -5,6 +5,7 @@ import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.data.MemoryManager
 import cz.zvird.workmanager.gui.LocalDateCell
 import cz.zvird.workmanager.gui.errorNotification
+import cz.zvird.workmanager.gui.informativeNotification
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
@@ -57,7 +58,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Ctrl+N, Enter and Delete key handlers, consumes the Enter key if row editing is in progress
+	 * Ctrl+N, Ctrl+E and Delete key handlers
 	 */
 	private fun keyHandlers() {
 		table.addEventFilter(KeyEvent.KEY_PRESSED, {
@@ -68,13 +69,8 @@ class TableViewController : Initializable {
 				it.isControlDown && !it.isShiftDown && it.code == N ->
 					createNewRow()
 
-				!it.isControlDown && !it.isShiftDown && it.code == ENTER -> {
+				it.isControlDown && !it.isShiftDown && it.code == E ->
 					editCurrentRow()
-
-					if (editingRow != table.selectionModel.selectedIndex) {
-						it.consume()
-					}
-				}
 			}
 		})
 	}
@@ -236,13 +232,13 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Edits the currently selected row, cell after cell
+	 * Edits the currently selected row (cell after cell), one row at a time
 	 */
 	private fun editCurrentRow() {
 		if (!isEditing) {
 			editingRow = table.selectionModel.selectedIndex
 			isEditing = true
-			println("INFO: Editing row $editingRow")
+			informativeNotification("Úprava řádku $editingRow začala.")
 
 			thread {
 				while (isEditing) {
@@ -261,7 +257,6 @@ class TableViewController : Initializable {
 						}
 					} catch (e: IllegalStateException) {
 						println("WARNING: ${e.message}")
-						isEditing = false
 					}
 
 					isEditing = false
@@ -269,6 +264,7 @@ class TableViewController : Initializable {
 			}
 		}
 	}
+
 
 	/**
 	 * @param column specified to edit on a given row

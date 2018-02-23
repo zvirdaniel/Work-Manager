@@ -42,11 +42,13 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 	override fun startEdit() {
 		super.startEdit()
 		contentDisplay = ContentDisplay.GRAPHIC_ONLY
-		datePicker.requestFocus()
 
 		thread(start = true, isDaemon = false, block = {
-			Thread.sleep(100)
-			Platform.runLater { datePicker.editor.selectAll() }
+			Thread.sleep(125)
+			Platform.runLater {
+				datePicker.requestFocus()
+				datePicker.editor.selectAll()
+			}
 		})
 	}
 
@@ -79,7 +81,7 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 			datePicker.value = item
 			text = dateToFancyString(item)
 			graphic = datePicker
-			contentDisplay = ContentDisplay.TEXT_ONLY // TEXT_ONLY should be set when not editing
+			contentDisplay = ContentDisplay.TEXT_ONLY
 		}
 	}
 
@@ -146,8 +148,8 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 		}
 
 		/**
-		 * The JavaFX platform has a bug (fixed in Java 9), which does not commit value of its TextField when pressing the ENTER key
-		 * This fixes the problem, it overrides default behaviour when pressing the ENTER key in the TextField
+		 * The JavaFX platform has a bug, which does not commit value of its TextField when pressing the ENTER key
+		 * This fixes the problem, it overrides default behaviour when pressing the ENTER key in a TextField
 		 */
 		datePicker.addEventFilter(KeyEvent.KEY_PRESSED, {
 			if (it.code == KeyCode.ENTER) {

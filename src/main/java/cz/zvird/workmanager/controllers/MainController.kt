@@ -125,7 +125,7 @@ class MainController : Initializable {
 
 				MemoryManager.getMonth().hourlyWage = hourlyWage
 
-				informativeNotification("Hodinový plat byl změněn na $hourlyWage Kč")
+				informativeNotification("Hodinový plat byl změněn na $hourlyWage Kč.")
 				refreshBottomBarUI()
 			} catch (e: Exception) {
 				errorNotification("${hourlyWageField.text} není celé číslo větší než 0!")
