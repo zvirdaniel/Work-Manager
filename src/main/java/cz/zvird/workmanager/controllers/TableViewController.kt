@@ -70,7 +70,10 @@ class TableViewController : Initializable {
 					createNewRow()
 
 				it.isControlDown && !it.isShiftDown && it.code == E ->
-					editCurrentRow()
+					editCurrentRow(false)
+
+				it.isControlDown && !it.isShiftDown && it.code == F ->
+					editCurrentRow(true)
 			}
 		})
 	}
@@ -125,6 +128,7 @@ class TableViewController : Initializable {
 
 			override fun fromString(string: String): Duration {
 				try {
+					// TODO: Add hour manipulation
 					val minutes = string.toLong()
 					return Duration.ofMinutes(minutes)
 				} catch (e: NumberFormatException) {
@@ -233,8 +237,9 @@ class TableViewController : Initializable {
 
 	/**
 	 * Edits the currently selected row (cell after cell), one row at a time
+	 * @param fast whether to skip editing date
 	 */
-	private fun editCurrentRow() {
+	private fun editCurrentRow(fast: Boolean) {
 		if (!isEditing) {
 			editingRow = table.selectionModel.selectedIndex
 			isEditing = true
@@ -243,7 +248,7 @@ class TableViewController : Initializable {
 			thread {
 				while (isEditing) {
 					try {
-						editCell(date)
+						if (!fast) editCell(date)
 						editCell(time)
 						editCell(duration)
 						editCell(description)
@@ -264,8 +269,6 @@ class TableViewController : Initializable {
 			}
 		}
 	}
-
-	// TODO: Implement time editing
 
 	/**
 	 * @param column specified to edit on a given row
