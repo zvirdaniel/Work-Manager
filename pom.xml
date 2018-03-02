@@ -8,27 +8,31 @@
     <artifactId>WorkManager</artifactId>
     <version>RELEASE</version>
 
+    <properties>
+        <kotlin-version>1.2.30</kotlin-version>
+    </properties>
+
     <dependencies>
         <!--Kotlin-->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>1.2.21</version>
+            <version>${kotlin-version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
-            <version>1.2.21</version>
+            <version>${kotlin-version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-            <version>1.2.21</version>
+            <version>${kotlin-version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-maven-plugin</artifactId>
-            <version>1.2.21</version>
+            <version>${kotlin-version}</version>
             <scope>provided</scope>
         </dependency>
         <!--Kotlin end-->
@@ -78,7 +82,7 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <version>1.2.21</version>
+                <version>${kotlin-version}</version>
                 <configuration>
                     <jvmTarget>1.8</jvmTarget>
                 </configuration>

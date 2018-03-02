@@ -265,6 +265,7 @@ class TableViewController : Initializable {
 		}
 	}
 
+	// TODO: Implement time editing
 
 	/**
 	 * @param column specified to edit on a given row

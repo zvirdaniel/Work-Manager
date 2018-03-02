@@ -24,14 +24,23 @@ class Main : Application() {
 		val css = javaClass.getResource("views/Main.css").toExternalForm()
 		root.stylesheets.add(css)
 
-		DataHolder.primaryStage.scene = Scene(root, 1280.0, 800.0)
-		DataHolder.primaryStage.minWidth = 1280.0
-		DataHolder.primaryStage.minHeight = 800.0
+		DataHolder.primaryStage.scene = Scene(root, 960.0, 600.0)
+		DataHolder.primaryStage.minWidth = 960.0
+		DataHolder.primaryStage.minHeight = 600.0
 		DataHolder.primaryStage.show()
 
+		initializeData()
+
+		DataHolder.getTableViewController().table.requestFocus()
+		Platform.runLater { DataHolder.getTableViewController().table.selectionModel.selectFirst() }
+	}
+
+	/**
+	 * Loads last used file, or creates and loads a temporary one, after the UI is loaded
+	 */
+	private fun initializeData() {
 		Platform.runLater {
 			BlockedTask {
-				// Loads last used file, or a temporary one, after the UI is loaded
 				try {
 					MemoryManager.fileRefresh(true)
 				} catch (e: Exception) {
@@ -42,9 +51,6 @@ class Main : Application() {
 
 			DataHolder.mainController.refreshBottomBarUI()
 		}
-
-		DataHolder.getTableViewController().table.requestFocus()
-		Platform.runLater { DataHolder.getTableViewController().table.selectionModel.selectFirst() }
 	}
 
 	/**
