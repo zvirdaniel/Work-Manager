@@ -128,11 +128,18 @@ class TableViewController : Initializable {
 
 			override fun fromString(string: String): Duration {
 				try {
-					// TODO: Add hour manipulation
+					if (string.contains("h", true)) {
+						val substr = string.substringBeforeLast('h').trim()
+						val hours = substr.toLong()
+						return Duration.ofHours(hours)
+					}
+
 					val minutes = string.toLong()
 					return Duration.ofMinutes(minutes)
 				} catch (e: NumberFormatException) {
-					errorNotification("$string není validní počet minut! Pouze celé čísla.")
+					errorNotification("$string není validní stup! Povolené formáty jsou:\n" +
+							"150 => 150 minut\n" +
+							"2h => 2 hodiny")
 				}
 
 				return Duration.ofMinutes(30)
