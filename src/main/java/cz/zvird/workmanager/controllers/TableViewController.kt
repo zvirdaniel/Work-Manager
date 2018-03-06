@@ -31,17 +31,16 @@ import java.time.format.DateTimeParseException
 import java.util.*
 import kotlin.concurrent.thread
 
+// TODO: Save dialog when exiting if changes were made
+// TODO: Fix committing the same value over again
+// TODO: Stop cell editing after successful commit
+
 class TableViewController : Initializable {
-	@FXML
-	lateinit var table: TableView<WorkSession>
-	@FXML
-	lateinit var date: TableColumn<WorkSession, LocalDate>
-	@FXML
-	lateinit var time: TableColumn<WorkSession, LocalTime>
-	@FXML
-	lateinit var duration: TableColumn<WorkSession, Duration>
-	@FXML
-	lateinit var description: TableColumn<WorkSession, String>
+	@FXML lateinit var table: TableView<WorkSession>
+	@FXML lateinit var date: TableColumn<WorkSession, LocalDate>
+	@FXML lateinit var time: TableColumn<WorkSession, LocalTime>
+	@FXML lateinit var duration: TableColumn<WorkSession, Duration>
+	@FXML lateinit var description: TableColumn<WorkSession, String>
 
 	// The following variables are used in row editor
 	private var isEditing = false
@@ -58,7 +57,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Ctrl+N, Ctrl+E and Delete key handlers
+	 * Ctrl+N, Ctrl+E, Ctrl+T and Delete key handlers
 	 */
 	private fun keyHandlers() {
 		table.addEventFilter(KeyEvent.KEY_PRESSED, {
@@ -72,7 +71,7 @@ class TableViewController : Initializable {
 				it.isControlDown && !it.isShiftDown && it.code == E ->
 					editCurrentRow(false)
 
-				it.isControlDown && !it.isShiftDown && it.code == F ->
+				it.isControlDown && !it.isShiftDown && it.code == T ->
 					editCurrentRow(true)
 			}
 		})
@@ -255,10 +254,10 @@ class TableViewController : Initializable {
 			thread {
 				while (isEditing) {
 					try {
-						if (!fast) editCell(date)
-						editCell(time)
-						editCell(duration)
-						editCell(description)
+						if (!fast) editCell(date, 5000)
+						editCell(time, 8000)
+						editCell(duration, 5000)
+						editCell(description, 20000)
 
 						Thread.sleep(100)
 						Platform.runLater {
@@ -279,31 +278,46 @@ class TableViewController : Initializable {
 
 	/**
 	 * @param column specified to edit on a given row
-	 * @throws IllegalStateException if editing goes on for over 5 seconds
+	 * @param terminateInMilliseconds when to terminate editing
+	 * @throws IllegalStateException if editing goes on over specified time
 	 */
-	private fun <T> editCell(column: TableColumn<WorkSession, T>) {
-		var time = 0
+	private fun <T> editCell(column: TableColumn<WorkSession, T>, terminateInMilliseconds: Int) {
+		// ProgressBar initialization
+		val progressBar = DataHolder.mainController.progress
+		progressBar.visibleProperty().value = true
+
+		// State management
 		val state = EditingStateHolder(EDITING)
 		val listener = generateListener<T>(state)
 		column.getCellObservableValue(editingRow).addListener(listener)
 
+		// User interface management
 		Platform.runLater {
 			table.selectionModel.select(editingRow, column)
 			table.focusModel.focus(editingRow, column)
 			table.edit(editingRow, column)
+			progressBar.progressProperty().value = 0.0
 		}
 
+		// Progress management
+		var timeInMilliseconds = 0
 		do {
-			Thread.sleep(100)
-			time += 100
+			Thread.sleep(50)
+			timeInMilliseconds += 50
 
-			if (time >= 5000) {
+			Platform.runLater {
+				progressBar.progressProperty().value = (timeInMilliseconds / (terminateInMilliseconds / 100.0)) / 100.0
+			}
+
+			if (timeInMilliseconds >= terminateInMilliseconds) {
 				state.value = CANCELLED
 			}
 		} while (state.value == EDITING)
+		Thread.sleep(100)
 
+		// Termination
 		column.getCellObservableValue(editingRow).removeListener(listener)
-
+		progressBar.visibleProperty().value = false
 		if (state.value == CANCELLED) {
 			throw IllegalStateException("Editing has been cancelled in column '${column.text}' on row $editingRow")
 		}

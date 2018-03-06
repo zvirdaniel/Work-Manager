@@ -11,10 +11,7 @@ import javafx.collections.ListChangeListener
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.control.Button
-import javafx.scene.control.MenuItem
-import javafx.scene.control.TabPane
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.layout.StackPane
@@ -47,6 +44,7 @@ class MainController : Initializable {
 	@FXML lateinit var stackPane: StackPane
 	@FXML lateinit var hourlyWageField: TextField
 	@FXML lateinit var wageText: Text
+	@FXML lateinit var progress: ProgressBar
 	private lateinit var window: Window
 
 	private val listChangeListener = ListChangeListener<WorkSession> {
@@ -100,6 +98,9 @@ class MainController : Initializable {
 			window = tabPane.scene.window
 			DataHolder.getTableViewController().table.items.addListener(listChangeListener)
 		}
+
+		// Hide ProgressBar when app launches
+		progress.visibleProperty().value = false
 	}
 
 	/**
@@ -187,7 +188,7 @@ class MainController : Initializable {
 		}
 
 		while (groups > 0) {
-			result+= ' '
+			result += ' '
 			groups--
 
 			for (i in 0 until 3) {
@@ -195,7 +196,7 @@ class MainController : Initializable {
 				index++
 			}
 		}
-		
+
 		return result
 	}
 

@@ -14,112 +14,112 @@
                 <Menu mnemonicParsing="false" text="Soubor">
                     <MenuItem fx:id="newFileMenu" mnemonicParsing="false" text="Nový">
                         <accelerator>
-                            <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+                            <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="DOWN" shortcut="UP"/>
                         </accelerator>
                     </MenuItem>
                     <MenuItem fx:id="openFileMenu" mnemonicParsing="false" text="Otevřít...">
                         <accelerator>
-                            <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                            <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                         </accelerator>
                     </MenuItem>
                     <MenuItem fx:id="saveFileMenu" mnemonicParsing="false" text="Uložit soubor">
                         <accelerator>
-                            <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                            <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                         </accelerator>
                     </MenuItem>
                     <MenuItem fx:id="saveAsFileMenu" mnemonicParsing="false" text="Uložit jako...">
                         <accelerator>
-                            <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+                            <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP"/>
                         </accelerator>
                     </MenuItem>
                 </Menu>
                 <Menu fx:id="exportMenu" mnemonicParsing="false" text="Export">
                     <MenuItem mnemonicParsing="false" text="XLSX Tabulka">
                         <accelerator>
-                            <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                            <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                         </accelerator>
                     </MenuItem>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Ostatní">
-                    <MenuItem fx:id="clearMonthMenu" mnemonicParsing="false" text="Vymazat data aktuálního měsíce" />
-                    <MenuItem fx:id="aboutMenu" mnemonicParsing="false" text="Autor..." />
+                    <MenuItem fx:id="clearMonthMenu" mnemonicParsing="false" text="Vymazat data aktuálního měsíce"/>
+                    <MenuItem fx:id="aboutMenu" mnemonicParsing="false" text="Autor..."/>
                 </Menu>
             </MenuBar>
         </top>
         <center>
             <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
                 <Tab closable="false" text="Leden">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Únor">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Březen">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Duben">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Květen">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Červen">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Červenec">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Srpen">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Září">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Říjen">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Listopad">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
                 <Tab closable="false" text="Prosinec">
-                    <fx:include source="TableView.fxml" />
+                    <fx:include source="TableView.fxml"/>
                 </Tab>
             </TabPane>
         </center>
-      <bottom>
-          <AnchorPane BorderPane.alignment="CENTER">
-              <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0"
-                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                  <AnchorPane prefHeight="200.0" prefWidth="960.0">
-                      <Text fx:id="wageText" accessibleText="Mzda je počítána z celých dokončených hodin." strokeType="OUTSIDE"
-                            strokeWidth="0.0" text="Zpracování..." wrappingWidth="930.0" AnchorPane.bottomAnchor="5.0"
-                            AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0"/>
-                  </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                      <ButtonBar buttonMinWidth="50.0" maxHeight="40.0" minHeight="40.0" prefWidth="100.0"
-                                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                 AnchorPane.topAnchor="0.0">
-                          <buttons>
-                              <Label maxWidth="100.0" minWidth="100.0" prefHeight="20.0" text="Hodinový plat:"
-                                     ButtonBar.buttonData="LEFT">
-                                  <font>
-                                      <Font size="15.0"/>
-                                  </font>
-                              </Label>
-                              <TextField fx:id="hourlyWageField" maxWidth="120.0" minWidth="120.0" prefWidth="120.0"
-                                         promptText="číslo větší nule" ButtonBar.buttonData="LEFT"/>
-                              <Button fx:id="newRowButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0"
-                                      text="Nový řádek" ButtonBar.buttonData="RIGHT"/>
-                              <Button fx:id="deleteButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0"
-                                      text="Odstranit" ButtonBar.buttonData="RIGHT"/>
-                          </buttons>
-                          <padding>
-                              <Insets left="10.0" right="10.0"/>
-                          </padding>
-                      </ButtonBar>
-                  </AnchorPane>
-              </VBox>
-          </AnchorPane>
-      </bottom>
+        <bottom>
+            <AnchorPane BorderPane.alignment="CENTER">
+                <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0"
+                      AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <AnchorPane prefHeight="200.0" prefWidth="960.0">
+                        <Text fx:id="wageText" accessibleText="Mzda je počítána z celých dokončených hodin." strokeType="OUTSIDE"
+                              strokeWidth="0.0" text="Zpracování..." wrappingWidth="930.0" AnchorPane.bottomAnchor="5.0"
+                              AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0"/>
+                    </AnchorPane>
+                    <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                        <ButtonBar buttonMinWidth="50.0" maxHeight="40.0" minHeight="40.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0"
+                                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <buttons>
+                                <Label maxWidth="100.0" minWidth="100.0" prefHeight="20.0" text="Hodinový plat:"
+                                       ButtonBar.buttonData="LEFT">
+                                    <font>
+                                        <Font size="15.0"/>
+                                    </font>
+                                </Label>
+                                <TextField fx:id="hourlyWageField" maxWidth="120.0" minWidth="120.0" prefWidth="120.0"
+                                           promptText="číslo větší nule" ButtonBar.buttonData="LEFT"/>
+                                <ProgressBar fx:id="progress" prefWidth="200.0"/>
+                                <Button fx:id="newRowButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Nový řádek"
+                                        ButtonBar.buttonData="RIGHT"/>
+                                <Button fx:id="deleteButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Odstranit"
+                                        ButtonBar.buttonData="RIGHT"/>
+                            </buttons>
+                            <padding>
+                                <Insets left="10.0" right="10.0"/>
+                            </padding>
+                        </ButtonBar>
+                    </AnchorPane>
+                </VBox>
+            </AnchorPane>
+        </bottom>
     </BorderPane>
 </StackPane>
