@@ -34,6 +34,8 @@ import kotlin.concurrent.thread
 // TODO: Save dialog when exiting if changes were made
 // TODO: Fix committing the same value over again
 // TODO: Stop cell editing after successful commit
+// TODO: Inspect current usage of thread, and possible future usages of it across the project (XLSX exporting)
+// TODO: Block shortcuts when exporting a xlsx
 
 class TableViewController : Initializable {
 	@FXML lateinit var table: TableView<WorkSession>

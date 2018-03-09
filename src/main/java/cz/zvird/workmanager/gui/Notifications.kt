@@ -1,5 +1,6 @@
 package cz.zvird.workmanager.gui
 
+import cz.zvird.workmanager.data.DataHolder
 import javafx.util.Duration
 import org.controlsfx.control.Notifications
 
@@ -9,7 +10,7 @@ import org.controlsfx.control.Notifications
  */
 fun cantSaveNotification(fileName: String) {
 	Notifications.create()
-			.title("WorkManager")
+			.title(DataHolder.appTitle)
 			.text("Soubor nelze uložit jako $fileName.")
 			.hideAfter(Duration(4000.0))
 			.showError()
@@ -21,7 +22,7 @@ fun cantSaveNotification(fileName: String) {
  */
 fun savedAsNotification(fileName: String) {
 	Notifications.create()
-			.title("WorkManager")
+			.title(DataHolder.appTitle)
 			.text("Soubor uložen jako $fileName.")
 			.hideAfter(Duration(4000.0))
 			.showInformation()
@@ -33,7 +34,7 @@ fun savedAsNotification(fileName: String) {
  */
 fun informativeNotification(text: String) {
 	Notifications.create()
-			.title("WorkManager")
+			.title(DataHolder.appTitle)
 			.text(text)
 			.hideAfter(Duration(4000.0))
 			.showInformation()
@@ -45,7 +46,7 @@ fun informativeNotification(text: String) {
  */
 fun errorNotification(message: String) {
 	Notifications.create()
-			.title("WorkManager")
+			.title(DataHolder.appTitle)
 			.text(message)
 			.hideAfter(Duration(4000.0))
 			.showError()

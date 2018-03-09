@@ -12,6 +12,7 @@ import java.time.ZoneId
  * Holds static variables accessible everywhere
  */
 object DataHolder {
+	val appTitle = "Work Manager"
 	var services: HostServices? = null // Used in about dialog to open a link in a web browser
 	val maskerPane = MaskerPane() // Used to block the UI
 	val zone: ZoneId = ZoneId.of("Europe/Prague") // This zone is used in all DateTime/Instant conversions

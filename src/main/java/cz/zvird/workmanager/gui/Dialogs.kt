@@ -147,7 +147,7 @@ fun showSaveFileDialog(
 fun showAboutDialog(ownerWindow: Window) {
 	val link = Hyperlink("GitHub")
 	link.onAction = EventHandler {
-		DataHolder.services?.showDocument("https://github.com/zvirdaniel/WorkManager")
+		DataHolder.services?.showDocument("https://github.com/zvirdaniel/Work-Manager")
 	}
 
 	val flow = TextFlow(Text("Chyby pište na"), link)
