@@ -35,7 +35,7 @@ import kotlin.concurrent.thread
 // TODO: Fix committing the same value over again
 // TODO: Stop cell editing after successful commit
 // TODO: Inspect current usage of thread, and possible future usages of it across the project (XLSX exporting)
-// TODO: Block shortcuts when exporting a xlsx
+// TODO: Start session and stop session buttons
 
 class TableViewController : Initializable {
 	@FXML lateinit var table: TableView<WorkSession>
@@ -50,7 +50,7 @@ class TableViewController : Initializable {
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
-		keyHandlers()
+		addKeyboardHandlers()
 		blankRowCallback()
 		cellValueFactories()
 		cellFactories()
@@ -59,9 +59,9 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Ctrl+N, Ctrl+E, Ctrl+T and Delete key handlers
+	 * Adds Ctrl+N, Ctrl+E, Ctrl+T and Delete key handlers
 	 */
-	private fun keyHandlers() {
+	private fun addKeyboardHandlers() {
 		table.addEventFilter(KeyEvent.KEY_PRESSED, {
 			when {
 				it.code == DELETE && table.selectionModel.selectedItem != null ->
