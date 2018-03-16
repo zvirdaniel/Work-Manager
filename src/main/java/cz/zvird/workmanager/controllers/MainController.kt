@@ -204,7 +204,7 @@ class MainController : Initializable {
 	 * Opens an export dialog (file selector, and month range selector) and exports the file
 	 */
 	private fun exportFileUI() {
-		val pair = showExportFileDialog(window)
+		val pair = showExportFileDialog(window) ?: return // Terminates exporting if dialog was closed with the cancel button
 		val monthRange = pair.first
 		val file = pair.second
 
@@ -267,6 +267,7 @@ class MainController : Initializable {
 				FileManager.new(file, year)
 				FileManager.load(file)
 				savedAsNotification(file.name)
+				MemoryManager.isChanged = false
 			} catch (e: Exception) {
 				cantSaveNotification(file.name)
 			}
@@ -280,6 +281,7 @@ class MainController : Initializable {
 		try {
 			FileManager.save()
 			savedAsNotification(FileManager.retrieve().name)
+			MemoryManager.isChanged = false
 		} catch (e: Exception) {
 			cantSaveNotification(FileManager.retrieve().name)
 		}
@@ -304,6 +306,7 @@ class MainController : Initializable {
 			try {
 				FileManager.save(file)
 				savedAsNotification(file.name)
+				MemoryManager.isChanged = false
 			} catch (e: Exception) {
 				cantSaveNotification(file.name)
 			}
@@ -325,6 +328,7 @@ class MainController : Initializable {
 				BlockedTask {
 					try {
 						FileManager.load(file, true)
+						MemoryManager.isChanged = false
 					} catch (e: Exception) {
 						informativeNotification("Soubor nelze otevřít, nebo není validní.")
 					}

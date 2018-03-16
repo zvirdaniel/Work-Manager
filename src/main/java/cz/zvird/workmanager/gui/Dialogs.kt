@@ -40,9 +40,9 @@ fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): In
 }
 
 /**
- * @return range of months to export, selected xlsx file to export the data into
+ * @return null if dialog was canceled, Pair with range of months to export and the selected file otherwise
  */
-fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?> {
+fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?>? {
 	val loader = FXMLLoader(Main::class.java.getResource("views/ExportDialog.fxml"))
 	val controller = ExportDialogController()
 	loader.setController(controller)
@@ -55,7 +55,8 @@ fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?> {
 
 	// Add buttons
 	val exportButtonType = ButtonType("Export", ButtonBar.ButtonData.OK_DONE)
-	dialog.dialogPane.buttonTypes.addAll(ButtonType.CANCEL, exportButtonType)
+	val cancelButtonType = ButtonType("Zrušit", ButtonBar.ButtonData.CANCEL_CLOSE)
+	dialog.dialogPane.buttonTypes.addAll(cancelButtonType, exportButtonType)
 
 	// Pass export button to controller, button can be pressed only after a file has been selected
 	val exportButton = dialog.dialogPane.lookupButton(exportButtonType)
@@ -68,11 +69,21 @@ fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?> {
 	dialog.initOwner(ownerWindow)
 	dialog.initModality(Modality.WINDOW_MODAL)
 
+	// Callback handles the values returned by the dialog
 	dialog.resultConverter = Callback {
-		controller.getResult()
+		if (it == exportButtonType) {
+			controller.getResult()
+		} else {
+			null
+		}
 	}
 
-	return dialog.showAndWait().get()
+	val result = dialog.showAndWait()
+	return if (result.isPresent) {
+		result.get()
+	} else {
+		null
+	}
 }
 
 /**

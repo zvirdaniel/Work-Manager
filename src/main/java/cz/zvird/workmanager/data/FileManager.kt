@@ -27,7 +27,6 @@ object FileManager {
 			currentFile = lastFile
 			throw e
 		}
-
 	}
 
 	/**

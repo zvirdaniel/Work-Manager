@@ -14,10 +14,16 @@ import java.io.File
 import java.time.Year
 
 /**
- * Manages the data in memory, and handles file interaction using the FileManager
+ * Manages the data in memory, and handles file interaction
  */
 object MemoryManager {
 	internal val workYear: WorkYear
+
+	var isChanged: Boolean = false
+		set(value) {
+			field = value
+			println(value)
+		}
 
 	init {
 		val months = hashMapOf<Int, WorkMonth>()

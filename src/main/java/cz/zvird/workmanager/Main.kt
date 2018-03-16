@@ -12,6 +12,14 @@ import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 
+// TODO: Save dialog when exiting if changes were made
+// TODO: Fix committing the same value over again
+// TODO: Stop cell editing after successful commit
+// TODO: Inspect current usage of thread, and possible future usages of it across the project (XLSX exporting)
+// TODO: Start session and stop session buttons
+// TODO: Implement Wage Calculator into the app
+// TODO: Make tax calculation variables editable
+
 class Main : Application() {
 	override fun start(stage: Stage) {
 		DataHolder.primaryStage = stage

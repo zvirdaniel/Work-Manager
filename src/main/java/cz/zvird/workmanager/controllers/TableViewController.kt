@@ -31,12 +31,6 @@ import java.time.format.DateTimeParseException
 import java.util.*
 import kotlin.concurrent.thread
 
-// TODO: Save dialog when exiting if changes were made
-// TODO: Fix committing the same value over again
-// TODO: Stop cell editing after successful commit
-// TODO: Inspect current usage of thread, and possible future usages of it across the project (XLSX exporting)
-// TODO: Start session and stop session buttons
-
 class TableViewController : Initializable {
 	@FXML lateinit var table: TableView<WorkSession>
 	@FXML lateinit var date: TableColumn<WorkSession, LocalDate>
