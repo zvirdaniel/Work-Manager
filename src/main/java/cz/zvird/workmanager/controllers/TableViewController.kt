@@ -198,14 +198,11 @@ class TableViewController : Initializable {
 				WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
 			}
 		} else {
-			session = if (DataHolder.currentMonth == LocalDate.now(DataHolder.zone).monthValue) {
-				WorkSession(addMinutes = 180, description = "Doplnit!")
-			} else {
-				val localDate = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, 1)
-				val dateTime = LocalDateTime.of(localDate, LocalTime.of(12, 0))
-				WorkSession(dateTime, 180, "Doplnit!")
-			}
+			val localDate = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, 1)
+			val dateTime = LocalDateTime.of(localDate, LocalTime.of(12, 0))
+			session = WorkSession(dateTime, 180, "Doplnit!")
 		}
+
 
 		table.items.add(session)
 		Platform.runLater {
