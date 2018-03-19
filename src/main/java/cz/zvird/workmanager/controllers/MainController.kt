@@ -69,22 +69,26 @@ class MainController : Initializable {
 		// MaskerPane is used to block the UI if needed
 		stackPane.children.add(DataHolder.maskerPane)
 
-		// Requests focus, scrolls to the end of the table, sets DataHolder.currentTab, and hooks listeners for wage calculation
+		// Requests focus, scrolls to the end of the table, hooks listeners for wage calculation, and sorts all data by its first column
 		tabPane.selectionModel.selectedIndexProperty().addListener { _, oldValue, newValue ->
 			DataHolder.currentTab = newValue.toInt()
 			val oldTab = DataHolder.getTableViewController(oldValue.toInt())
 			val newTab = DataHolder.getTableViewController()
 			Platform.runLater {
-				newTab.table.requestFocus()
-				if (newTab.table.items.isNotEmpty()) {
-					newTab.table.scrollTo(newTab.table.items.count() - 1)
+				val newTable = newTab.table
+
+				sortTableByFirstColumn(newTable)
+
+				newTable.requestFocus()
+				if (newTable.items.isNotEmpty()) {
+					newTable.scrollTo(newTable.items.count() - 1)
 				}
 
 				refreshBottomBarUI()
 
 				oldTab.table.items.removeListener(listChangeListener)
-				newTab.table.items.addListener(listChangeListener)
-				newTab.table.selectionModel.selectLast()
+				newTable.items.addListener(listChangeListener)
+				newTable.selectionModel.selectLast()
 			}
 		}
 
@@ -99,8 +103,33 @@ class MainController : Initializable {
 			DataHolder.getTableViewController().table.items.addListener(listChangeListener)
 		}
 
-		// Hide ProgressBar when app launches
+		// Hides the ProgressBar on application initialization
 		progress.visibleProperty().value = false
+
+		// Waits until the app launches and is fully visible (i.e. with data loaded) and sorts the table
+		thread {
+			val tableView = DataHolder.getTableViewController().table
+			while (!tableView.isFocused || !tableView.isVisible) {
+				Thread.sleep(100)
+			}
+
+			Thread.sleep(100)
+			Platform.runLater {
+				sortTableByFirstColumn()
+			}
+		}
+	}
+
+	/**
+	 * Removes previous sorting properties of the given table view, and sorts all data in ascending order by its first column
+	 * @param tableView to sort, implicitly the currently opened table view
+	 */
+	fun sortTableByFirstColumn(tableView: TableView<WorkSession> = DataHolder.getTableViewController().table) {
+		val sortColumn = tableView.columns.first()
+		sortColumn.sortType = TableColumn.SortType.ASCENDING
+		tableView.sortOrder.clear()
+		tableView.sortOrder.add(sortColumn)
+		tableView.sort()
 	}
 
 	/**

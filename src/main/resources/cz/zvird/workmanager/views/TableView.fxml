@@ -5,7 +5,7 @@
 <AnchorPane xmlns="http://javafx.com/javafx/8.0.151" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.zvird.workmanager.controllers.TableViewController">
      <TableView fx:id="table" editable="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <columns>
-             <TableColumn fx:id="date" maxWidth="140.0" minWidth="140.0" text="Datum" />
+             <TableColumn fx:id="date" maxWidth="140.0" minWidth="140.0" text="Datum"/>
              <TableColumn fx:id="time" maxWidth="120.0" minWidth="120.0" text="Začátek práce" />
              <TableColumn fx:id="duration" maxWidth="120.0" minWidth="120.0" text="Celkový čas" />
              <TableColumn fx:id="description" prefWidth="100.0" sortable="false" text="Popis práce" />
