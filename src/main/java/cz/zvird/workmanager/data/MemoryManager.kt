@@ -113,8 +113,8 @@ object MemoryManager {
 					hasChanged = true
 				}
 
-				it.filter { it.beginDateProperty.value.year != currentYear }.forEach {
-					it.beginDateProperty.value = it.beginDateProperty.value.withYear(currentYear)
+				it.filter { it.beginDateProperty.value.year != yearToValidate.year }.forEach {
+					it.beginDateProperty.value = it.beginDateProperty.value.withYear(yearToValidate.year)
 					hasChanged = true
 				}
 

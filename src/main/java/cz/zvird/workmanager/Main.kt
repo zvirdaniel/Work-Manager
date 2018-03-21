@@ -20,7 +20,6 @@ import javafx.stage.Stage
 // TODO: Implement Wage Calculator into the app
 // TODO: Make tax calculation variables editable
 // TODO: Mask the UI when opening a file
-// TODO: Data structure repair does not work when reopening last used file, but notification shows
 
 class Main : Application() {
 	override fun start(stage: Stage) {
