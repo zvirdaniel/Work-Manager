@@ -1,6 +1,7 @@
 package cz.zvird.workmanager.gui
 
 import cz.zvird.workmanager.data.DataHolder
+import javafx.application.Platform
 import javafx.concurrent.Task
 import javafx.event.EventHandler
 import javafx.scene.input.KeyEvent
@@ -51,6 +52,10 @@ class BlockedTask(private val body: () -> Unit) {
 	}
 
 	init {
+		if (!Platform.isFxApplicationThread()) {
+			throw IllegalThreadStateException("BlockedTask has to run on the JavaFX thread!")
+		}
+
 		disableKeyboardShortcuts()
 		DataHolder.maskerPane.progressProperty().bind(task.progressProperty())
 		DataHolder.maskerPane.textProperty().bind(task.messageProperty())
