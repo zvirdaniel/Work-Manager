@@ -273,8 +273,14 @@ class MainController : Initializable {
 	 * Opens a file selector and creates new file
 	 */
 	private fun newFileUI() {
-		val year = showYearSelectorDialog(window)
+		val string = showYearSelectorDialog(window)
 
+		if (string == null) {
+			informativeNotification("Vytváření souboru přerušeno uživatelem.")
+			return
+		}
+
+		val year = string.toIntOrNull()
 		if (year == null || year <= 0) {
 			errorNotification("Špatně zadaný rok!")
 			return

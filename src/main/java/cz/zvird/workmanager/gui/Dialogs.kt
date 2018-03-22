@@ -21,7 +21,7 @@ import java.time.Year
  * Shows text input dialog to enter a year
  * @return integer, or null if user entered wrong values
  */
-fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): Int? = safeCall {
+fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): String? = safeCall {
 	val dialog = TextInputDialog(Year.now(DataHolder.zone).value.toString())
 	dialog.title = "Zadejte rok"
 	dialog.headerText = headerText ?: "Zadejte rok"
@@ -30,14 +30,21 @@ fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): In
 	ownerWindow?.let { dialog.initOwner(it) }
 	dialog.initModality(Modality.WINDOW_MODAL)
 
-	val result = dialog.showAndWait()
-
-	var year: Int? = null
-	result?.ifPresent {
-		year = it.toIntOrNull()
+	// Callback handles the values returned by the dialog
+	dialog.resultConverter = Callback {
+		if (it.buttonData == ButtonType.OK.buttonData) {
+			dialog.editor.text
+		} else {
+			null
+		}
 	}
 
-	year // return here
+	val result = dialog.showAndWait()
+	if (result.isPresent) {
+		result.get() // return here
+	} else {
+		null // return here
+	}
 }
 
 /**
