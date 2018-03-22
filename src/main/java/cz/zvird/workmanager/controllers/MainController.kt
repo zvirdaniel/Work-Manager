@@ -238,20 +238,15 @@ class MainController : Initializable {
 		val file = pair.second
 
 		if (file != null) {
-			val blockedTask = object : BlockedTask({
-				writeYearInXlsx(file, monthRange)
-			}) {
-				override fun succeeded() {
+			BlockedTask {
+				try {
+					writeYearInXlsx(file, monthRange)
 					savedAsNotification(file.name)
-				}
-
-				override fun failed() {
-					this.exception.printStackTrace()
+				} catch (e: Exception) {
+					e.printStackTrace()
 					cantSaveNotification(file.name)
 				}
 			}
-
-			thread { blockedTask.run() }
 		}
 	}
 
@@ -292,13 +287,15 @@ class MainController : Initializable {
 				ownerWindow = window)
 
 		if (file != null) {
-			try {
-				FileManager.new(file, year)
-				FileManager.load(file)
-				savedAsNotification(file.name)
-				MemoryManager.isChanged = false
-			} catch (e: Exception) {
-				cantSaveNotification(file.name)
+			BlockedTask {
+				try {
+					FileManager.new(file, year)
+					FileManager.load(file)
+					savedAsNotification(file.name)
+					MemoryManager.isChanged = false
+				} catch (e: Exception) {
+					cantSaveNotification(file.name)
+				}
 			}
 		}
 	}
@@ -307,12 +304,14 @@ class MainController : Initializable {
 	 * Saves the file and notifies the user
 	 */
 	private fun saveFileUI() {
-		try {
-			FileManager.save()
-			savedAsNotification(FileManager.retrieve().name)
-			MemoryManager.isChanged = false
-		} catch (e: Exception) {
-			cantSaveNotification(FileManager.retrieve().name)
+		BlockedTask {
+			try {
+				FileManager.save()
+				savedAsNotification(FileManager.retrieve().name)
+				MemoryManager.isChanged = false
+			} catch (e: Exception) {
+				cantSaveNotification(FileManager.retrieve().name)
+			}
 		}
 	}
 
@@ -332,12 +331,14 @@ class MainController : Initializable {
 
 
 		if (file != null) {
-			try {
-				FileManager.save(file)
-				savedAsNotification(file.name)
-				MemoryManager.isChanged = false
-			} catch (e: Exception) {
-				cantSaveNotification(file.name)
+			BlockedTask {
+				try {
+					FileManager.save(file)
+					savedAsNotification(file.name)
+					MemoryManager.isChanged = false
+				} catch (e: Exception) {
+					cantSaveNotification(file.name)
+				}
 			}
 		}
 	}
@@ -353,15 +354,13 @@ class MainController : Initializable {
 		)
 
 		if (file != null) {
-			Platform.runLater {
-				BlockedTask {
-					try {
-						FileManager.load(file, true)
-						MemoryManager.isChanged = false
-					} catch (e: Exception) {
-						informativeNotification("Soubor nelze otevřít, nebo není validní.")
-					}
-				}.run()
+			BlockedTask {
+				try {
+					FileManager.load(file, true)
+					MemoryManager.isChanged = false
+				} catch (e: Exception) {
+					informativeNotification("Soubor nelze otevřít, nebo není validní.")
+				}
 			}
 		}
 	}

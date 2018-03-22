@@ -8,6 +8,7 @@ import cz.zvird.workmanager.models.WorkMonth
 import cz.zvird.workmanager.models.WorkSession
 import cz.zvird.workmanager.models.WorkSessionRaw
 import cz.zvird.workmanager.models.WorkYear
+import cz.zvird.workmanager.safeCall
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import java.io.File
@@ -22,7 +23,7 @@ object MemoryManager {
 	var isChanged: Boolean = false
 		set(value) {
 			field = value
-			println(value)
+			println("Memory - is changed: $field")
 		}
 
 	init {
@@ -81,9 +82,11 @@ object MemoryManager {
 			monthInMemory?.hourlyWage = workYearFromFile.months[i]?.hourlyWage ?: 0
 		}
 
-		DataHolder.mainController.refreshBottomBarUI()
-		DataHolder.primaryStage.title = "${DataHolder.appTitle} - Rok ${MemoryManager.currentYear} - ${file.name}"
-		DataHolder.mainController.sortTableByFirstColumn()
+		safeCall {
+			DataHolder.mainController.refreshBottomBarUI()
+			DataHolder.primaryStage.title = "${DataHolder.appTitle} - Rok ${MemoryManager.currentYear} - ${file.name}"
+			DataHolder.mainController.sortTableByFirstColumn()
+		}
 	}
 
 	/**
@@ -93,8 +96,7 @@ object MemoryManager {
 	private fun validateAndRepair(yearToValidate: WorkYear) {
 		if (yearToValidate.year <= 0) {
 			val newYear = showYearSelectorDialog(
-					DataHolder.primaryStage.scene.window,
-					"Korekce dat"
+					DataHolder.primaryStage.scene.window, "Korekce dat"
 			)
 
 			if (newYear == null || newYear <= 0) {
@@ -125,7 +127,9 @@ object MemoryManager {
 			}
 		}
 
-		if (hasChanged) informativeNotification("Datová struktura opravena.")
+		if (hasChanged) {
+			informativeNotification("Datová struktura opravena.")
+		}
 	}
 
 	/**
@@ -182,6 +186,6 @@ object MemoryManager {
 			month
 		} else {
 			throw IllegalArgumentException("Month numbers can only be between 1 and 12!")
-		}                                                                           
+		}
 	}
 }

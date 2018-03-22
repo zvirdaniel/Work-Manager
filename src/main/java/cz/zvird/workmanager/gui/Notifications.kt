@@ -1,6 +1,7 @@
 package cz.zvird.workmanager.gui
 
 import cz.zvird.workmanager.data.DataHolder
+import cz.zvird.workmanager.safeCall
 import javafx.util.Duration
 import org.controlsfx.control.Notifications
 
@@ -9,11 +10,13 @@ import org.controlsfx.control.Notifications
  * @param fileName that will show up in the notification
  */
 fun cantSaveNotification(fileName: String) {
-	Notifications.create()
-			.title(DataHolder.appTitle)
-			.text("Soubor nelze uložit jako $fileName.")
-			.hideAfter(Duration(4000.0))
-			.showError()
+	safeCall {
+		Notifications.create()
+				.title(DataHolder.appTitle)
+				.text("Soubor nelze uložit jako $fileName.")
+				.hideAfter(Duration(4000.0))
+				.showError()
+	}
 }
 
 /**
@@ -21,11 +24,13 @@ fun cantSaveNotification(fileName: String) {
  * @param fileName that will show up in the notification
  */
 fun savedAsNotification(fileName: String) {
-	Notifications.create()
-			.title(DataHolder.appTitle)
-			.text("Soubor uložen jako $fileName.")
-			.hideAfter(Duration(4000.0))
-			.showInformation()
+	safeCall {
+		Notifications.create()
+				.title(DataHolder.appTitle)
+				.text("Soubor uložen jako $fileName.")
+				.hideAfter(Duration(4000.0))
+				.showInformation()
+	}
 }
 
 /**
@@ -33,11 +38,13 @@ fun savedAsNotification(fileName: String) {
  * @param text that will show up in the notification
  */
 fun informativeNotification(text: String) {
-	Notifications.create()
-			.title(DataHolder.appTitle)
-			.text(text)
-			.hideAfter(Duration(4000.0))
-			.showInformation()
+	safeCall {
+		Notifications.create()
+				.title(DataHolder.appTitle)
+				.text(text)
+				.hideAfter(Duration(4000.0))
+				.showInformation()
+	}
 }
 
 /**
@@ -45,9 +52,11 @@ fun informativeNotification(text: String) {
  * @param message that will show up in the notification
  */
 fun errorNotification(message: String) {
-	Notifications.create()
-			.title(DataHolder.appTitle)
-			.text(message)
-			.hideAfter(Duration(4000.0))
-			.showError()
+	safeCall {
+		Notifications.create()
+				.title(DataHolder.appTitle)
+				.text(message)
+				.hideAfter(Duration(4000.0))
+				.showError()
+	}
 }

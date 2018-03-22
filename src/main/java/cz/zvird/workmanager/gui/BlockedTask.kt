@@ -4,12 +4,13 @@ import cz.zvird.workmanager.data.DataHolder
 import javafx.concurrent.Task
 import javafx.event.EventHandler
 import javafx.scene.input.KeyEvent
+import kotlin.concurrent.thread
 
 /**
- * Executes body while blocking keyboard input, and the entire UI using MaskerPane
- * @param body function reference
+ * Executes body in the background thread, while blocking the keyboard input and the entire UI using the MaskerPane object
+ * @param body function reference, will be executed in a different thread
  */
-open class BlockedTask(private val body: () -> Unit) : Task<Unit>() {
+class BlockedTask(private val body: () -> Unit) {
 	// Event consumer has to be stored in a variable, in order to be able to remove the reference
 	private val consumer = EventHandler<KeyEvent> { it.consume() }
 
@@ -27,30 +28,34 @@ open class BlockedTask(private val body: () -> Unit) : Task<Unit>() {
 		DataHolder.primaryStage.removeEventFilter(KeyEvent.ANY, consumer)
 	}
 
+	private val task = object : Task<Unit>() {
+		override fun done() {
+			DataHolder.maskerPane.progressProperty().unbind()
+			DataHolder.maskerPane.textProperty().unbind()
+			DataHolder.maskerPane.visibleProperty().unbind()
+			DataHolder.maskerPane.visibleProperty().value = false
+			enableKeyboardShortcuts()
+		}
+
+		override fun call() {
+			updateMessage("Probíhá zpracování")
+
+			body()
+
+			updateMessage("Zpracování dokončeno")
+			updateProgress(100, 100)
+			Thread.sleep(500)
+
+			return
+		}
+	}
+
 	init {
 		disableKeyboardShortcuts()
-		DataHolder.maskerPane.progressProperty().bind(this.progressProperty())
-		DataHolder.maskerPane.textProperty().bind(this.messageProperty())
-		DataHolder.maskerPane.visibleProperty().bind(this.runningProperty())
-	}
+		DataHolder.maskerPane.progressProperty().bind(task.progressProperty())
+		DataHolder.maskerPane.textProperty().bind(task.messageProperty())
+		DataHolder.maskerPane.visibleProperty().bind(task.runningProperty())
 
-	override fun done() {
-		DataHolder.maskerPane.progressProperty().unbind()
-		DataHolder.maskerPane.textProperty().unbind()
-		DataHolder.maskerPane.visibleProperty().unbind()
-		DataHolder.maskerPane.visibleProperty().value = false
-		enableKeyboardShortcuts()
-	}
-
-	override fun call() {
-		updateMessage("Probíhá zpracování")
-
-		body()
-
-		Thread.sleep(1000)
-		updateMessage("Zpracování dokončeno")
-		updateProgress(100, 100)
-
-		return
+		thread { task.run() }
 	}
 }

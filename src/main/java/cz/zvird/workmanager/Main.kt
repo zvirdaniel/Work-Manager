@@ -19,7 +19,8 @@ import javafx.stage.Stage
 // TODO: Start session and stop session buttons
 // TODO: Implement Wage Calculator into the app
 // TODO: Make tax calculation variables editable
-// TODO: Mask the UI when opening a file
+// TODO: BUG - Pressing cancel on new file dialog should not trigger an error
+// TODO: Check cancel pressing on the year repair dialog
 
 class Main : Application() {
 	override fun start(stage: Stage) {
@@ -48,18 +49,16 @@ class Main : Application() {
 	 * Loads last used file, or creates and loads a temporary one, after the UI is loaded
 	 */
 	private fun initializeData() {
-		Platform.runLater {
-			BlockedTask {
-				try {
-					MemoryManager.fileRefresh(true)
-				} catch (e: Exception) {
-					val temporaryFile = FileManager.new()
-					FileManager.load(temporaryFile)
-				}
-			}.run()
-
-			DataHolder.mainController.refreshBottomBarUI()
+		BlockedTask {
+			try {
+				MemoryManager.fileRefresh(true)
+			} catch (e: Exception) {
+				val temporaryFile = FileManager.new()
+				FileManager.load(temporaryFile)
+			}
 		}
+
+		DataHolder.mainController.refreshBottomBarUI()
 	}
 
 	/**
@@ -82,4 +81,22 @@ class Main : Application() {
 
 fun main(args: Array<String>) {
 	Application.launch(Main::class.java, *args)
+}
+
+/**
+ * Checks if the current thread is equal to the JavaFX thread, and if not, wraps the function call in the Platform.runLater call
+ * @param function to execute
+ * @return value returned by the function
+ */
+fun <T> safeCall(function: () -> T): T? {
+	if (Platform.isFxApplicationThread()) {
+		return function()
+	}
+
+	var result: T? = null
+	Platform.runLater {
+		result = function()
+	}
+
+	return result
 }

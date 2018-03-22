@@ -3,6 +3,7 @@ package cz.zvird.workmanager.gui
 import cz.zvird.workmanager.Main
 import cz.zvird.workmanager.controllers.ExportDialogController
 import cz.zvird.workmanager.data.DataHolder
+import cz.zvird.workmanager.safeCall
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.*
@@ -20,7 +21,7 @@ import java.time.Year
  * Shows text input dialog to enter a year
  * @return integer, or null if user entered wrong values
  */
-fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): Int? {
+fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): Int? = safeCall {
 	val dialog = TextInputDialog(Year.now(DataHolder.zone).value.toString())
 	dialog.title = "Zadejte rok"
 	dialog.headerText = headerText ?: "Zadejte rok"
@@ -36,13 +37,13 @@ fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): In
 		year = it.toIntOrNull()
 	}
 
-	return year
+	year // return here
 }
 
 /**
  * @return null if dialog was canceled, Pair with range of months to export and the selected file otherwise
  */
-fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?>? {
+fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?>? = safeCall {
 	val loader = FXMLLoader(Main::class.java.getResource("views/ExportDialog.fxml"))
 	val controller = ExportDialogController()
 	loader.setController(controller)
@@ -79,10 +80,10 @@ fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?>? {
 	}
 
 	val result = dialog.showAndWait()
-	return if (result.isPresent) {
-		result.get()
+	if (result.isPresent) {
+		result.get() // return here
 	} else {
-		null
+		null // return here
 	}
 }
 
@@ -99,7 +100,7 @@ fun showOpenFileDialog(
 		filters: Collection<FileChooser.ExtensionFilter>? = null,
 		initialDir: File = File(System.getProperty("user.home")),
 		ownerWindow: Window? = null
-): File? {
+): File? = safeCall {
 	val chooser = FileChooser()
 	chooser.title = title
 	chooser.initialDirectory = initialDir
@@ -108,7 +109,7 @@ fun showOpenFileDialog(
 		chooser.extensionFilters.addAll(filters)
 	}
 
-	return chooser.showOpenDialog(ownerWindow)
+	chooser.showOpenDialog(ownerWindow) // return here
 }
 
 /**
@@ -128,7 +129,7 @@ fun showSaveFileDialog(
 		initialFileName: String? = null,
 		ownerWindow: Window? = null,
 		extension: String = ""
-): File? {
+): File? = safeCall {
 	val chooser = FileChooser()
 	chooser.title = title
 	chooser.initialDirectory = initialDir
@@ -149,27 +150,29 @@ fun showSaveFileDialog(
 		}
 	}
 
-	return file
+	file // return here
 }
 
 /**
  * Shows about dialog with a GitHub link
  */
 fun showAboutDialog(ownerWindow: Window) {
-	val link = Hyperlink("GitHub")
-	link.onAction = EventHandler {
-		DataHolder.services?.showDocument("https://github.com/zvirdaniel/Work-Manager")
+	safeCall {
+		val link = Hyperlink("GitHub")
+		link.onAction = EventHandler {
+			DataHolder.services?.showDocument("https://github.com/zvirdaniel/Work-Manager")
+		}
+
+		val flow = TextFlow(Text("Chyby pište na"), link)
+
+		val alert = Alert(Alert.AlertType.INFORMATION)
+		alert.title = "Autor"
+		alert.headerText = "Daniel Zvir"
+		alert.dialogPane.content = flow
+
+		ownerWindow.let { alert.initOwner(it) }
+		alert.initModality(Modality.WINDOW_MODAL)
+
+		alert.show()
 	}
-
-	val flow = TextFlow(Text("Chyby pište na"), link)
-
-	val alert = Alert(Alert.AlertType.INFORMATION)
-	alert.title = "Autor"
-	alert.headerText = "Daniel Zvir"
-	alert.dialogPane.content = flow
-
-	ownerWindow.let { alert.initOwner(it) }
-	alert.initModality(Modality.WINDOW_MODAL)
-
-	alert.show()
 }
