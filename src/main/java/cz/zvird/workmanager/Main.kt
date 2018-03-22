@@ -19,8 +19,6 @@ import javafx.stage.Stage
 // TODO: Start session and stop session buttons
 // TODO: Implement Wage Calculator into the app
 // TODO: Make tax calculation variables editable
-// TODO: BUG - Pressing cancel on new file dialog should not trigger an error
-// TODO: Check cancel pressing on the year repair dialog
 
 class Main : Application() {
 	override fun start(stage: Stage) {

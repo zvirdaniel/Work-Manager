@@ -97,7 +97,7 @@ object MemoryManager {
 		if (yearToValidate.year <= 0) {
 			val newYear = showYearSelectorDialog(
 					DataHolder.primaryStage.scene.window, "Korekce dat"
-			)
+			)?.toIntOrNull()
 
 			if (newYear == null || newYear <= 0) {
 				informativeNotification("Špatně zadaný rok, použije se aktuální.")
