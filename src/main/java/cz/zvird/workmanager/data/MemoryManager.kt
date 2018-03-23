@@ -85,7 +85,7 @@ object MemoryManager {
 		safeCall {
 			DataHolder.mainController.refreshBottomBarUI()
 			DataHolder.primaryStage.title = "${DataHolder.appTitle} - Rok ${MemoryManager.currentYear} - ${file.name}"
-			DataHolder.mainController.sortTableByFirstColumn()
+			DataHolder.mainController.sortTableAndFocus()
 		}
 	}
 

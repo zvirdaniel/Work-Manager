@@ -17,8 +17,6 @@ import javafx.stage.Stage
 // TODO: Start session and stop session buttons
 // TODO: Implement Wage Calculator into the app
 // TODO: Make tax calculation variables transparent and editable
-// TODO: Change delete keyboard shortcut, revise ALL other shortcuts (even in event filters)
-// TODO: Pressing enter on the same value in any text field should refocus the given table, row and cell
 
 class Main : Application() {
 	override fun start(stage: Stage) {
@@ -89,7 +87,7 @@ fun <T> safeCall(function: () -> T): T? {
 
 	var result: T? = null
 	Platform.runLater {
-		println("DEBUG: runLater has been used in the safeCall with function")
+		println("DEBUG: runLater has been used in the safeCall")
 		result = function()
 	}
 

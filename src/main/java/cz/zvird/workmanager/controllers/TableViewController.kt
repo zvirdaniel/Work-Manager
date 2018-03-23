@@ -52,17 +52,14 @@ class TableViewController : Initializable {
 	private fun addKeyboardHandlers() {
 		table.addEventFilter(KeyEvent.KEY_PRESSED, {
 			when {
-				it.code == DELETE && table.selectionModel.selectedItem != null ->
+				it.isControlDown && !it.isShiftDown && it.code == DELETE && table.selectionModel.selectedItem != null ->
 					removeRow(table.selectionModel.selectedItem)
 
 				it.isControlDown && !it.isShiftDown && it.code == N ->
 					createNewRow()
 
 				it.isControlDown && !it.isShiftDown && it.code == E ->
-					editCurrentRow(false)
-
-				it.isControlDown && !it.isShiftDown && it.code == T ->
-					editCurrentRow(true)
+					editCurrentRow()
 			}
 		})
 	}
@@ -182,9 +179,8 @@ class TableViewController : Initializable {
 
 	/**
 	 * Edits the currently selected row (cell after cell), one row at a time
-	 * @param fast whether to skip editing date
 	 */
-	private fun editCurrentRow(fast: Boolean) {
+	private fun editCurrentRow() {
 		if (rowEditorActive) {
 			rowEditorActive = false // Terminates any other threads depending on this variable
 		}
@@ -195,7 +191,7 @@ class TableViewController : Initializable {
 		thread {
 			while (rowEditorActive) {
 				try {
-					if (!fast) editCell(date)
+					editCell(date)
 					editCell(time)
 					editCell(duration)
 					editCell(description)

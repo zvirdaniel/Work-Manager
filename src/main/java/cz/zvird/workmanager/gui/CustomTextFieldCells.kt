@@ -70,48 +70,33 @@ fun generateStringTextCell(): TextFieldTableCell<WorkSession, String> = generate
  */
 fun generateDurationTextCell(): TextFieldTableCell<WorkSession, Duration> {
 	val durationConverter = object : StringConverter<Duration>() {
+		var oldString = ""
+		var oldDuration = Duration.ZERO
+
 		override fun toString(duration: Duration): String {
-			return duration.toString()
+			val newString = duration.toString()
 					.substring(2)
 					.replace("(\\d[HMS])(?!$)".toRegex(), "$1 ")
 					.toLowerCase()
+
+			oldString = newString
+			oldDuration = duration
+			return newString
 		}
 
-		override fun fromString(string: String): Duration {
-			try {
-				if (string.contains("h", true) || string.contains('.') || string.contains(',')) {
-					var input = string
-
-					// Possible values at this point are: 4,5h or 4.5h or 4h
-					if (string.contains("h", true)) {
-						input = input.substringBeforeLast('h').trim()
-					}
-
-					// Possible values at this point are: 4,5 or 4.5 or 4
-					if (input.contains(',')) {
-						input = input.replace(',', '.')
-					}
-
-					// Possible values at this point are: 4.5 or 4
-					if (input.contains('.')) {
-						val minutes = input.toDouble() * 60
-						return Duration.ofMinutes(minutes.toLong())
-					}
-
-					val hours = input.toLong()
-					return Duration.ofHours(hours)
-				}
-
-				val minutes = string.toLong()
-				return Duration.ofMinutes(minutes)
-			} catch (e: NumberFormatException) {
-				errorNotification("$string není validní stup! Povolené formáty jsou:\n" +
-						"150 => 150 minut\n" +
-						"2h => 2 hodiny\n" +
-						"2,5h => 2 hodiny 30 minut", 10000.0)
+		override fun fromString(newString: String): Duration {
+			if (oldString == newString) {
+				return oldDuration
 			}
 
-			return Duration.ofMinutes(30)
+			try {
+				val minutes = newString.toLong() * 60.0
+				return Duration.ofMinutes(minutes.toLong())
+			} catch (e: NumberFormatException) {
+				errorNotification("$newString není validní stup!")
+			}
+
+			return Duration.ZERO
 		}
 	}
 

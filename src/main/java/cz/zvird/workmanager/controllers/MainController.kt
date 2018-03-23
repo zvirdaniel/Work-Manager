@@ -78,18 +78,12 @@ class MainController : Initializable {
 			Platform.runLater {
 				val newTable = newTab.table
 
-				sortTableByFirstColumn(newTable)
-
-				newTable.requestFocus()
-				if (newTable.items.isNotEmpty()) {
-					newTable.scrollTo(newTable.items.count() - 1)
-				}
+				sortTableAndFocus(newTable)
 
 				refreshBottomBarUI()
 
 				oldTab.table.items.removeListener(listChangeListener)
 				newTable.items.addListener(listChangeListener)
-				newTable.selectionModel.selectLast()
 			}
 		}
 
@@ -116,21 +110,29 @@ class MainController : Initializable {
 
 			Thread.sleep(100)
 			Platform.runLater {
-				sortTableByFirstColumn()
+				sortTableAndFocus()
 			}
 		}
 	}
 
 	/**
 	 * Removes previous sorting properties of the given table view, and sorts all data in ascending order by its first column
+	 * Requests focus to the last row in the given table, after the sort
 	 * @param tableView to sort, implicitly the currently opened table view
 	 */
-	fun sortTableByFirstColumn(tableView: TableView<WorkSession> = DataHolder.getTableViewController().table) {
+	fun sortTableAndFocus(tableView: TableView<WorkSession> = DataHolder.getTableViewController().table) {
 		val sortColumn = tableView.columns.first()
 		sortColumn.sortType = TableColumn.SortType.ASCENDING
 		tableView.sortOrder.clear()
 		tableView.sortOrder.add(sortColumn)
 		tableView.sort()
+
+		tableView.requestFocus()
+		if (tableView.items.isNotEmpty()) {
+			tableView.scrollTo(tableView.items.count() - 1)
+		}
+
+		tableView.selectionModel.selectLast()
 	}
 
 	/**
