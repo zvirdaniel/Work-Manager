@@ -4,8 +4,9 @@ import cz.zvird.workmanager.controllers.TableViewController.EditingStateHolder.E
 import cz.zvird.workmanager.data.DataHolder
 import cz.zvird.workmanager.data.MemoryManager
 import cz.zvird.workmanager.gui.LocalDateCell
-import cz.zvird.workmanager.gui.errorNotification
-import cz.zvird.workmanager.gui.informativeNotification
+import cz.zvird.workmanager.gui.generateDurationTextCell
+import cz.zvird.workmanager.gui.generateLocalTimeTextCell
+import cz.zvird.workmanager.gui.generateStringTextCell
 import cz.zvird.workmanager.models.WorkSession
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
@@ -16,18 +17,14 @@ import javafx.scene.control.Label
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
-import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.input.KeyCode.*
 import javafx.scene.input.KeyEvent
 import javafx.util.Callback
-import javafx.util.StringConverter
 import java.net.URL
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -37,10 +34,6 @@ class TableViewController : Initializable {
 	@FXML lateinit var time: TableColumn<WorkSession, LocalTime>
 	@FXML lateinit var duration: TableColumn<WorkSession, Duration>
 	@FXML lateinit var description: TableColumn<WorkSession, String>
-
-	// The following variables are used in row editor
-	private var isEditing = false
-	private var editingRow = 0
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
 		table.placeholder = Label("Žádná data k zobrazení. Lze přidat tlačítkem dole, nebo Ctrl + N.")
@@ -87,61 +80,21 @@ class TableViewController : Initializable {
 	 * Responsible for rendering the data contained within each cell for a single column
 	 */
 	private fun cellFactories() {
-		date.cellFactory = Callback { LocalDateCell() }
+		date.cellFactory = Callback {
+			LocalDateCell()
+		}
 
-		time.cellFactory = TextFieldTableCell.forTableColumn(object : StringConverter<LocalTime>() {
-			override fun toString(time: LocalTime): String {
-				return time.format(DateTimeFormatter.ofPattern("HH:mm"))
-			}
+		time.cellFactory = Callback {
+			generateLocalTimeTextCell()
+		}
 
-			override fun fromString(string: String): LocalTime {
-				try {
-					if (string.contains(':')) {
-						return LocalTime.parse(string, DateTimeFormatter.ofPattern("HH:mm"))
-					}
+		duration.cellFactory = Callback {
+			generateDurationTextCell()
+		}
 
-					if (string.length == 4) {
-						return LocalTime.parse(string, DateTimeFormatter.ofPattern("HHmm"))
-					}
-
-					return LocalTime.parse(string, DateTimeFormatter.ofPattern("HH"))
-				} catch (e: DateTimeParseException) {
-					errorNotification("$string není validní čas!")
-				}
-
-				return LocalTime.now(DataHolder.zone)
-			}
-		})
-
-		duration.cellFactory = TextFieldTableCell.forTableColumn(object : StringConverter<Duration>() {
-			override fun toString(duration: Duration): String {
-				return duration.toString()
-						.substring(2)
-						.replace("(\\d[HMS])(?!$)".toRegex(), "$1 ")
-						.toLowerCase()
-			}
-
-			override fun fromString(string: String): Duration {
-				try {
-					if (string.contains("h", true)) {
-						val substr = string.substringBeforeLast('h').trim()
-						val hours = substr.toLong()
-						return Duration.ofHours(hours)
-					}
-
-					val minutes = string.toLong()
-					return Duration.ofMinutes(minutes)
-				} catch (e: NumberFormatException) {
-					errorNotification("$string není validní stup! Povolené formáty jsou:\n" +
-							"150 => 150 minut\n" +
-							"2h => 2 hodiny")
-				}
-
-				return Duration.ofMinutes(30)
-			}
-		})
-
-		description.cellFactory = TextFieldTableCell.forTableColumn()
+		description.cellFactory = Callback {
+			generateStringTextCell()
+		}
 	}
 
 	/**
@@ -187,9 +140,9 @@ class TableViewController : Initializable {
 		val session: WorkSession
 		val lastSession = table.items.lastOrNull()
 
-		if (lastSession != null) {
+		session = if (lastSession != null) {
 			val lastDatePlusOneDay = lastSession.beginDateProperty.get().plusDays(1)
-			session = if (lastDatePlusOneDay.monthValue == DataHolder.currentMonth) {
+			if (lastDatePlusOneDay.monthValue == DataHolder.currentMonth) {
 				val lastDateTime = LocalDateTime.of(lastDatePlusOneDay, LocalTime.of(12, 0))
 				WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
 			} else {
@@ -200,7 +153,7 @@ class TableViewController : Initializable {
 		} else {
 			val localDate = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, 1)
 			val dateTime = LocalDateTime.of(localDate, LocalTime.of(12, 0))
-			session = WorkSession(dateTime, 180, "Doplnit!")
+			WorkSession(dateTime, 180, "Doplnit!")
 		}
 
 
@@ -218,7 +171,7 @@ class TableViewController : Initializable {
 	 * @param state to modify when the user makes a change to the column
 	 * @return ChangeListener that can be added or removed from any given observable value
 	 */
-	private fun <T> generateListener(state: EditingStateHolder): ChangeListener<T> = ChangeListener { _, _, _ ->
+	private fun <T> generateChangeListener(state: EditingStateHolder): ChangeListener<T> = ChangeListener { _, _, _ ->
 		state.value = FINISHED
 	}
 
@@ -229,10 +182,13 @@ class TableViewController : Initializable {
 	 * The solution is to hold the variable in a class, and pass the class instance to the functions instead.
 	 */
 	private class EditingStateHolder(initial: EditingState) {
-		enum class EditingState { EDITING, CANCELLED, FINISHED }
+		enum class EditingState { EDITING, CANCELED, FINISHED }
 
 		var value = initial
 	}
+
+	private var editingRow = 0 // Used in the row editor to determine the currently used row
+	private var isEditing = false // Used in the row editor, ensures only one edit at a time is possible
 
 	/**
 	 * Edits the currently selected row (cell after cell), one row at a time
@@ -242,11 +198,12 @@ class TableViewController : Initializable {
 		if (!isEditing) {
 			editingRow = table.selectionModel.selectedIndex
 			isEditing = true
-			informativeNotification("Úprava řádku $editingRow začala.")
 
 			thread {
 				while (isEditing) {
 					try {
+						// TODO: Editing description should be without a timer
+						// TODO: Editing should be canceled when focus is lost
 						if (!fast) editCell(date, 5000)
 						editCell(time, 8000)
 						editCell(duration, 5000)
@@ -260,7 +217,7 @@ class TableViewController : Initializable {
 
 						}
 					} catch (e: IllegalStateException) {
-						println("WARNING: ${e.message}")
+						println("DEBUG: ${e.message}")
 					}
 
 					isEditing = false
@@ -272,7 +229,7 @@ class TableViewController : Initializable {
 	/**
 	 * @param column specified to edit on a given row
 	 * @param terminateInMilliseconds when to terminate editing
-	 * @throws IllegalStateException if editing goes on over specified time
+	 * @throws IllegalStateException if editing was canceled
 	 */
 	private fun <T> editCell(column: TableColumn<WorkSession, T>, terminateInMilliseconds: Int) {
 		// ProgressBar initialization
@@ -280,8 +237,10 @@ class TableViewController : Initializable {
 		progressBar.visibleProperty().value = true
 
 		// State management
-		val state = EditingStateHolder(EDITING)
-		val listener = generateListener<T>(state)
+		DataHolder.editCellFinishNow = false
+		DataHolder.editCellCancelNow = false
+		val editingState = EditingStateHolder(EDITING)
+		val listener = generateChangeListener<T>(editingState)
 		column.getCellObservableValue(editingRow).addListener(listener)
 
 		// User interface management
@@ -292,9 +251,9 @@ class TableViewController : Initializable {
 			progressBar.progressProperty().value = 0.0
 		}
 
-		// Progress management
+		// Progress and state management
 		var timeInMilliseconds = 0
-		do {
+		while (editingState.value == EDITING) {
 			Thread.sleep(50)
 			timeInMilliseconds += 50
 
@@ -302,17 +261,20 @@ class TableViewController : Initializable {
 				progressBar.progressProperty().value = (timeInMilliseconds / (terminateInMilliseconds / 100.0)) / 100.0
 			}
 
-			if (timeInMilliseconds >= terminateInMilliseconds) {
-				state.value = CANCELLED
+			if (timeInMilliseconds >= terminateInMilliseconds || DataHolder.editCellCancelNow == true) {
+				editingState.value = CANCELED
 			}
-		} while (state.value == EDITING)
-		Thread.sleep(100)
+
+			if (DataHolder.editCellFinishNow == true) {
+				editingState.value = FINISHED
+			}
+		}
 
 		// Termination
 		column.getCellObservableValue(editingRow).removeListener(listener)
 		progressBar.visibleProperty().value = false
-		if (state.value == CANCELLED) {
-			throw IllegalStateException("Editing has been cancelled in column '${column.text}' on row $editingRow")
+		if (editingState.value == CANCELED) {
+			throw IllegalStateException("Editing has been canceled in column '${column.text}' on row $editingRow")
 		}
 	}
 }

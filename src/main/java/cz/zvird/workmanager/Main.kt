@@ -13,12 +13,11 @@ import javafx.scene.image.Image
 import javafx.stage.Stage
 
 // TODO: Save dialog when exiting if changes were made
-// TODO: Fix committing the same value over again
-// TODO: Stop cell editing after successful commit
 // TODO: Inspect current usage of threads, and possible future usages of it across the project (XLSX exporting)
 // TODO: Start session and stop session buttons
 // TODO: Implement Wage Calculator into the app
-// TODO: Make tax calculation variables editable
+// TODO: Make tax calculation variables transparent and editable
+// TODO: Change delete keyboard shortcut, revise ALL other shortcuts (even in event filters)
 
 class Main : Application() {
 	override fun start(stage: Stage) {

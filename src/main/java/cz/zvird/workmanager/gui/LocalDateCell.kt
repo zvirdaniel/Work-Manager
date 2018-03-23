@@ -18,10 +18,11 @@ import java.time.format.DateTimeFormatter
 import kotlin.concurrent.thread
 
 /**
- * Custom cell with a DatePicker
+ * Custom cell with a date picker
  */
 class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 	private val datePicker = DatePicker()
+	private var oldValue: LocalDate? = null
 
 	init {
 		initDatePicker()
@@ -34,35 +35,54 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 				startEdit()
 			}
 		}
+
+		/**
+		 * Informs the DataHolder about canceling the edit
+		 */
+		this.addEventFilter(KeyEvent.KEY_PRESSED) {
+			if (!it.isShiftDown && !it.isControlDown && !it.isAltDown && it.code == KeyCode.ESCAPE) {
+				DataHolder.editCellCancelNow = true
+			}
+		}
 	}
 
 	/**
-	 * Makes DatePicker visible, requests focus, waits 100ms in another thread, and selects all text in a TextField
+	 * Makes date picker visible, requests focus, waits 100ms in another thread, and selects all text in a TextField
 	 */
 	override fun startEdit() {
 		super.startEdit()
 		contentDisplay = ContentDisplay.GRAPHIC_ONLY
 
-		thread(start = true, isDaemon = false, block = {
+		oldValue = datePicker.value
+
+		thread {
 			Thread.sleep(125)
 			Platform.runLater {
 				datePicker.requestFocus()
 				datePicker.editor.selectAll()
 			}
-		})
+		}
 	}
 
 	/**
-	 * Hides DatePicker and commits the value to the controller
+	 * Hides date picker and commits the value to the controller
 	 */
 	override fun commitEdit(newValue: LocalDate?) {
 		super.commitEdit(newValue)
 		datePicker.value = newValue
 		contentDisplay = ContentDisplay.TEXT_ONLY
+
+		/**
+		 * There is a bug in the JavaFX platform, which does not commit the value properly, if the new value is the same as the old value
+		 * The following code tells the row editor to continue editing the next cell
+		 */
+		if (oldValue == newValue) {
+			DataHolder.editCellFinishNow = true
+		}
 	}
 
 	/**
-	 * Hides DatePicker, does not commit any values
+	 * Hides date picker, does not commit any values
 	 */
 	override fun cancelEdit() {
 		super.cancelEdit()
@@ -96,13 +116,16 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 	}
 
 	/**
-	 * Initialises DatePicker attributes and behaviour
+	 * Initializes date picker attributes and behaviour
 	 */
 	private fun initDatePicker() {
 		datePicker.isEditable = true
 		datePicker.promptText = "dd. mm. yyyy"
 		datePicker.converter = generateLocalDateConverter()
 
+		/**
+		 * Filters the available dates in the graphical date picker to the given month
+		 */
 		val dayCellFactory = Callback<DatePicker, DateCell> {
 			object : DateCell() {
 				override fun updateItem(item: LocalDate, empty: Boolean) {
@@ -128,14 +151,14 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 		var lastDate = datePicker.value
 
 		/**
-		 * Sets last used date to a variable when opening the DatePicker UI
+		 * Sets last used date to a variable when opening the date picker
 		 */
 		datePicker.setOnShown {
 			lastDate = datePicker.value
 		}
 
 		/**
-		 * Commits a change and closes the UI if the user picks a new date
+		 * Commits the change and closes the date picker if the user picks a new date
 		 */
 		datePicker.setOnHidden {
 			val newValue = datePicker.value
@@ -148,8 +171,8 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 		}
 
 		/**
-		 * The JavaFX platform has a bug, which does not commit value of its TextField when pressing the ENTER key
-		 * This fixes the problem, it overrides default behaviour when pressing the ENTER key in a TextField
+		 * There is a bug in the JavaFX platform, which does not commit value of its TextField when pressing the ENTER key
+		 * This fixes the problem, it overrides the default behaviour when pressing the ENTER key in a TextField
 		 */
 		datePicker.addEventFilter(KeyEvent.KEY_PRESSED, {
 			if (it.code == KeyCode.ENTER) {

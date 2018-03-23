@@ -51,12 +51,12 @@ fun informativeNotification(text: String) {
  * Shows error notification with a given message
  * @param message that will show up in the notification
  */
-fun errorNotification(message: String) {
+fun errorNotification(message: String, hideAfterMillis: Double = 4000.0) {
 	safeCall {
 		Notifications.create()
 				.title(DataHolder.appTitle)
 				.text(message)
-				.hideAfter(Duration(4000.0))
+				.hideAfter(Duration(hideAfterMillis))
 				.showError()
 	}
 }
