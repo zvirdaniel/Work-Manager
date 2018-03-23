@@ -18,6 +18,7 @@ import javafx.stage.Stage
 // TODO: Implement Wage Calculator into the app
 // TODO: Make tax calculation variables transparent and editable
 // TODO: Change delete keyboard shortcut, revise ALL other shortcuts (even in event filters)
+// TODO: Pressing enter on the same value in any text field should refocus the given table, row and cell
 
 class Main : Application() {
 	override fun start(stage: Stage) {
@@ -34,16 +35,14 @@ class Main : Application() {
 		DataHolder.primaryStage.scene = Scene(root, 960.0, 600.0)
 		DataHolder.primaryStage.minWidth = 960.0
 		DataHolder.primaryStage.minHeight = 600.0
+		DataHolder.primaryStage.title = DataHolder.appTitle
 		DataHolder.primaryStage.show()
 
 		initializeData()
-
-		DataHolder.getTableViewController().table.requestFocus()
-		Platform.runLater { DataHolder.getTableViewController().table.selectionModel.selectFirst() }
 	}
 
 	/**
-	 * Loads last used file, or creates and loads a temporary one, after the UI is loaded
+	 * Loads last used file, or creates and loads a temporary one
 	 */
 	private fun initializeData() {
 		BlockedTask {
@@ -54,8 +53,6 @@ class Main : Application() {
 				FileManager.load(temporaryFile)
 			}
 		}
-
-		DataHolder.mainController.refreshBottomBarUI()
 	}
 
 	/**
@@ -92,6 +89,7 @@ fun <T> safeCall(function: () -> T): T? {
 
 	var result: T? = null
 	Platform.runLater {
+		println("DEBUG: runLater has been used in the safeCall with function")
 		result = function()
 	}
 

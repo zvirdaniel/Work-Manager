@@ -56,7 +56,7 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 		oldValue = datePicker.value
 
 		thread {
-			Thread.sleep(125)
+			Thread.sleep(150)
 			Platform.runLater {
 				datePicker.requestFocus()
 				datePicker.editor.selectAll()
@@ -74,10 +74,19 @@ class LocalDateCell : TableCell<WorkSession, LocalDate>() {
 
 		/**
 		 * There is a bug in the JavaFX platform, which does not commit the value properly, if the new value is the same as the old value
-		 * The following code tells the row editor to continue editing the next cell
+		 * The following code manages focus loss, and tells the row editor to proceed editing the next cell
 		 */
 		if (oldValue == newValue) {
-			DataHolder.editCellFinishNow = true
+			if (DataHolder.getTableViewController().rowEditorActive) {
+				DataHolder.editCellFinishNow = true
+				return
+			}
+
+			val row = this.tableRow.index
+			val column = this.tableColumn
+			if (column != null) {
+				DataHolder.getTableViewController().focusCell(row, column)
+			}
 		}
 	}
 

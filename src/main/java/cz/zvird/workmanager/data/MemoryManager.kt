@@ -54,7 +54,7 @@ object MemoryManager {
 		get() = workYear.year
 
 	/**
-	 * Reloads the JSON and displays it, automatically corrects the data structure if needed
+	 * Reloads the JSON and displays it, corrects the data structure if requested
 	 * @param validate will check and repair the data structure, shows dialogs to the user if needed
 	 * @throws Exception if parsing or correcting the JSON fails irrecoverably
 	 */

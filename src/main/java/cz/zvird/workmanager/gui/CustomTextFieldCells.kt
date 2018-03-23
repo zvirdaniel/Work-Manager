@@ -16,8 +16,8 @@ import java.time.format.DateTimeParseException
  * Generates custom text field table cell, which integrates into the DataHolders variables properly
  * Handles edit cancellation, fixes the bug caused when committing the same value to the cell
  */
-private fun <S, T> generateCustomTextFieldTableCell(converter: StringConverter<T>): TextFieldTableCell<S, T> {
-	return object : TextFieldTableCell<S, T>(converter) {
+private fun <T> generateCustomTextFieldTableCell(converter: StringConverter<T>): TextFieldTableCell<WorkSession, T> {
+	return object : TextFieldTableCell<WorkSession, T>(converter) {
 		init {
 			/**
 			 * Informs the DataHolder about canceling the edit
@@ -42,10 +42,19 @@ private fun <S, T> generateCustomTextFieldTableCell(converter: StringConverter<T
 
 			/**
 			 * There is a bug in the JavaFX platform, which does not commit the value properly, if the new value is the same as the old value
-			 * The following code tells the row editor to continue editing the next cell
+			 * The following code manages focus loss, and tells the row editor to proceed editing the next cell
 			 */
 			if (oldValue == newValue) {
-				DataHolder.editCellFinishNow = true
+				if (DataHolder.getTableViewController().rowEditorActive) {
+					DataHolder.editCellFinishNow = true
+					return
+				}
+
+				val row = this.tableRow.index
+				val column = this.tableColumn
+				if (column != null) {
+					DataHolder.getTableViewController().focusCell(row, column)
+				}
 			}
 		}
 	}

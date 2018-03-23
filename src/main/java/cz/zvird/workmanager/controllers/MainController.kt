@@ -71,6 +71,7 @@ class MainController : Initializable {
 
 		// Requests focus, scrolls to the end of the table, hooks listeners for wage calculation, and sorts all data by its first column
 		tabPane.selectionModel.selectedIndexProperty().addListener { _, oldValue, newValue ->
+			DataHolder.editCellCancelNow = true // Terminates any row editor instances
 			DataHolder.currentTab = newValue.toInt()
 			val oldTab = DataHolder.getTableViewController(oldValue.toInt())
 			val newTab = DataHolder.getTableViewController()

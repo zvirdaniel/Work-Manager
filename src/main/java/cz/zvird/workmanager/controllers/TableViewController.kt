@@ -8,6 +8,7 @@ import cz.zvird.workmanager.gui.generateDurationTextCell
 import cz.zvird.workmanager.gui.generateLocalTimeTextCell
 import cz.zvird.workmanager.gui.generateStringTextCell
 import cz.zvird.workmanager.models.WorkSession
+import cz.zvird.workmanager.safeCall
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.event.EventHandler
@@ -46,7 +47,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Adds Ctrl+N, Ctrl+E, Ctrl+T and Delete key handlers
+	 * Adds table view key handlers
 	 */
 	private fun addKeyboardHandlers() {
 		table.addEventFilter(KeyEvent.KEY_PRESSED, {
@@ -80,21 +81,10 @@ class TableViewController : Initializable {
 	 * Responsible for rendering the data contained within each cell for a single column
 	 */
 	private fun cellFactories() {
-		date.cellFactory = Callback {
-			LocalDateCell()
-		}
-
-		time.cellFactory = Callback {
-			generateLocalTimeTextCell()
-		}
-
-		duration.cellFactory = Callback {
-			generateDurationTextCell()
-		}
-
-		description.cellFactory = Callback {
-			generateStringTextCell()
-		}
+		date.cellFactory = Callback { LocalDateCell() }
+		time.cellFactory = Callback { generateLocalTimeTextCell() }
+		duration.cellFactory = Callback { generateDurationTextCell() }
+		description.cellFactory = Callback { generateStringTextCell() }
 	}
 
 	/**
@@ -188,22 +178,22 @@ class TableViewController : Initializable {
 	}
 
 	private var editingRow = 0 // Used in the row editor to determine the currently used row
-	private var isEditing = false // Used in the row editor, controls the thread state, ensures only one edit at a time is possible
+	var rowEditorActive = false // Used in the row editor, controls the thread state, ensures only one row editor at a time is possible
 
 	/**
 	 * Edits the currently selected row (cell after cell), one row at a time
 	 * @param fast whether to skip editing date
 	 */
 	private fun editCurrentRow(fast: Boolean) {
-		if (isEditing) {
-			isEditing = false // Terminates any other threads depending on this variable
+		if (rowEditorActive) {
+			rowEditorActive = false // Terminates any other threads depending on this variable
 		}
 
 		editingRow = table.selectionModel.selectedIndex
-		isEditing = true
+		rowEditorActive = true
 
 		thread {
-			while (isEditing) {
+			while (rowEditorActive) {
 				try {
 					if (!fast) editCell(date)
 					editCell(time)
@@ -221,7 +211,7 @@ class TableViewController : Initializable {
 					println("DEBUG: ${e.message}")
 				}
 
-				isEditing = false
+				rowEditorActive = false
 			}
 		}
 	}
@@ -272,6 +262,17 @@ class TableViewController : Initializable {
 		progressBar.visibleProperty().value = false
 		if (editingState.value == CANCELED) {
 			throw IllegalStateException("Editing has been canceled in column '${column.text}' on row $editingRow")
+		}
+	}
+
+	/**
+	 * Sets focus to the given column on the given row
+	 */
+	fun <T> focusCell(row: Int, column: TableColumn<WorkSession, T>) {
+		safeCall {
+			table.requestFocus()
+			table.selectionModel.select(row, column)
+			table.focusModel.focus(row, column)
 		}
 	}
 }
