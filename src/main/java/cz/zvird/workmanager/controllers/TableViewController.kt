@@ -188,50 +188,50 @@ class TableViewController : Initializable {
 	}
 
 	private var editingRow = 0 // Used in the row editor to determine the currently used row
-	private var isEditing = false // Used in the row editor, ensures only one edit at a time is possible
+	private var isEditing = false // Used in the row editor, controls the thread state, ensures only one edit at a time is possible
 
 	/**
 	 * Edits the currently selected row (cell after cell), one row at a time
 	 * @param fast whether to skip editing date
 	 */
 	private fun editCurrentRow(fast: Boolean) {
-		if (!isEditing) {
-			editingRow = table.selectionModel.selectedIndex
-			isEditing = true
+		if (isEditing) {
+			isEditing = false // Terminates any other threads depending on this variable
+		}
 
-			thread {
-				while (isEditing) {
-					try {
-						// TODO: Editing description should be without a timer
-						// TODO: Editing should be canceled when focus is lost
-						if (!fast) editCell(date, 5000)
-						editCell(time, 8000)
-						editCell(duration, 5000)
-						editCell(description, 20000)
+		editingRow = table.selectionModel.selectedIndex
+		isEditing = true
 
-						Thread.sleep(100)
-						Platform.runLater {
-							table.requestFocus()
-							table.selectionModel.select(editingRow)
-							table.focusModel.focus(editingRow)
+		thread {
+			while (isEditing) {
+				try {
+					if (!fast) editCell(date)
+					editCell(time)
+					editCell(duration)
+					editCell(description)
 
-						}
-					} catch (e: IllegalStateException) {
-						println("DEBUG: ${e.message}")
+					Thread.sleep(100)
+					Platform.runLater {
+						table.requestFocus()
+						table.selectionModel.select(editingRow)
+						table.focusModel.focus(editingRow)
+
 					}
-
-					isEditing = false
+				} catch (e: IllegalStateException) {
+					println("DEBUG: ${e.message}")
 				}
+
+				isEditing = false
 			}
 		}
 	}
 
 	/**
-	 * @param column specified to edit on a given row
-	 * @param terminateInMilliseconds when to terminate editing
+	 * Edits the given column in the current row, cancels the edit on the focus loss
+	 * @param column to edit on the given row
 	 * @throws IllegalStateException if editing was canceled
 	 */
-	private fun <T> editCell(column: TableColumn<WorkSession, T>, terminateInMilliseconds: Int) {
+	private fun <T> editCell(column: TableColumn<WorkSession, T>) {
 		// ProgressBar initialization
 		val progressBar = DataHolder.mainController.progress
 		progressBar.visibleProperty().value = true
@@ -248,20 +248,17 @@ class TableViewController : Initializable {
 			table.selectionModel.select(editingRow, column)
 			table.focusModel.focus(editingRow, column)
 			table.edit(editingRow, column)
-			progressBar.progressProperty().value = 0.0
+			progressBar.progressProperty().value = -1.0
 		}
 
-		// Progress and state management
-		var timeInMilliseconds = 0
+		// State management
 		while (editingState.value == EDITING) {
 			Thread.sleep(50)
-			timeInMilliseconds += 50
 
-			Platform.runLater {
-				progressBar.progressProperty().value = (timeInMilliseconds / (terminateInMilliseconds / 100.0)) / 100.0
-			}
+			val focusedCell = table.focusModel.focusedCell
+			val focusedRow = focusedCell.row
 
-			if (timeInMilliseconds >= terminateInMilliseconds || DataHolder.editCellCancelNow == true) {
+			if (DataHolder.editCellCancelNow == true || focusedCell.tableColumn != column || focusedRow != editingRow) {
 				editingState.value = CANCELED
 			}
 
