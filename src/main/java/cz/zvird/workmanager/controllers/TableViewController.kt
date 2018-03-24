@@ -182,12 +182,16 @@ class TableViewController : Initializable {
 	 */
 	private fun editCurrentRow() {
 		if (rowEditorActive) {
-			rowEditorActive = false // Terminates any other threads depending on this variable
+			rowEditorActive = false // Terminates all threads depending on this variable
 		}
 
 		editingRow = table.selectionModel.selectedIndex
-		rowEditorActive = true
 
+		if (table.items.isEmpty() || table.items[editingRow] == null) {
+			return
+		}
+
+		rowEditorActive = true
 		thread {
 			while (rowEditorActive) {
 				try {
