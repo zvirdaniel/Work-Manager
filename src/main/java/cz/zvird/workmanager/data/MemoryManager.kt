@@ -20,12 +20,6 @@ import java.time.Year
 object MemoryManager {
 	internal val workYear: WorkYear
 
-	var isChanged: Boolean = false
-		set(value) {
-			field = value
-			println("Memory - is changed: $field")
-		}
-
 	init {
 		val months = hashMapOf<Int, WorkMonth>()
 		for (i in 1..12) {
@@ -35,8 +29,9 @@ object MemoryManager {
 			 * when user changes something in that specific property, ChangeEvent is fired from the list itself and listeners can catch it.
 			 */
 			months[i] = WorkMonth(
-					FXCollections.observableArrayList<WorkSession> { arrayOf(it.durationProperty) },
-					0
+					FXCollections.observableArrayList<WorkSession> {
+						arrayOf(it.beginDateProperty, it.beginTimeProperty, it.durationProperty, it.descriptionProperty)
+					}, 0
 			)
 		}
 

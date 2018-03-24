@@ -12,11 +12,11 @@ import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 
-// TODO: Save dialog when exiting if changes were made
 // TODO: Inspect current usage of threads, and possible future usages of it across the project (XLSX exporting)
 // TODO: Start session and stop session buttons
 // TODO: Implement Wage Calculator into the app
 // TODO: Make tax calculation variables transparent and editable
+// TODO: Inspect occasional fatal application failures when using safeCalls (too many Platform.runLater calls)
 
 class Main : Application() {
 	override fun start(stage: Stage) {

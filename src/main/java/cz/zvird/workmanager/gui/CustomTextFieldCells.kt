@@ -90,7 +90,12 @@ fun generateDurationTextCell(): TextFieldTableCell<WorkSession, Duration> {
 			}
 
 			try {
-				val minutes = newString.toLong() * 60.0
+				var string = newString
+				if (newString.contains(',')) {
+					string = string.replace(',', '.')
+				}
+
+				val minutes = string.toDouble() * 60.0
 				return Duration.ofMinutes(minutes.toLong())
 			} catch (e: NumberFormatException) {
 				errorNotification("$newString není validní stup!")
