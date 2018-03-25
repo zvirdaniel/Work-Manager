@@ -15,7 +15,7 @@ import java.io.File
 import java.time.Year
 
 /**
- * Manages the data in memory, and handles file interaction
+ * Manages the data in memory, and handles all file interaction
  */
 object MemoryManager {
 	internal val workYear: WorkYear
@@ -25,7 +25,7 @@ object MemoryManager {
 		for (i in 1..12) {
 			/**
 			 * When using listeners on observable lists, they fire events only if something is added or removed within the lists.
-			 * The following lambda specifies which properties of T used in the list should be checked for changes as well. Therefore,
+			 * The following lambda specifies which properties, used in the list, should be checked for changes as well. Therefore,
 			 * when user changes something in that specific property, ChangeEvent is fired from the list itself and listeners can catch it.
 			 */
 			months[i] = WorkMonth(
@@ -50,7 +50,7 @@ object MemoryManager {
 
 	/**
 	 * Reloads the JSON and displays it, corrects the data structure if requested
-	 * @param validate will check and repair the data structure, shows dialogs to the user if needed
+	 * @param validate will check and repair the data structure, shows dialogs to the user if required
 	 * @throws Exception if parsing or correcting the JSON fails irrecoverably
 	 */
 	fun fileRefresh(validate: Boolean = false) {
@@ -85,7 +85,7 @@ object MemoryManager {
 	}
 
 	/**
-	 * Checks the data structure for data consistency, and repairs it if needed
+	 * Checks the data structure for data inconsistency, and repairs it if needed
 	 * @param yearToValidate instance to check and repair
 	 */
 	private fun validateAndRepair(yearToValidate: WorkYear) {
@@ -129,8 +129,8 @@ object MemoryManager {
 
 	/**
 	 * Creates a blank JSON with basic data structure
-	 * @param file to save the data into
-	 * @param year used in the file
+	 * @param file
+	 * @param year, implicitly the current year
 	 * @throws java.io.IOException
 	 * @throws com.fasterxml.jackson.core.JsonGenerationException
 	 * @throws com.fasterxml.jackson.databind.JsonMappingException
@@ -148,7 +148,7 @@ object MemoryManager {
 
 	/**
 	 * Creates a JSON containing the user data
-	 * @param target to save data into, implicitly currently opened one
+	 * @param target implicitly currently opened one
 	 * @throws java.io.IOException
 	 * @throws com.fasterxml.jackson.core.JsonGenerationException
 	 * @throws com.fasterxml.jackson.databind.JsonMappingException

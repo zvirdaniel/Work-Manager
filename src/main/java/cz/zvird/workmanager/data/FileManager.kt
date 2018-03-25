@@ -13,7 +13,7 @@ object FileManager {
 	private var currentFile: File? = null
 
 	/**
-	 * Loads the file to the memory and displays it
+	 * Loads the file to memory and displays it
 	 * @throws Exception if file is not valid
 	 */
 	fun load(file: File, validate: Boolean = false) {
@@ -40,7 +40,7 @@ object FileManager {
 		}
 
 		val lastUsedPath = Preferences.userNodeForPackage(FileManager::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
-		if (lastUsedPath == FILE_NOT_EXISTS) { // If there is no last used file, create temporary one
+		if (lastUsedPath == FILE_NOT_EXISTS) { // If there is no last used file, create a temporary one
 			currentFile = new()
 			return retrieve()
 		}
@@ -51,9 +51,9 @@ object FileManager {
 	}
 
 	/**
-	 * Saves all the data into the selected file
-	 * @param target file to save, implicitly current file
-	 * @throws java.io.IOException if creating blank file failed
+	 * Saves all data into the selected file
+	 * @param target implicitly current file
+	 * @throws java.io.IOException if creating a blank file failed
 	 */
 	fun save(target: File? = null) {
 		if (target != null) {
@@ -66,9 +66,9 @@ object FileManager {
 
 	/**
 	 * Creates a file in the filesystem, writes blank data into it, and returns it
-	 * @param target to write blank data into, implicitly a temporary one
+	 * @param target implicitly a temporary one
 	 * @param year implicitly set to the current year
-	 * @throws java.io.IOException if creating blank file failed
+	 * @throws java.io.IOException if creating a blank file failed
 	 * @returns created file
 	 */
 	fun new(target: File? = null, year: Int = Year.now(DataHolder.zone).value): File {

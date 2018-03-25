@@ -122,7 +122,7 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 		cell.cellStyle.font.italic = true
 
 		// Finally set column widths, the width is measured in units of 1/256th of a character width
-		sheet.setColumnWidth(0, 30 * 256) //30 characters wide
+		sheet.setColumnWidth(0, 30 * 256) // 30 characters wide
 		sheet.setColumnWidth(3, 90 * 256)
 	}
 
@@ -180,9 +180,8 @@ private fun createDataStyle(wb: XSSFWorkbook): XSSFCellStyle {
 	// Alignment
 	style.setVerticalAlignment(VerticalAlignment.CENTER)
 	style.setAlignment(HorizontalAlignment.CENTER)
-
-	// gui
 	style.wrapText = true
+
 	return style
 }
 
@@ -208,11 +207,10 @@ private fun createHeaderStyle(wb: XSSFWorkbook): XSSFCellStyle {
 	// Alignment
 	style.setAlignment(HorizontalAlignment.CENTER)
 	style.setVerticalAlignment(VerticalAlignment.CENTER)
-
-	// gui
 	style.fillForegroundColor = IndexedColors.GREY_50_PERCENT.getIndex()
 	style.setFillPattern(FillPatternType.SOLID_FOREGROUND)
 	style.wrapText = true
+
 	return style
 }
 
@@ -228,5 +226,6 @@ private fun createMonthNameStyle(wb: XSSFWorkbook): XSSFCellStyle {
 	// Alignment
 	style.setAlignment(HorizontalAlignment.CENTER)
 	style.setVerticalAlignment(VerticalAlignment.CENTER)
+
 	return style
 }

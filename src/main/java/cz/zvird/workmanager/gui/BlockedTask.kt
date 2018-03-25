@@ -8,7 +8,7 @@ import javafx.scene.input.KeyEvent
 import kotlin.concurrent.thread
 
 /**
- * Executes body in the background thread, while blocking the keyboard input and the entire UI using the MaskerPane object
+ * Executes body in the background thread, while blocking the keyboard input and the entire user interface using the MaskerPane object
  * @param body function reference, will be executed in a different thread
  */
 class BlockedTask(private val body: () -> Unit) {

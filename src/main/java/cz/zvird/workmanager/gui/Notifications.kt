@@ -34,7 +34,7 @@ fun savedAsNotification(fileName: String) {
 }
 
 /**
- * Shows informative message with a given text
+ * Shows informative notification with a given text
  * @param text that will show up in the notification
  */
 fun informativeNotification(text: String) {

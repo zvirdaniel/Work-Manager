@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
 /**
- * Generates custom text field table cell, which integrates into the DataHolders variables properly
+ * Generates custom text field table cell, which integrates into the DataHolder variables properly
  * Handles edit cancellation, fixes the bug caused when committing the same value to the cell
  */
 private fun <T> generateCustomTextFieldTableCell(converter: StringConverter<T>): TextFieldTableCell<WorkSession, T> {

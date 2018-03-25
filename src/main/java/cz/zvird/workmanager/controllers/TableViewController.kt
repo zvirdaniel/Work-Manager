@@ -29,6 +29,9 @@ import java.time.LocalTime
 import java.util.*
 import kotlin.concurrent.thread
 
+/**
+ * Controller for the table view, each table has its own instance
+ */
 class TableViewController : Initializable {
 	@FXML lateinit var table: TableView<WorkSession>
 	@FXML lateinit var date: TableColumn<WorkSession, LocalDate>
@@ -65,7 +68,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Responsible for saving the data when cell factories detect a change
+	 * Responsible for saving the data when cell factories commit a change
 	 */
 	private fun commitHandlers() {
 		date.onEditCommit = EventHandler { it.rowValue.beginDateProperty.value = it.newValue }
@@ -75,7 +78,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Responsible for rendering the data contained within each cell for a single column
+	 * Responsible for rendering the data and managing the user interface of each cell
 	 */
 	private fun cellFactories() {
 		date.cellFactory = Callback { LocalDateCell() }
@@ -85,7 +88,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Responsible for populating the data for all cells within a single column
+	 * Responsible for populating the cells with data, which are rendered by the cell factories
 	 */
 	private fun cellValueFactories() {
 		date.cellValueFactory = Callback { it.value.beginDateProperty }
@@ -95,7 +98,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Double-click on blank space creates a new row
+	 * Adds a call back to the table, which makes double-clicking the blank space create a new row
 	 */
 	private fun blankRowCallback() {
 		table.rowFactory = Callback {
@@ -112,7 +115,7 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Removes a row if table is not empty
+	 * Removes a row if the table is not empty
 	 */
 	fun removeRow(row: WorkSession) {
 		if (table.items.isNotEmpty()) {

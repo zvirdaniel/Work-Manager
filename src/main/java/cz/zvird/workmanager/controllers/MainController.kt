@@ -28,7 +28,7 @@ import java.util.*
 import kotlin.concurrent.thread
 
 /**
- * Controller for the main UI, not controlling TableView
+ * Controller for the main user interface, not controlling TableView
  */
 class MainController : Initializable {
 	@FXML lateinit var tabPane: TabPane
@@ -66,10 +66,10 @@ class MainController : Initializable {
 		clearMonthMenu.onAction = EventHandler { clearCurrentMonth() }
 		hourlyWageField.onKeyPressed = EventHandler { hourlyWageKeyPress(it) }
 
-		// MaskerPane is used to block the UI if needed
+		// MaskerPane is used to block the user interface if needed
 		stackPane.children.add(DataHolder.maskerPane)
 
-		// Requests focus, scrolls to the end of the table, hooks listeners for wage calculation, and sorts all data by its first column
+		// On every tab change: sorts the table, hooks up listeners for wage calculation, refreshes the bottom bar
 		tabPane.selectionModel.selectedIndexProperty().addListener { _, oldValue, newValue ->
 			DataHolder.editCellCancelNow = true // Terminates any row editor instances
 			DataHolder.currentTab = newValue.toInt()
@@ -87,7 +87,7 @@ class MainController : Initializable {
 			}
 		}
 
-		// Select tab with current month
+		// Selects tab with the current month
 		val currentMonthIndex = Date().toInstant().atZone(DataHolder.zone).toLocalDate().month.value - 1
 		tabPane.selectionModel.select(currentMonthIndex)
 		DataHolder.currentTab = currentMonthIndex
@@ -117,7 +117,7 @@ class MainController : Initializable {
 
 	/**
 	 * Removes previous sorting properties of the given table view, and sorts all data in ascending order by its first column
-	 * Requests focus to the last row in the given table, after the sort
+	 * The, requests focus to the last row in the given table
 	 * @param tableView to sort, implicitly the currently opened table view
 	 */
 	fun sortTableAndFocus(tableView: TableView<WorkSession> = DataHolder.getTableViewController().table) {
@@ -143,7 +143,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Changes the hourly wage for the current tab, and updates the bottom bar UI
+	 * Changes the hourly wage for the current tab, and updates the bottom bar user interface
 	 */
 	private fun hourlyWageKeyPress(event: KeyEvent) {
 		if (event.code == KeyCode.ENTER) {
@@ -233,7 +233,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Opens an export dialog (file selector, and month range selector) and exports the file
+	 * Opens an export dialog (file selector, and a month range selector) and exports the file
 	 */
 	private fun exportFileUI() {
 		val pair = showExportFileDialog(window) ?: return // Terminates exporting if dialog was closed with the cancel button
@@ -254,7 +254,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Creates a new row in currently opened tab by calling its controller
+	 * Creates a new row in the currently opened tab
 	 */
 	private fun newRow() {
 		val currentTab = DataHolder.getTableViewController()
@@ -262,7 +262,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Deletes a row by calling the controller for currently opened tab
+	 * Deletes a row in the currently opened tab
 	 */
 	private fun deleteRow() {
 		val currentTab = DataHolder.getTableViewController()
@@ -273,7 +273,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Opens a file selector and creates new file
+	 * Opens a file selector and creates a new file
 	 */
 	private fun newFileUI() {
 		val string = showYearSelectorDialog(window)

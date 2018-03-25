@@ -19,7 +19,7 @@ import java.time.Year
 
 /**
  * Shows text input dialog to enter a year
- * @return integer, or null if user entered wrong values
+ * @return integer, or null if user entered any incorrect values
  */
 fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): String? = safeCall {
 	val dialog = TextInputDialog(Year.now(DataHolder.zone).value.toString())
@@ -48,6 +48,7 @@ fun showYearSelectorDialog(ownerWindow: Window?, headerText: String? = null): St
 }
 
 /**
+ * Shows the file export dialog
  * @return null if dialog was canceled, Pair with range of months to export and the selected file otherwise
  */
 fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?>? = safeCall {
@@ -96,10 +97,10 @@ fun showExportFileDialog(ownerWindow: Window): Pair<IntRange, File?>? = safeCall
 
 /**
  * Shows an open file dialog
- * @param title file chooser title
- * @param filters file extension filters
- * @param initialDir opened when chooser dialog opens
- * @param ownerWindow given to file chooser itself as owner
+ * @param title
+ * @param filters
+ * @param initialDir
+ * @param ownerWindow
  * @return selected file
  */
 fun showOpenFileDialog(
@@ -121,8 +122,8 @@ fun showOpenFileDialog(
 
 /**
  * Shows a save file dialog
- * @param title file chooser title
- * @param filters file extension filters
+ * @param title
+ * @param filters
  * @param initialDir opened when chooser dialog opens
  * @param initialFileName used as suggested file name
  * @param ownerWindow given to file chooser itself as owner
@@ -161,7 +162,7 @@ fun showSaveFileDialog(
 }
 
 /**
- * Shows about dialog with a GitHub link
+ * Shows an about dialog with a link to the projects GitHub page
  */
 fun showAboutDialog(ownerWindow: Window) {
 	safeCall {
