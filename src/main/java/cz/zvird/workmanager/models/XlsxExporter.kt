@@ -32,8 +32,8 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 		val month = MemoryManager.getMonth(monthNumber)
 		val monthName = monthsCzech[monthNumber - 1]
 
-		val sheet = wb.createSheet() // Sheet with current month
-		wb.setSheetName(wb.getSheetIndex(sheet), monthName) // Set sheet name
+		val sheet = wb.createSheet() // Sheet with the current month
+		wb.setSheetName(wb.getSheetIndex(sheet), monthName) // Set the sheet name
 		sheet.printSetup.landscape = true
 		sheet.fitToPage = true
 		sheet.horizontallyCenter = true
@@ -41,10 +41,10 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 		val titleRow = sheet.createRow(0) // Row 0
 		titleRow.heightInPoints = 45F
 		val titleCell = titleRow.createCell(0)
-		titleCell.setCellValue(monthName) // Set month string to cell
-		titleCell.cellStyle = createMonthNameStyle(wb) // Set styling to cell
+		titleCell.setCellValue(monthName) // Set the name of the given month to the cell
+		titleCell.cellStyle = createMonthNameStyle(wb) // Set styling to the cell
 
-		// Border
+		// Set the border of the month title cell
 		val region = CellRangeAddress.valueOf("\$A$1:\$D$1")
 		sheet.addMergedRegion(region) // Make cell 0 expand
 		val border = BorderStyle.THIN
@@ -58,7 +58,7 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 		RegionUtil.setBorderRight(border, region, sheet)
 		RegionUtil.setRightBorderColor(borderColor, region, sheet)
 
-		// Header for every row
+		// Create a header for every row
 		val headerRow = sheet.createRow(1) // Row 1
 		headerRow.heightInPoints = 40F
 		for (i in titles.indices) {
@@ -67,7 +67,7 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 			headerCell.cellStyle = createHeaderStyle(wb) // Set styling to cell
 		}
 
-		// Create cells for data
+		// Create cells for all the data
 		for (rowNumber in 2..month.sessions.size + 1) {
 			val row = sheet.createRow(rowNumber)
 			for (column in titles.indices) {
@@ -90,7 +90,7 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 			row.getCell(3).setCellValue(session.descriptionProperty.value)
 		}
 
-		// Style cells with data
+		// Style the cells with data
 		for (rowNumber in 2..month.sessions.size + 1) {
 			val row = sheet.getRow(rowNumber)
 			for (column in titles.indices) {
@@ -100,7 +100,7 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 					3 -> cellStyle = createDescriptionStyle(wb)
 					2 -> {
 						cellStyle = createDataStyle(wb)
-						cellStyle.dataFormat = wb.createDataFormat().getFormat("0.#")
+						cellStyle.dataFormat = wb.createDataFormat().getFormat("0.0")
 					}
 					else -> cellStyle = createDataStyle(wb)
 				}
@@ -108,7 +108,7 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 			}
 		}
 
-		// Formula with total hours calculation
+		// Formula, which calculates the total hours
 		val formulaRow = sheet.createRow(month.sessions.size + 4)
 		var cell = formulaRow.createCell(0)
 		cell.setCellValue("Celkový počet hodin: ")
@@ -118,7 +118,7 @@ fun writeYearInXlsx(saveFile: File, monthRange: IntRange) {
 		cell = formulaRow.createCell(1)
 		cell.cellFormula = "SUM(C3:C27)"
 		cell.cellStyle = createDataStyle(wb)
-		cell.cellStyle.dataFormat = wb.createDataFormat().getFormat("0.##")
+		cell.cellStyle.dataFormat = wb.createDataFormat().getFormat("0.0#")
 		cell.cellStyle.font.italic = true
 
 		// Finally set column widths, the width is measured in units of 1/256th of a character width
