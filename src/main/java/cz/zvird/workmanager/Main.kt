@@ -16,7 +16,6 @@ import javafx.stage.Stage
 // TODO: Start session and stop session buttons
 // TODO: Implement Wage Calculator into the app
 // TODO: Make tax calculation variables transparent and editable
-// TODO: Inspect occasional fatal application failures when using safeCalls (too many Platform.runLater calls)
 
 class Main : Application() {
 	override fun start(stage: Stage) {
@@ -45,8 +44,9 @@ class Main : Application() {
 	private fun initializeData() {
 		BlockedTask {
 			try {
-				MemoryManager.fileRefresh(true)
+				MemoryManager.loadDataFromCurrentFile()
 			} catch (e: Exception) {
+				e.printStackTrace()
 				val temporaryFile = FileManager.new()
 				FileManager.load(temporaryFile)
 			}
@@ -87,7 +87,7 @@ fun <T> safeCall(function: () -> T): T? {
 
 	var result: T? = null
 	Platform.runLater {
-		println("DEBUG: runLater has been used in the safeCall")
+		println("DEBUG: safeCall will use the JavaFX thread")
 		result = function()
 	}
 

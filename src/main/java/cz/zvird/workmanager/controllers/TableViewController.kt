@@ -251,11 +251,11 @@ class TableViewController : Initializable {
 			val focusedCell = table.focusModel.focusedCell
 			val focusedRow = focusedCell.row
 
-			if (DataHolder.editCellCancelNow == true || focusedCell.tableColumn != column || focusedRow != editingRow) {
+			if (DataHolder.editCellCancelNow || focusedCell.tableColumn != column || focusedRow != editingRow) {
 				editingState.value = CANCELED
 			}
 
-			if (DataHolder.editCellFinishNow == true) {
+			if (DataHolder.editCellFinishNow) {
 				editingState.value = FINISHED
 			}
 		}

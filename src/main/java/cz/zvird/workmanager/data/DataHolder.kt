@@ -12,8 +12,9 @@ import java.time.ZoneId
  * Holds static variables accessible everywhere
  */
 object DataHolder {
-	var editCellFinishNow: Boolean? = false // Used in the row editor, fixes a bug in the JavaFX platform
-	var editCellCancelNow: Boolean? = false // Used in the row editor, cancels editing a row completely
+	var dataListenerEnabled = true // Used in the table view, and in the file reloading method
+	var editCellFinishNow = false // Used in the row editor, fixes a bug in the JavaFX platform
+	var editCellCancelNow = false // Used in the row editor, cancels the current row edit
 	val appTitle = "Work Manager"
 	var services: HostServices? = null // Used in the about dialog to open a link in a web browser
 	val maskerPane = MaskerPane() // Used to block the user interface

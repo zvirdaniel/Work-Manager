@@ -3,12 +3,11 @@ package cz.zvird.workmanager.data
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import cz.zvird.workmanager.gui.informativeNotification
-import cz.zvird.workmanager.gui.showYearSelectorDialog
 import cz.zvird.workmanager.models.WorkMonth
 import cz.zvird.workmanager.models.WorkSession
 import cz.zvird.workmanager.models.WorkSessionRaw
 import cz.zvird.workmanager.models.WorkYear
-import cz.zvird.workmanager.safeCall
+import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import java.io.File
@@ -49,11 +48,12 @@ object MemoryManager {
 		get() = workYear.year
 
 	/**
-	 * Reloads the JSON and displays it, corrects the data structure if requested
-	 * @param validate will check and repair the data structure, shows dialogs to the user if required
+	 * Loads the current file and displays it, performs basic data structure correction
 	 * @throws Exception if parsing or correcting the JSON fails irrecoverably
 	 */
-	fun fileRefresh(validate: Boolean = false) {
+	fun loadDataFromCurrentFile() {
+		DataHolder.dataListenerEnabled = false // Disables the data listener in all table views (in rare cases, it caused fatal crashes)
+
 		val file = FileManager.retrieve()
 		val rawDataFromFile: Pair<Int, HashMap<Int, Pair<List<WorkSessionRaw>, Int>>> = jacksonObjectMapper().readValue(file)
 
@@ -67,7 +67,7 @@ object MemoryManager {
 
 		val workYearFromFile = WorkYear(rawDataFromFile.first, workMonthsFromFile)
 
-		if (validate) validateAndRepair(workYearFromFile)
+		validateAndRepair(workYearFromFile)
 
 		workYear.year = workYearFromFile.year
 		for (i in 1..12) {
@@ -77,32 +77,26 @@ object MemoryManager {
 			monthInMemory?.hourlyWage = workYearFromFile.months[i]?.hourlyWage ?: 0
 		}
 
-		safeCall {
-			DataHolder.mainController.refreshBottomBarUI()
-			DataHolder.primaryStage.title = "${DataHolder.appTitle} - Rok ${MemoryManager.currentYear} - ${file.name}"
+		Platform.runLater {
 			DataHolder.mainController.sortTableAndFocus()
+			DataHolder.primaryStage.title = "${DataHolder.appTitle} - Rok ${MemoryManager.currentYear} - ${file.name}"
 		}
+
+		DataHolder.dataListenerEnabled = true
 	}
 
 	/**
-	 * Checks the data structure for data inconsistency, and repairs it if needed
-	 * @param yearToValidate instance to check and repair
+	 * Checks the data structure for data inconsistency, and corrects it if needed
+	 * @param yearToValidate instance to check and correct
 	 */
 	private fun validateAndRepair(yearToValidate: WorkYear) {
-		if (yearToValidate.year <= 0) {
-			val newYear = showYearSelectorDialog(
-					DataHolder.primaryStage.scene.window, "Korekce dat"
-			)?.toIntOrNull()
+		var hasChanged = false
 
-			if (newYear == null || newYear <= 0) {
-				informativeNotification("Špatně zadaný rok, použije se aktuální.")
-				yearToValidate.year = Year.now(DataHolder.zone).value
-			} else {
-				yearToValidate.year = newYear
-			}
+		if (yearToValidate.year <= 0) {
+			yearToValidate.year = Year.now(DataHolder.zone).value
+			hasChanged = true
 		}
 
-		var hasChanged = false
 		for (i in 1..12) {
 			yearToValidate.months[i]?.sessions?.let {
 				it.filter { it.beginDateProperty.value.monthValue != i }.forEach {
@@ -123,7 +117,7 @@ object MemoryManager {
 		}
 
 		if (hasChanged) {
-			informativeNotification("Datová struktura opravena.")
+			informativeNotification("Proběhla korekce dat.")
 		}
 	}
 

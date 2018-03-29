@@ -16,12 +16,12 @@ object FileManager {
 	 * Loads the file to memory and displays it
 	 * @throws Exception if file is not valid
 	 */
-	fun load(file: File, validate: Boolean = false) {
+	fun load(file: File) {
 		val lastFile = currentFile
 		currentFile = file
 
 		try {
-			MemoryManager.fileRefresh(validate)
+			MemoryManager.loadDataFromCurrentFile()
 			Preferences.userNodeForPackage(FileManager::class.java).put(LAST_USED_FILE, file.absolutePath)
 		} catch (e: Exception) {
 			currentFile = lastFile

@@ -47,8 +47,10 @@ class MainController : Initializable {
 	@FXML lateinit var progress: ProgressBar
 	private lateinit var window: Window
 
-	private val listChangeListener = ListChangeListener<WorkSession> {
-		refreshBottomBarUI()
+	internal val listChangeListener = ListChangeListener<WorkSession> {
+		if (DataHolder.dataListenerEnabled) {
+			refreshBottomBarUI()
+		}
 	}
 
 	override fun initialize(location: URL?, resources: ResourceBundle?) {
@@ -64,27 +66,26 @@ class MainController : Initializable {
 		aboutMenu.onAction = EventHandler { showAboutDialog(window) }
 		exportMenu.onAction = EventHandler { exportFileUI() }
 		clearMonthMenu.onAction = EventHandler { clearCurrentMonth() }
-		hourlyWageField.onKeyPressed = EventHandler { hourlyWageKeyPress(it) }
+		hourlyWageField.onKeyPressed = EventHandler { hourlyWageEnterKeyPress(it) }
 
 		// MaskerPane is used to block the user interface if needed
 		stackPane.children.add(DataHolder.maskerPane)
 
-		// On every tab change: sorts the table, hooks up listeners for wage calculation, refreshes the bottom bar
+		// On every tab selection: sorts the table, hooks up the change listener (used to calculate wage), refreshes the bottom bar
 		tabPane.selectionModel.selectedIndexProperty().addListener { _, oldValue, newValue ->
 			DataHolder.editCellCancelNow = true // Terminates any row editor instances
 			DataHolder.currentTab = newValue.toInt()
 			val oldTab = DataHolder.getTableViewController(oldValue.toInt())
 			val newTab = DataHolder.getTableViewController()
+			val newTable = newTab.table
+
 			Platform.runLater {
-				val newTable = newTab.table
-
 				sortTableAndFocus(newTable)
-
 				refreshBottomBarUI()
-
-				oldTab.table.items.removeListener(listChangeListener)
-				newTable.items.addListener(listChangeListener)
 			}
+
+			oldTab.table.items.removeListener(listChangeListener)
+			newTable.items.addListener(listChangeListener)
 		}
 
 		// Selects tab with the current month
@@ -145,7 +146,7 @@ class MainController : Initializable {
 	/**
 	 * Changes the hourly wage for the current tab, and updates the bottom bar user interface
 	 */
-	private fun hourlyWageKeyPress(event: KeyEvent) {
+	private fun hourlyWageEnterKeyPress(event: KeyEvent) {
 		if (event.code == KeyCode.ENTER) {
 			if (hourlyWageField.text.trim().isEmpty()) {
 				errorNotification("Nebylo zadáno číslo!")
@@ -169,7 +170,7 @@ class MainController : Initializable {
 	/**
 	 * Recalculates total time and monthly wage for the current month, and displays it in the bottom bar
 	 */
-	fun refreshBottomBarUI() {
+	private fun refreshBottomBarUI() {
 		val sessions = DataHolder.getTableViewController().table.items
 		val hourlyWage = MemoryManager.getMonth().hourlyWage
 		hourlyWageField.text = hourlyWage.toString()
@@ -350,7 +351,7 @@ class MainController : Initializable {
 	}
 
 	/**
-	 * Opens a file selector in home directory and opens the file
+	 * Opens a file selector in the home directory and opens the selected file
 	 */
 	private fun openFileUI() {
 		val file = showOpenFileDialog(
@@ -362,7 +363,7 @@ class MainController : Initializable {
 		if (file != null) {
 			BlockedTask {
 				try {
-					FileManager.load(file, true)
+					FileManager.load(file)
 				} catch (e: Exception) {
 					informativeNotification("Soubor nelze otevřít, nebo není validní.")
 				}
