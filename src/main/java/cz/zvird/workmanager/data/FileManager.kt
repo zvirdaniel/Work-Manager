@@ -9,7 +9,7 @@ import java.util.prefs.Preferences
  */
 object FileManager {
 	private const val LAST_USED_FILE = "last_used_file"
-	private const val FILE_NOT_EXISTS = "file_not_exists"
+	private const val PATH_NOT_FOUND = "path_not_found"
 	private var currentFile: File? = null
 
 	/**
@@ -34,31 +34,36 @@ object FileManager {
 	 */
 	fun retrieve(): File {
 		val file = currentFile
-
 		if (file != null) {
 			return file
 		}
 
-		val lastUsedPath = Preferences.userNodeForPackage(FileManager::class.java)[LAST_USED_FILE, FILE_NOT_EXISTS]
-		if (lastUsedPath == FILE_NOT_EXISTS) { // If there is no last used file, create a temporary one
-			currentFile = new()
-			return retrieve()
+		val lastUsedPath = Preferences.userNodeForPackage(FileManager::class.java)[LAST_USED_FILE, PATH_NOT_FOUND]
+		if (lastUsedPath != PATH_NOT_FOUND) {
+			val lastUsedFile = File(lastUsedPath)
+
+			if (lastUsedFile.exists() && lastUsedFile.isFile) {
+				currentFile = lastUsedFile
+				return retrieve()
+			}
 		}
 
-		// Return last used file
-		currentFile = File(lastUsedPath)
+		currentFile = new()
 		return retrieve()
 	}
 
 	/**
 	 * Saves all data into the selected file
 	 * @param target implicitly current file
-	 * @throws java.io.IOException if creating a blank file failed
+	 * @throws java.io.IOException
+	 * @throws com.fasterxml.jackson.core.JsonGenerationException
+	 * @throws com.fasterxml.jackson.databind.JsonMappingException
 	 */
 	fun save(target: File? = null) {
 		if (target != null) {
 			MemoryManager.saveDataToFile(target)
 			load(target)
+			return
 		}
 
 		MemoryManager.saveDataToFile()
