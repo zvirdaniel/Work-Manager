@@ -161,7 +161,6 @@ class TableViewController : Initializable {
 		}
 	}
 
-
 	/**
 	 * Listener informs the row editor about changes in the current column by editing the state
 	 * @param state to modify when the user makes a change to the column
@@ -271,32 +270,30 @@ class TableViewController : Initializable {
 
 			if (focusedRow != editingRow) {
 				message += "because of focus loss on the row"
-
-				if (DataHolder.editCellCancelNow || focusedCell.tableColumn != column || focusedRow != editingRow) {
-					editingState.value = CANCELED
-				}
-
-				if (DataHolder.editCellFinishNow) {
-					editingState.value = FINISHED
-				}
+				editingState.value = CANCELED
 			}
 
-			// Termination
-			column.getCellObservableValue(editingRow).removeListener(listener)
-			progressBar.visibleProperty().value = false
-			if (editingState.value == CANCELED) {
-				throw IllegalStateException(message)
+			if (DataHolder.editCellFinishNow) {
+				editingState.value = FINISHED
 			}
 		}
 
-		/**
-		 * Sets focus to the given column on the given row
-		 */
-		fun <T> focusCell(row: Int, column: TableColumn<WorkSession, T>) {
-			safeCall {
-				table.requestFocus()
-				table.selectionModel.select(row, column)
-				table.focusModel.focus(row, column)
-			}
+		// Termination
+		column.getCellObservableValue(editingRow).removeListener(listener)
+		progressBar.visibleProperty().value = false
+		if (editingState.value == CANCELED) {
+			throw IllegalStateException(message)
 		}
 	}
+
+	/**
+	 * Sets focus to the given column on the given row
+	 */
+	fun <T> focusCell(row: Int, column: TableColumn<WorkSession, T>) {
+		safeCall {
+			table.requestFocus()
+			table.selectionModel.select(row, column)
+			table.focusModel.focus(row, column)
+		}
+	}
+}
