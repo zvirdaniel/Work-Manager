@@ -68,11 +68,11 @@ class MainController : Initializable {
 		clearMonthMenu.onAction = EventHandler { clearCurrentMonth() }
 		hourlyWageField.onKeyPressed = EventHandler { hourlyWageEnterKeyPress(it) }
 
-		stackPane.addEventFilter(KeyEvent.KEY_PRESSED, {
+		stackPane.addEventFilter(KeyEvent.KEY_PRESSED) {
 			if (it.code == KeyCode.F2) {
 				saveFileUI()
 			}
-		})
+		}
 
 		// MaskerPane is used to block the user interface if needed
 		stackPane.children.add(DataHolder.maskerPane)

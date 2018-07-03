@@ -271,30 +271,32 @@ class TableViewController : Initializable {
 
 			if (focusedRow != editingRow) {
 				message += "because of focus loss on the row"
-				editingState.value = CANCELED
+
+				if (DataHolder.editCellCancelNow || focusedCell.tableColumn != column || focusedRow != editingRow) {
+					editingState.value = CANCELED
+				}
+
+				if (DataHolder.editCellFinishNow) {
+					editingState.value = FINISHED
+				}
 			}
 
-			if (DataHolder.editCellFinishNow) {
-				editingState.value = FINISHED
+			// Termination
+			column.getCellObservableValue(editingRow).removeListener(listener)
+			progressBar.visibleProperty().value = false
+			if (editingState.value == CANCELED) {
+				throw IllegalStateException(message)
 			}
 		}
 
-		// Termination
-		column.getCellObservableValue(editingRow).removeListener(listener)
-		progressBar.visibleProperty().value = false
-		if (editingState.value == CANCELED) {
-			throw IllegalStateException(message)
+		/**
+		 * Sets focus to the given column on the given row
+		 */
+		fun <T> focusCell(row: Int, column: TableColumn<WorkSession, T>) {
+			safeCall {
+				table.requestFocus()
+				table.selectionModel.select(row, column)
+				table.focusModel.focus(row, column)
+			}
 		}
 	}
-
-	/**
-	 * Sets focus to the given column on the given row
-	 */
-	fun <T> focusCell(row: Int, column: TableColumn<WorkSession, T>) {
-		safeCall {
-			table.requestFocus()
-			table.selectionModel.select(row, column)
-			table.focusModel.focus(row, column)
-		}
-	}
-}

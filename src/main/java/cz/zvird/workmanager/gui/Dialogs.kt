@@ -7,8 +7,11 @@ import cz.zvird.workmanager.safeCall
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.*
+<<<<<<< HEAD
 import javafx.scene.input.Clipboard
 import javafx.scene.input.ClipboardContent
+=======
+>>>>>>> cf29c16fb12ae17d89ed7375c61fe6f5a044d651
 import javafx.scene.layout.AnchorPane
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
