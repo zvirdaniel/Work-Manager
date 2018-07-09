@@ -19,7 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<StackPane fx:id="stackPane" prefHeight="600.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/8.0.121"
+<StackPane fx:id="stackPane" prefHeight="600.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/10.0.1"
            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.zvird.workmanager.controllers.MainController">
     <BorderPane>
         <top>
@@ -121,6 +121,7 @@
                                 <TextField fx:id="hourlyWageField" maxWidth="120.0" minWidth="120.0" prefWidth="120.0"
                                            promptText="číslo větší nule" ButtonBar.buttonData="LEFT"/>
                                 <ProgressBar fx:id="progress" prefWidth="200.0"/>
+                                <Button fx:id="startStopButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Načítání..." ButtonBar.buttonData="RIGHT"/>
                                 <Button fx:id="newRowButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Nový řádek"
                                         ButtonBar.buttonData="RIGHT"/>
                                 <Button fx:id="deleteButton" maxWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Odstranit"

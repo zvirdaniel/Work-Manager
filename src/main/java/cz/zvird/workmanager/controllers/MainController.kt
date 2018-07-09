@@ -41,6 +41,7 @@ class MainController : Initializable {
 	@FXML lateinit var exportMenu: MenuItem
 	@FXML lateinit var deleteButton: Button
 	@FXML lateinit var newRowButton: Button
+	@FXML lateinit var startStopButton: Button
 	@FXML lateinit var stackPane: StackPane
 	@FXML lateinit var hourlyWageField: TextField
 	@FXML lateinit var wageText: Text
@@ -57,12 +58,17 @@ class MainController : Initializable {
 		// Adds the controller to the DataHolder in order to be accessible everywhere
 		DataHolder.mainController = this
 
+		// Initializes the Start/Stop button
+		handleStartStop(true)
+
+		// Connects all EventHandlers
 		newFileMenu.onAction = EventHandler { newFileUI() }
 		openFileMenu.onAction = EventHandler { openFileUI() }
 		saveFileMenu.onAction = EventHandler { saveFileUI() }
 		saveAsFileMenu.onAction = EventHandler { saveFileAsUI() }
 		deleteButton.onAction = EventHandler { deleteRow() }
 		newRowButton.onAction = EventHandler { newRow() }
+		startStopButton.onAction = EventHandler { handleStartStop() }
 		aboutMenu.onAction = EventHandler { showAboutDialog(window) }
 		exportMenu.onAction = EventHandler { exportFileUI() }
 		clearMonthMenu.onAction = EventHandler { clearCurrentMonth() }
@@ -119,6 +125,15 @@ class MainController : Initializable {
 			Platform.runLater {
 				sortTableAndFocus()
 			}
+		}
+	}
+
+	/**
+	 * Handles the Start/Stop button
+	 */
+	private fun handleStartStop(init: Boolean = false) {
+		if (init) {
+			startStopButton.text = if (MemoryManager.lastSession == null) "Start" else "Stop"
 		}
 	}
 

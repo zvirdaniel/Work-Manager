@@ -11,13 +11,26 @@ import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import java.io.File
+import java.time.LocalDateTime
 import java.time.Year
+import java.time.format.DateTimeParseException
+import java.util.prefs.Preferences
 
 /**
  * Manages the data in memory, and handles all file interaction
  */
 object MemoryManager {
 	internal val workYear: WorkYear
+
+	private const val LAST_SESSION = "last_session_local_date_time"
+
+	var lastSession: LocalDateTime?
+		get() = try {
+			LocalDateTime.parse(Preferences.userNodeForPackage(MemoryManager::class.java).get(LAST_SESSION, "null"))
+		} catch (e: DateTimeParseException) {
+			null
+		}
+		set(value) = Preferences.userNodeForPackage(MemoryManager::class.java).put(LAST_SESSION, value.toString())
 
 	init {
 		val months = hashMapOf<Int, WorkMonth>()
