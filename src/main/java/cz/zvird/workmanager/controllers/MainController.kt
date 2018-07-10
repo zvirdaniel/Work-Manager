@@ -24,6 +24,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.net.URL
 import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -132,9 +133,26 @@ class MainController : Initializable {
 	 * Handles the Start/Stop button
 	 */
 	private fun handleStartStop(init: Boolean = false) {
+		val lastSession = MemoryManager.lastSession
+
 		if (init) {
-			startStopButton.text = if (MemoryManager.lastSession == null) "Start" else "Stop"
+			startStopButton.text = if (lastSession == null) "Start" else "Stop"
+			return
 		}
+
+		if (lastSession == null) {
+			MemoryManager.lastSession = LocalDateTime.now()
+			informativeNotification("Byl zaznamenán čas začátku, můžete aplikaci ukončit.")
+			startStopButton.text = "Stop"
+			return
+		}
+
+		val newSession = WorkSession(lastSession, LocalDateTime.now(), "TODO: Popis")
+		DataHolder.getTableViewController().addRow(newSession)
+
+		MemoryManager.lastSession = null
+		startStopButton.text = "Start"
+
 	}
 
 	/**
@@ -280,7 +298,7 @@ class MainController : Initializable {
 	 */
 	private fun newRow() {
 		val currentTab = DataHolder.getTableViewController()
-		currentTab.createNewRow()
+		currentTab.addRow()
 	}
 
 	/**

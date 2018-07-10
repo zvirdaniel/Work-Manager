@@ -59,10 +59,10 @@ class TableViewController : Initializable {
 					removeRow(table.selectionModel.selectedItem)
 
 				it.isControlDown && !it.isShiftDown && it.code == N ->
-					createNewRow()
+					addRow()
 
 				it.code == INSERT ->
-					createNewRow()
+					addRow()
 
 				it.code == F5 ->
 					editCurrentRow()
@@ -112,7 +112,7 @@ class TableViewController : Initializable {
 
 			row.onMouseClicked = EventHandler {
 				if (it.clickCount >= 2 && row.item !is WorkSession) {
-					createNewRow()
+					addRow()
 				}
 			}
 
@@ -130,30 +130,34 @@ class TableViewController : Initializable {
 	}
 
 	/**
-	 * Creates new row with some data, scrolls to the end of the table and selects it
+	 * Creates new row with data, scrolls to the end of the table and selects it
+	 * @param session will be generated if null
 	 */
-	fun createNewRow() {
-		val session: WorkSession
+	fun addRow(session: WorkSession? = null) {
+		val newSession: WorkSession
 		val lastSession = table.items.lastOrNull()
 
-		session = if (lastSession != null) {
-			val lastDatePlusOneDay = lastSession.beginDateProperty.get().plusDays(1)
-			if (lastDatePlusOneDay.monthValue == DataHolder.currentMonth) {
-				val lastDateTime = LocalDateTime.of(lastDatePlusOneDay, LocalTime.of(12, 0))
-				WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
-			} else {
-				val lastDate = lastSession.beginDateProperty.get()
-				val lastDateTime = LocalDateTime.of(lastDate, LocalTime.of(12, 0))
-				WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
-			}
+		if (session != null) {
+			newSession = session
 		} else {
-			val localDate = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, 1)
-			val dateTime = LocalDateTime.of(localDate, LocalTime.of(12, 0))
-			WorkSession(dateTime, 180, "Doplnit!")
+			newSession = if (lastSession != null) {
+				val lastDatePlusOneDay = lastSession.beginDateProperty.get().plusDays(1)
+				if (lastDatePlusOneDay.monthValue == DataHolder.currentMonth) {
+					val lastDateTime = LocalDateTime.of(lastDatePlusOneDay, LocalTime.of(12, 0))
+					WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
+				} else {
+					val lastDate = lastSession.beginDateProperty.get()
+					val lastDateTime = LocalDateTime.of(lastDate, LocalTime.of(12, 0))
+					WorkSession(lastDateTime, 180, lastSession.descriptionProperty.value)
+				}
+			} else {
+				val localDate = LocalDate.of(MemoryManager.currentYear, DataHolder.currentMonth, 1)
+				val dateTime = LocalDateTime.of(localDate, LocalTime.of(12, 0))
+				WorkSession(dateTime, 180, "Doplnit!")
+			}
 		}
 
-
-		table.items.add(session)
+		table.items.add(newSession)
 		Platform.runLater {
 			table.scrollTo(table.items.last())
 			table.requestFocus()

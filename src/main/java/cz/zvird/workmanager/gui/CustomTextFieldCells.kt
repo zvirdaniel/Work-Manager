@@ -127,7 +127,7 @@ fun generateLocalTimeTextCell(): TextFieldTableCell<WorkSession, LocalTime> {
 					return LocalTime.parse(string, DateTimeFormatter.ofPattern("HHmm"))
 				}
 
-				return LocalTime.parse(string, DateTimeFormatter.ofPattern("HH"))
+				return LocalTime.parse(string, DateTimeFormatter.ofPattern("H"))
 			} catch (e: DateTimeParseException) {
 				errorNotification("$string není validní čas!")
 			}
