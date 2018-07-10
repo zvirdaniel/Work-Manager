@@ -12,7 +12,6 @@ import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 
-// TODO: Start session and stop session buttons
 // TODO: Implement Wage Calculator into the app
 // TODO: Make tax calculation variables transparent and editable
 
