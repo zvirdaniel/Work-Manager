@@ -9,7 +9,7 @@
     <version>RELEASE</version>
 
     <properties>
-        <kotlin-version>1.2.51</kotlin-version>
+        <kotlin-version>1.2.61</kotlin-version>
     </properties>
 
     <dependencies>

@@ -20,8 +20,6 @@ import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Window
 import org.jetbrains.kotlin.utils.addToStdlib.sumByLong
 import java.io.File
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.net.URL
 import java.time.Duration
 import java.time.LocalDateTime
@@ -215,21 +213,9 @@ class MainController : Initializable {
 		hourlyWageField.text = hourlyWage.toString()
 		val duration = Duration.ofMinutes(sessions.sumByLong { it.durationProperty.value.toMinutes() })
 		val monthlyWageGross = (hourlyWage * duration.toHours()).toInt()
-		var monthlyWage = monthlyWageGross
-		var tax = 0
 
-		if (monthlyWageGross > 10000) {
-			val superGrossWage = monthlyWageGross.toDouble() * 1.34
-			val superGrossWageRounded = BigDecimal(superGrossWage / 100.0).setScale(0, RoundingMode.HALF_UP)
-			val incomeTax = superGrossWageRounded.toDouble() * 100.0 * 0.15
-			monthlyWage = (monthlyWageGross * 0.89 - incomeTax + 2070).toInt()
-			tax = monthlyWageGross - monthlyWage
-		}
+		val monthlyWageText = "Mzda: ${formatWage(monthlyWageGross)} Kč"
 
-		val monthlyWageText = when (tax) {
-			0 -> "Mzda: ${formatWage(monthlyWage)} Kč"
-			else -> "Hrubá mzda: ${formatWage(monthlyWageGross)} Kč -> Čistá mzda: ${formatWage(monthlyWage)} Kč -> Daň: ${formatWage(tax)} Kč"
-		}
 
 		val hoursText = "Čas celkem: " +
 				duration.toString()
